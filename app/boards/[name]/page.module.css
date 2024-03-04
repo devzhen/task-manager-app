@@ -1,0 +1,13 @@
+.cardsBackground {
+  display: flex;
+  flex: 1;
+  padding: 10px;
+}
+
+.cards {
+  display: flex;
+  flex: 1;
+  background-color: #2a2d43;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}

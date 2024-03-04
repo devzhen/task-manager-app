@@ -3,16 +3,35 @@
   display: flex;
   flex-direction: column;
   background-color: #191b1f;
-  padding-top: 10px;
+  padding: 10px;
+  overflow-y: auto;
 }
 
 .board {
   display: flex;
-  padding: 16px 10px 21px 27px;
-  background: inherit;
+  padding: 16px 10px 16px 27px;
+  margin-bottom: 4px;
+  background-color: #2a2d43;
+  border-radius: 10px;
   outline: none;
   border: none;
   cursor: pointer;
+  text-decoration: none;
+}
+
+.boardActive {
+  background-color: #545668;
+}
+
+.board:last-child {
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
+  background-color: #545668;
+}
+
+.board:active {
+  opacity: 0.5;
 }
 
 .board span {
@@ -23,5 +42,3 @@
 .board img {
   margin-right: 10px;
 }
-
-

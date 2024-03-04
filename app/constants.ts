@@ -8,13 +8,16 @@ export const BOARDS = {
   [firstBoardUUID]: {
     id: firstBoardUUID,
     name: 'Home board',
+    href: '/',
   },
   [secondBoardUUID]: {
     id: secondBoardUUID,
     name: 'Design board',
+    href: '/',
   },
   [thirdBoardUUID]: {
     id: thirdBoardUUID,
     name: 'Learning board',
+    href: '/',
   },
 } as const;
