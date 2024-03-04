@@ -1,0 +1,27 @@
+.container {
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  background-color: #191b1f;
+  padding-top: 10px;
+}
+
+.board {
+  display: flex;
+  padding: 16px 10px 21px 27px;
+  background: inherit;
+  outline: none;
+  border: none;
+  cursor: pointer;
+}
+
+.board span {
+  font-size: 16px;
+  color: #f8f2fc;
+}
+
+.board img {
+  margin-right: 10px;
+}
+
+

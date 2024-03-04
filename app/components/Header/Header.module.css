@@ -1,0 +1,25 @@
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  width: 100%;
+  padding-bottom: 10px;
+}
+
+.header span {
+  font-size: 30px;
+}
+
+.header span:nth-child(1) {
+  color: #f8f2fc;
+}
+
+.header span:nth-child(2) {
+  
+  background-image: linear-gradient(45deg, #ad4e8e, #ba72ba, #9b91ed);
+  background-size: 100%;
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+  -webkit-text-fill-color: transparent; 
+  -moz-text-fill-color: transparent;
+}

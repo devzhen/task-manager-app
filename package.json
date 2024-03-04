@@ -6,19 +6,45 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "type-check": "tsc --project tsconfig.json --pretty --noEmit && echo ",
+    "prepare": "husky",
+    "format": "prettier --check --ignore-path .gitignore node_modules .",
+    "format:fix": "prettier --write --ignore-path .gitignore .",
+    "lint:css": "stylelint './app/**/*.module.css'"
   },
   "dependencies": {
+    "next": "14.1.1",
+    "ramda": "^0.29.1",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.1.1"
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "typescript": "^5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/uuid": "^9.0.8",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
     "eslint": "^8",
-    "eslint-config-next": "14.1.1"
+    "eslint-config-next": "14.1.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-unused-imports": "^3.0.0",
+    "husky": "^9.0.10",
+    "prettier": "^3.2.5",
+    "stylelint": "^16.2.1",
+    "stylelint-config-recommended": "^14.0.0",
+    "stylelint-config-standard": "^36.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5"
+  },
+  "resolutions": {
+    "wrap-ansi": "7.0.0",
+    "string-width": "4.1.0"
   }
 }
