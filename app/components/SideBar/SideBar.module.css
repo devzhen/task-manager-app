@@ -9,6 +9,8 @@
 
 .board {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 16px 10px 16px 27px;
   margin-bottom: 4px;
   background-color: #2a2d43;
@@ -17,6 +19,10 @@
   border: none;
   cursor: pointer;
   text-decoration: none;
+}
+
+.boardAddItem {
+  justify-content: flex-start;
 }
 
 .boardActive {

@@ -26,3 +26,56 @@ body {
   grid-template-rows: 70px 1fr 34px;
   min-height: 100vh;
 }
+
+.ReactModal__Overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+.ReactModal__Content {
+  position: relative !important;
+  display: flex;
+  flex-direction: column;
+  width: 360px;
+  background-color: transparent !important;
+  border-radius: 20px !important;
+  border: 1px solid #696e73 !important;
+  color: #f8f2fc;
+  padding: 28px !important;
+}
+
+.ReactModal__Content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  border-radius: 20px;
+  background: linear-gradient(to top, #5d3142, #392c45, #1e254b);
+}
+
+.error {
+  color: #d85045;
+}
+
+.loader {
+  border: 2px solid #f9fafb;
+  border-top: 2px solid #3662e3;
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

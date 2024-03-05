@@ -21,3 +21,5 @@ export const BOARDS = {
     href: '/',
   },
 } as const;
+
+export const BOARD_NAME_MIN_LENGTH = 3;

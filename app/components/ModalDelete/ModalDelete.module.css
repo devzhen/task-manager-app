@@ -1,0 +1,48 @@
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.header img {
+  cursor: pointer;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  padding: 30px 0 40px;
+  font-size: 14px;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.footer button {
+  padding: 10px 20px;
+  color: #f8f2fc;
+  outline: none;
+  border: 1px solid #696e73;
+  border-radius: 10px;
+  background-color: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.footer button:active {
+  opacity: 0.5;
+}
+
+.footer button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.footer button:nth-child(1) {
+  display: flex;
+  justify-content: center;
+  min-width: 114px;
+  background-color: #3f65dd;
+}
