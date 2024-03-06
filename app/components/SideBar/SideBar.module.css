@@ -11,7 +11,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 10px 16px 27px;
+  padding: 16px 12px 16px 27px;
   margin-bottom: 4px;
   background-color: #2a2d43;
   border-radius: 10px;
@@ -23,6 +23,10 @@
 
 .boardAddItem {
   justify-content: flex-start;
+}
+
+.boardAddItem img{
+  margin-right: 10px;
 }
 
 .boardActive {
@@ -45,6 +49,12 @@
   color: #f8f2fc;
 }
 
-.board img {
+.board img:first-child() {
   margin-right: 10px;
+}
+
+.boardActions {
+  display: flex;
+  justify-content: space-between;
+  min-width: 42px;
 }

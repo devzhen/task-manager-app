@@ -25,17 +25,17 @@ export default function ModalAddBoard(props: ModalAddBoardProps) {
   const [error, setError] = useState(modalError || '');
   const [isLoading, setIsLoading] = useState(false);
 
-  const isDisabled = name.length <= BOARD_NAME_MIN_LENGTH;
+  const isDisabled = name.trim().length <= BOARD_NAME_MIN_LENGTH;
 
   const createBoardHandler = () => {
-    if (boardNames.includes(name.trim())) {
+    if (boardNames.map((item) => item.trim().toLowerCase()).includes(name.trim())) {
       setError(`The '${name}' board is present.`);
 
       return;
     }
 
     setIsLoading(true);
-    createBoard(name, board);
+    createBoard(name.trim(), board);
   };
 
   const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {

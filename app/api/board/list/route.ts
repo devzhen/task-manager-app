@@ -6,7 +6,7 @@ import constructBoardHref from '@/app/utils/constructBoardHref';
 
 export const GET = async () => {
   try {
-    const res = await sql`SELECT * FROM Boards`;
+    const res = await sql`SELECT * FROM Boards ORDER BY created`;
 
     const boards = res.rows.map((item) => ({
       ...item,

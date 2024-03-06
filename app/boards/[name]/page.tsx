@@ -1,6 +1,8 @@
 import { headers } from 'next/headers';
 
 import SideBar from '@/app/components/SideBar';
+import StatusRow from '@/app/components/StatusRow';
+import { STATUSES } from '@/app/constants';
 import { BoardType } from '@/app/types';
 
 import styles from './page.module.css';
@@ -38,7 +40,11 @@ export default async function Home() {
     <>
       <SideBar initialBoards={boards} requestUrl={requestUrl as string} />
       <div className={styles.cardsBackground}>
-        <div className={styles.cards}></div>
+        <div className={styles.cards}>
+          {Object.values(STATUSES).map((status) => {
+            return <StatusRow name={status.name} key={status.name} color={status.color} />;
+          })}
+        </div>
       </div>
     </>
   );

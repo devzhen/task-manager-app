@@ -72,7 +72,9 @@ export default function SideBar(props: SideBarProps) {
   const createBoard = async (name: string, board: BoardType | null) => {
     const method = board?.id ? 'PUT' : 'POST';
     const apiUrl = board?.id ? `${requestUrl}/api/board/update` : `${requestUrl}/api/board/add`;
-    const body = board?.id ? JSON.stringify({ name, id: board.id }) : JSON.stringify({ name });
+    const body = board?.id
+      ? JSON.stringify({ name, id: board.id, created: board.created })
+      : JSON.stringify({ name });
 
     try {
       const url = new URL(apiUrl);
@@ -93,9 +95,13 @@ export default function SideBar(props: SideBarProps) {
         const index = boards.findIndex((item) => item.id === board.id);
 
         setBoards((prev) => compose(insert(index, json.board), remove(index, 1))(prev));
+
+        router.push(json.board.href);
       } else {
         // Add
         setBoards((prev) => [...prev, json.board]);
+
+        router.push(json.board.href);
       }
 
       setModalAddState({
@@ -189,7 +195,7 @@ export default function SideBar(props: SideBarProps) {
           <Link href={item.href} key={item.id} className={className.join(' ')}>
             <span>{item.name}</span>
             {index > 0 && (
-              <div>
+              <div className={styles.boardActions}>
                 <Image
                   alt="Img"
                   src="/edit.svg"
