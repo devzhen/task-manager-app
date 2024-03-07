@@ -10,6 +10,7 @@
   "plugins": ["unused-imports", "jsx-a11y", "@typescript-eslint"],
   "root": true,
   "rules": {
+    "no-redeclare": "error",
     "no-console": "error",
     "no-multiple-empty-lines": [2, { "max": 99999, "maxEOF": 0 }],
     "no-unused-vars": "off",
