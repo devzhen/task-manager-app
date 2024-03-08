@@ -1,21 +1,26 @@
+import { useEffect, useRef } from 'react';
+
 import { STATUSES } from '@/app/constants';
-import type { StateType } from '@/app/types';
+import type { CardLayoutType } from '@/app/types';
+import getCoords from '@/app/utils/getCoords';
 
 import styles from './Card.module.css';
 
 type CardProps = {
-  id: string;
-  name: string;
-  status: keyof typeof STATUSES;
-  index: number;
-  onDragStart: (e: DragEvent) => void;
-  onDragEnd: (e: DragEvent) => void;
   hovered: boolean;
-  hoveredPosition: StateType['hoveredCard']['position'];
+  id: string;
+  index: number;
+  name: string;
+  onDragEnd: (e: DragEvent) => void;
+  onDragStart: (e: DragEvent) => void;
+  onLayout: (layout: CardLayoutType) => void;
+  status: keyof typeof STATUSES;
 };
 
 export default function Card(props: CardProps) {
-  const { name, id, status, index, onDragStart, hovered, hoveredPosition, onDragEnd } = props;
+  const { name, id, status, index, onDragStart, hovered, onDragEnd, onLayout } = props;
+
+  const ref = useRef<HTMLDivElement | null>(null);
 
   let color;
   if (status === 'backlog') {
@@ -42,15 +47,30 @@ export default function Card(props: CardProps) {
   };
 
   const classes = [styles.container];
-  if (hovered && hoveredPosition === 'top') {
-    classes.push(styles.containerActiveTop);
+  if (hovered) {
+    classes.push(styles.containerActive);
   }
-  if (hovered && hoveredPosition === 'bottom') {
-    classes.push(styles.containerActiveBottom);
-  }
+
+  useEffect(() => {
+    if (ref.current) {
+      const coords = getCoords(ref.current);
+
+      const layout = {
+        id,
+        top: coords.top,
+        middle: coords.middle,
+        bottom: coords.bottom,
+        index,
+        status,
+      };
+
+      onLayout(layout);
+    }
+  }, [index, id, status, onLayout]);
 
   return (
     <div
+      ref={ref}
       className={classes.join(' ')}
       data-id={id}
       data-role="card"
@@ -59,11 +79,10 @@ export default function Card(props: CardProps) {
       draggable
       onDragStart={onDragStartHandler as VoidFunction}
       onDragEnd={onDragEnd as VoidFunction}
+      style={{ backgroundColor: color }}
     >
-      <div className={styles.content} style={{ backgroundColor: color }}>
-        <img src={`https://placehold.co/70x70.png?text=${id}`} alt="" />
-        {name}
-      </div>
+      <img src={`https://placehold.co/70x70.png?text=${id}`} alt="" />
+      {name}
     </div>
   );
 }

@@ -49,3 +49,5 @@ export const STATUSES = {
     color: '#8fd68f',
   },
 } as const;
+
+export const FAKE_CARD_ID = 'fake-card-id';

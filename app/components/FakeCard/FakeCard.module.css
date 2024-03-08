@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  justify-content: center;
+  flex: 1;
+  width: 100%;
+  position: relative;
+}
+
+.containerMargin {
+  margin-top: 20px;
+}
+
+.containerActive::before {
+  content: '';
+  position: absolute;
+  width: 90%;
+  height: 4px;
+  top: -12px;
+  background-color: #f5f4f1;
+  border-radius: 2px;
+}

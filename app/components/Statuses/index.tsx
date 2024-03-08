@@ -9,8 +9,7 @@ import remove from 'ramda/es/remove';
 import { useEffect, useRef, useState } from 'react';
 
 import { STATUSES } from '@/app/constants';
-import type { CardType, StateType, StatusesCardType } from '@/app/types';
-import getCoords from '@/app/utils/getCoords';
+import type { CardLayoutType, CardType, StateType, StatusesCardType } from '@/app/types';
 
 import StatusRow from '../StatusRow';
 
@@ -28,7 +27,6 @@ const initialState: StateType = {
   },
   hoveredCard: {
     id: '',
-    position: 'top',
     index: 0,
   },
 };
@@ -36,12 +34,12 @@ const initialState: StateType = {
 export default function Statuses() {
   const [cards, setCards] = useState<StatusesCardType>({
     [STATUSES.backlog.value]: [
-      // {
-      //   id: 'id-1',
-      //   name: 'Backlog 1',
-      //   status: STATUSES.backlog.value,
-      //   order: 1,
-      // },
+      {
+        id: 'id-1',
+        name: 'Backlog 1',
+        status: STATUSES.backlog.value,
+        order: 1,
+      },
       // {
       //   id: 'id-2',
       //   name: 'Backlog 2',
@@ -213,6 +211,9 @@ export default function Statuses() {
     }
   };
 
+  /**
+   * Drag end handler
+   */
   const onDragEndHandler = () => {
     if (state.isInitialized) {
       setState(initialState);
@@ -220,98 +221,71 @@ export default function Statuses() {
   };
 
   /**
+   * Find nearest element id
+   */
+  const findNearestElementId = ({ y, layouts }: { y: number; layouts: CardLayoutType[] }) => {
+    const nearest: { id: string | null; index: number; status: keyof typeof STATUSES | null } = {
+      id: null,
+      index: 0,
+      status: null,
+    };
+
+    for (let i = 0; i < layouts.length; i++) {
+      const layout = layouts[i];
+
+      if (layout.id === state.currentDraggable.id) {
+        continue;
+      }
+
+      if (y <= layout.middle) {
+        nearest.id = layout.id;
+        nearest.index = layout.index;
+        nearest.status = layout.status;
+
+        break;
+      }
+    }
+
+    return nearest;
+  };
+
+  /**
    * On drag over handler
    */
-  const onDragOverHandler = (status: keyof typeof STATUSES) => (e: DragEvent) => {
-    e.preventDefault();
+  const onDragOverHandler =
+    (status: keyof typeof STATUSES) =>
+    (e: DragEvent, dropContainer: HTMLDivElement | null, layouts: CardLayoutType[]) => {
+      e.preventDefault();
 
-    setState((prev) => ({
-      ...prev,
-      currentDroppable: {
-        status,
-      },
-    }));
+      setState((prev) => ({
+        ...prev,
+        currentDroppable: {
+          status,
+        },
+      }));
 
-    const target = e.target as Element;
-    if (!target) {
-      return;
-    }
-
-    // If a user hover's above a drop area without card
-    if (target.getAttribute('data-role') === 'drop-container') {
-      const card = (e.target as Element).querySelector('[data-role="card"]:last-child');
-
-      // If there is a card in a container
-      if (card) {
-        const hoveredId = card.getAttribute('data-id') as string;
-        const hoveredIndex = parseInt(card.getAttribute('data-index') as string);
-
-        setState((prev) => ({
-          ...prev,
-          hoveredCard: {
-            id: hoveredId,
-            position: 'bottom',
-            index: Math.max(hoveredIndex + 1),
-          },
-        }));
+      if (!dropContainer) {
+        return;
       }
 
-      return;
-    }
-
-    // If a user hover's above a card
-    const hoveredCard = target.closest('div[data-role="card"]');
-    const hoveredId = hoveredCard?.getAttribute('data-id') as string;
-
-    if (hoveredCard && hoveredId !== stateRef.current.currentDraggable.id) {
-      const hoveredIndex = parseInt(hoveredCard.getAttribute('data-index') as string);
-      const hoveredCoords = getCoords(hoveredCard);
-
-      // If a cursor above top half-part of a card
-      if (e.pageY > hoveredCoords.top && e.pageY <= hoveredCoords.middle) {
-        const newIndex = hoveredIndex;
-
-        // If the same position
-        if (
-          newIndex === stateRef.current.currentDraggable.index &&
-          status !== stateRef.current.currentDraggable.status
-        ) {
-          return;
-        }
-
-        setState((prev) => ({
-          ...prev,
-          hoveredCard: {
-            id: hoveredId,
-            position: 'top',
-            index: newIndex,
-          },
-        }));
+      const { id, index } = findNearestElementId({
+        y: e.pageY + dropContainer.scrollTop,
+        layouts,
+      });
+      if (!id) {
+        // eslint-disable-next-line no-console
+        console.log(`Couldn't find a nearest card id`, id);
+        return;
       }
 
-      // If a cursor above bottom half-part of a card
-      if (e.pageY > hoveredCoords.middle && e.pageY < hoveredCoords.bottom) {
-        const newIndex = hoveredIndex + 1;
-
-        // If the same position
-        if (
-          newIndex === stateRef.current.currentDraggable.index &&
-          status !== stateRef.current.currentDraggable.status
-        ) {
-          return;
-        }
-
-        setState((prev) => ({
-          ...prev,
-          hoveredCard: {
-            id: hoveredId,
-            position: 'bottom',
-            index: newIndex,
-          },
-        }));
-      }
-    }
-  };
+      setState((prev) => ({
+        ...prev,
+        hoveredCard: {
+          id,
+          index,
+        },
+      }));
+    };
 
   /**
    * On drop handler

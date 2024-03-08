@@ -28,7 +28,15 @@ export type StateType = {
   };
   hoveredCard: {
     id: string;
-    position: 'top' | 'bottom';
     index: number;
   };
+};
+
+export type CardLayoutType = {
+  id: string;
+  top: number;
+  middle: number;
+  bottom: number;
+  index: number;
+  status: keyof typeof STATUSES;
 };
