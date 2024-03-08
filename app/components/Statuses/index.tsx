@@ -262,19 +262,32 @@ export default function Statuses() {
         currentDroppable: {
           status,
         },
+        hoveredCard: initialState.hoveredCard,
       }));
 
       if (!dropContainer) {
         return;
       }
 
-      const { id, index } = findNearestElementId({
+      const {
+        id,
+        index,
+        status: nearestStatus,
+      } = findNearestElementId({
         y: e.pageY + dropContainer.scrollTop,
         layouts,
       });
       if (!id) {
         // eslint-disable-next-line no-console
         console.log(`Couldn't find a nearest card id`, id);
+        return;
+      }
+
+      // When sorting in the same drop area
+      if (
+        nearestStatus === state.currentDraggable.status &&
+        index - state.currentDraggable.index === 1
+      ) {
         return;
       }
 
@@ -291,6 +304,10 @@ export default function Statuses() {
    * On drop handler
    */
   const onDropHandler = (newStatus: keyof typeof STATUSES) => () => {
+    if (!state.hoveredCard.id) {
+      return;
+    }
+
     const clone = ramdaClone(cardsRef.current);
 
     const oldStatus = stateRef.current.currentDraggable.status;
@@ -304,29 +321,31 @@ export default function Statuses() {
       path([oldStatus, oldIndex]),
     )(clone) as CardType;
 
-    console.log('prev', clone);
-    console.log('meta', { oldStatus, oldIndex, newIndex, newStatus, item });
+    // TODO: remove
+    // console.log('prev', clone);
+    // console.log('meta', { oldStatus, oldIndex, newIndex, newStatus, item });
 
     const newCards = compose(
-      (cards: StatusesCardType) => {
-        cards[newStatus] = cards[newStatus].map((item, index) => ({ ...item, order: index }));
-        return cards;
+      (cardsArr: StatusesCardType) => {
+        cardsArr[newStatus] = cardsArr[newStatus].map((card, index) => ({ ...card, order: index }));
+        return cardsArr;
       },
-      (cards: StatusesCardType) => {
-        cards[newStatus] = insert(newIndex, item, cards[newStatus]);
-        return cards;
+      (cardsArr: StatusesCardType) => {
+        cardsArr[newStatus] = insert(newIndex, item, cardsArr[newStatus]);
+        return cardsArr;
       },
-      (cards: StatusesCardType) => {
-        cards[oldStatus] = cards[oldStatus].map((item, index) => ({ ...item, order: index }));
-        return cards;
+      (cardsArr: StatusesCardType) => {
+        cardsArr[oldStatus] = cardsArr[oldStatus].map((card, index) => ({ ...card, order: index }));
+        return cardsArr;
       },
-      (cards: StatusesCardType) => {
-        cards[oldStatus] = remove(oldIndex, 1, cards[oldStatus]);
-        return cards;
+      (cardsArr: StatusesCardType) => {
+        cardsArr[oldStatus] = remove(oldIndex, 1, cardsArr[oldStatus]);
+        return cardsArr;
       },
     )(clone);
 
-    console.log('next', clone, '\n\n');
+    // TODO: remove
+    // console.log('next', clone, '\n\n');
 
     setCards(newCards);
     setState(initialState);

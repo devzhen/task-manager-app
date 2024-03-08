@@ -15,6 +15,14 @@
     "no-multiple-empty-lines": [2, { "max": 99999, "maxEOF": 0 }],
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": "error",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-shadow": [
+      "error",
+      {
+        "ignoreTypeValueShadow": true,
+        "ignoreFunctionTypeParameterNameValueShadow": true
+      }
+    ],
     "unused-imports/no-unused-imports": "error",
     "eol-last": ["error", "always"],
     "semi": ["error", "always"],

@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { FAKE_CARD_ID, STATUSES } from '@/app/constants';
 import type { CardLayoutType, CardType, StateType } from '@/app/types';
@@ -47,6 +47,11 @@ export default function StatusRow(props: StatusRowProps) {
     onDragOver(e, containerRef.current, layoutsArr.current);
   };
 
+  useEffect(() => {
+    layoutsObj.current = {};
+    layoutsArr.current = [];
+  }, [cards.length]);
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -63,23 +68,23 @@ export default function StatusRow(props: StatusRowProps) {
         {cards.map((card, index) => {
           return (
             <Card
+              hovered={card.id === currentHoveredState.id}
+              id={card.id}
+              index={index}
               key={card.order}
               name={card.name}
-              id={card.id}
-              status={card.status}
-              index={index}
-              onDragStart={onDragStart}
               onDragEnd={onDragEnd}
-              hovered={card.id === currentHoveredState.id}
+              onDragStart={onDragStart}
               onLayout={onCardLayout}
+              status={card.status}
             />
           );
         })}
         <FakeCard
-          id={FAKE_CARD_ID}
-          onLayout={onCardLayout}
-          hovered={FAKE_CARD_ID === currentHoveredState.id}
+          hovered={`${FAKE_CARD_ID}-${status}` === currentHoveredState.id}
+          id={`${FAKE_CARD_ID}-${status}`}
           index={cards.length}
+          onLayout={onCardLayout}
           status={status}
         />
       </div>

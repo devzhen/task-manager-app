@@ -35,7 +35,7 @@ export default function FakeCard(props: FakeCardProps) {
       const layout = {
         id,
         top: coords.top,
-        middle: coords.middle,
+        middle: coords.bottom,
         bottom: coords.bottom,
         index,
         status,
