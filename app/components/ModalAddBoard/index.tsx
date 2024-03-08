@@ -3,7 +3,7 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import Modal from 'react-modal';
 
 import { BOARD_NAME_MIN_LENGTH } from '@/app/constants';
-import { BoardType } from '@/app/types';
+import type { BoardType } from '@/app/types';
 
 import styles from './ModalAddBoard.module.css';
 

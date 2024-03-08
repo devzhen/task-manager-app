@@ -1,12 +1,7 @@
-import { Dispatch, Fragment, SetStateAction, useEffect, useRef } from 'react';
-import { useDrop } from 'react-dnd';
-
 import { STATUSES } from '@/app/constants';
-import { CardType } from '@/app/types';
-import getCoords from '@/app/utils/getCoords';
+import type { CardType, StateType } from '@/app/types';
 
 import Card from '../Card';
-import DragHelpLine from '../DragHelpLine';
 
 import styles from './StatusRow.module.css';
 
@@ -15,82 +10,16 @@ type StatusRowProps = {
   color: string;
   cards: CardType[];
   status: keyof typeof STATUSES;
-  onDrop: ({
-    id,
-    name,
-    status,
-    oldStatus,
-  }: {
-    id: string;
-    name: string;
-    status: keyof typeof STATUSES;
-    oldStatus: keyof typeof STATUSES;
-    deleteIndex: number;
-  }) => void;
-  currentHoveredCardId: string | undefined;
-  setCurrentHoveredCardId: Dispatch<SetStateAction<string | undefined>>;
+  onDragStart: (e: DragEvent) => void;
+  onDragEnd: (e: DragEvent) => void;
+  onDragOver: (e: DragEvent) => void;
+  onDrop: (e: DragEvent) => void;
+  currentHoveredState: StateType['hoveredCard'];
 };
 
 export default function StatusRow(props: StatusRowProps) {
-  const { name, color, cards, onDrop, status, currentHoveredCardId, setCurrentHoveredCardId } =
+  const { name, color, cards, onDragStart, onDragOver, onDrop, currentHoveredState, onDragEnd } =
     props;
-
-  const dragContainerRef = useRef<HTMLDivElement | null>(null);
-
-  const currentHoveredCardIdRef = useRef(currentHoveredCardId);
-
-  const [, drop] = useDrop(() => ({
-    accept: 'card',
-    drop: (item: { id: string; name: string; status: keyof typeof STATUSES; index: number }) => {
-      console.log(2222);
-      onDrop({ ...item, oldStatus: item.status, status, deleteIndex: item.index });
-    },
-    hover: (item, monitor) => {
-      // Cursor's offset
-      const offset = monitor.getClientOffset();
-
-      if (offset) {
-        const elements = document.elementsFromPoint(offset.x, offset.y);
-        elements.forEach((cardItem) => {
-          if (
-            cardItem.getAttribute('data-role') === 'card' &&
-            item.id !== cardItem.getAttribute('data-id')
-          ) {
-            console.log(cardItem);
-            const coords = getCoords(cardItem);
-
-            let hoveredCardId;
-
-            // Highlight top line
-            if (offset.y > coords.top && offset.y <= coords.top + coords.height / 2) {
-              hoveredCardId = cardItem.previousElementSibling?.getAttribute('data-line-for');
-            }
-
-            // Highlight bottom line
-            if (offset.y > coords.top + coords.height / 2 && offset.y < coords.bottom) {
-              hoveredCardId = cardItem.nextElementSibling?.getAttribute('data-line-for');
-            }
-
-            if (hoveredCardId && currentHoveredCardIdRef.current !== hoveredCardId) {
-              setCurrentHoveredCardId(hoveredCardId);
-            }
-          }
-        });
-      }
-    },
-    collect: (monitor) => {
-      return {
-        isOver: monitor.isOver(),
-        canDrop: monitor.canDrop(),
-        item: monitor.getItem(),
-        offset: monitor.getDifferenceFromInitialOffset(),
-      };
-    },
-  }));
-
-  useEffect(() => {
-    currentHoveredCardIdRef.current = currentHoveredCardId;
-  }, [currentHoveredCardId]);
 
   return (
     <div className={styles.container}>
@@ -100,26 +29,23 @@ export default function StatusRow(props: StatusRowProps) {
       </div>
       <div
         className={styles.cardWrappers}
-        ref={(ref) => {
-          dragContainerRef.current = ref;
-          drop(ref);
-        }}
+        data-role="drop-container"
+        onDragOver={onDragOver as VoidFunction}
+        onDrop={onDrop as VoidFunction}
       >
-        <DragHelpLine
-          hoveredCardId={cards[0]?.id}
-          currentHoveredCardId={currentHoveredCardId}
-          order={0}
-        />
         {cards.map((card, index) => {
           return (
-            <Fragment key={card.id}>
-              <Card name={card.name} id={card.id} status={card.status} index={index} />
-              <DragHelpLine
-                hoveredCardId={cards[index + 1]?.id || `${card.id}-last`}
-                currentHoveredCardId={currentHoveredCardId}
-                order={index + 1}
-              />
-            </Fragment>
+            <Card
+              key={card.order}
+              name={card.name}
+              id={card.id}
+              status={card.status}
+              index={index}
+              onDragStart={onDragStart}
+              onDragEnd={onDragEnd}
+              hovered={card.id === currentHoveredState.id}
+              hoveredPosition={currentHoveredState.position}
+            />
           );
         })}
       </div>

@@ -2,7 +2,7 @@ import { headers } from 'next/headers';
 
 import SideBar from '@/app/components/SideBar';
 import Statuses from '@/app/components/Statuses';
-import { BoardType } from '@/app/types';
+import type { BoardType } from '@/app/types';
 
 import styles from './page.module.css';
 

@@ -1,6 +1,5 @@
-import { useDrag } from 'react-dnd';
-
 import { STATUSES } from '@/app/constants';
+import type { StateType } from '@/app/types';
 
 import styles from './Card.module.css';
 
@@ -9,15 +8,14 @@ type CardProps = {
   name: string;
   status: keyof typeof STATUSES;
   index: number;
+  onDragStart: (e: DragEvent) => void;
+  onDragEnd: (e: DragEvent) => void;
+  hovered: boolean;
+  hoveredPosition: StateType['hoveredCard']['position'];
 };
 
 export default function Card(props: CardProps) {
-  const { name, id, status, index } = props;
-
-  const [, drag] = useDrag(() => ({
-    type: 'card',
-    item: { name, id, status, index },
-  }));
+  const { name, id, status, index, onDragStart, hovered, hoveredPosition, onDragEnd } = props;
 
   let color;
   if (status === 'backlog') {
@@ -33,16 +31,39 @@ export default function Card(props: CardProps) {
     color = 'green';
   }
 
+  const onDragStartHandler = (e: DragEvent) => {
+    if (e.dataTransfer) {
+      e.dataTransfer.setData('id', id);
+      e.dataTransfer.setData('status', status);
+      e.dataTransfer.setData('index', `${index}`);
+    }
+
+    onDragStart(e);
+  };
+
+  const classes = [styles.container];
+  if (hovered && hoveredPosition === 'top') {
+    classes.push(styles.containerActiveTop);
+  }
+  if (hovered && hoveredPosition === 'bottom') {
+    classes.push(styles.containerActiveBottom);
+  }
+
   return (
     <div
-      ref={drag}
-      className={styles.container}
+      className={classes.join(' ')}
       data-id={id}
       data-role="card"
       data-index={index}
-      style={{ backgroundColor: color }}
+      data-status={status}
+      draggable
+      onDragStart={onDragStartHandler as VoidFunction}
+      onDragEnd={onDragEnd as VoidFunction}
     >
-      {name}
+      <div className={styles.content} style={{ backgroundColor: color }}>
+        <img src={`https://placehold.co/70x70.png?text=${id}`} alt="" />
+        {name}
+      </div>
     </div>
   );
 }

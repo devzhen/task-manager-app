@@ -21,6 +21,7 @@ const getCoords = (elem: Element) => {
     left: Math.round(left),
     right: Math.round(left) + box.width,
     bottom: Math.round(top) + box.height,
+    middle: Math.round(top) + box.height / 2,
     width: box.width,
     height: box.height,
   };

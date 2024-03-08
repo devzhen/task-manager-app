@@ -1,7 +1,7 @@
 import { sql } from '@vercel/postgres';
 import { NextResponse } from 'next/server';
 
-import { BoardType } from '@/app/types';
+import type { BoardType } from '@/app/types';
 import constructBoardHref from '@/app/utils/constructBoardHref';
 
 export const PUT = async (req: Request) => {

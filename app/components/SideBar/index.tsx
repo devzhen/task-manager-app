@@ -9,7 +9,7 @@ import insert from 'ramda/src/insert';
 import remove from 'ramda/src/remove';
 import { useState } from 'react';
 
-import { BoardType } from '@/app/types';
+import type { BoardType } from '@/app/types';
 
 import ModalAddBoard from '../ModalAddBoard';
 import ModalDelete from '../ModalDelete';

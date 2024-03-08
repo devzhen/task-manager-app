@@ -15,3 +15,20 @@ export type StatusesCardType = {
   [STATUSES.inReview.value]: CardType[];
   [STATUSES.completed.value]: CardType[];
 };
+
+export type StateType = {
+  isInitialized: boolean;
+  currentDraggable: {
+    id: string;
+    status: keyof typeof STATUSES;
+    index: number;
+  };
+  currentDroppable: {
+    status: keyof typeof STATUSES;
+  };
+  hoveredCard: {
+    id: string;
+    position: 'top' | 'bottom';
+    index: number;
+  };
+};
