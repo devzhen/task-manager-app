@@ -9,16 +9,16 @@ export async function GET(req: Request) {
   }
 
   try {
-    sql`DROP TABLE IF EXISTS Boards`;
-    const result = await sql`CREATE TABLE Boards ( 
+    await sql`DROP TABLE IF EXISTS Statuses;`;
+    const result = await sql`
+      CREATE TABLE Statuses ( 
         id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-        name varchar(255), 
-        href varchar(255),
-        created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        name varchar(255),
+        UNIQUE(name)
       );`;
 
     return NextResponse.json({ result }, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ error }, { status: 500 });
+    return NextResponse.json({ error, message: (error as Error).message }, { status: 500 });
   }
 }

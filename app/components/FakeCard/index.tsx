@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import { STATUSES } from '@/app/constants';
+import { STATUSES_OBJ } from '@/app/constants';
 import type { CardLayoutType } from '@/app/types';
 import getCoords from '@/app/utils/getCoords';
 
@@ -11,7 +11,7 @@ type FakeCardProps = {
   index: number;
   hovered: boolean;
   onLayout: (layout: CardLayoutType) => void;
-  status: keyof typeof STATUSES;
+  status: keyof typeof STATUSES_OBJ;
 };
 
 export default function FakeCard(props: FakeCardProps) {

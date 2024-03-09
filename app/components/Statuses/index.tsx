@@ -1,5 +1,6 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import assocPath from 'ramda/es/assocPath';
 import ramdaClone from 'ramda/es/clone';
 import compose from 'ramda/es/compose';
@@ -8,8 +9,8 @@ import path from 'ramda/es/path';
 import remove from 'ramda/es/remove';
 import { useEffect, useRef, useState } from 'react';
 
-import { STATUSES } from '@/app/constants';
-import type { CardLayoutType, CardType, StateType, StatusesCardType } from '@/app/types';
+import { STATUSES, STATUSES_OBJ } from '@/app/constants';
+import type { BoardType, CardLayoutType, CardType, StateType, StatusesCardType } from '@/app/types';
 
 import StatusRow from '../StatusRow';
 
@@ -19,11 +20,11 @@ const initialState: StateType = {
   isInitialized: false,
   currentDraggable: {
     id: '',
-    status: STATUSES.inProgress.value,
+    status: STATUSES.backlog,
     index: 0,
   },
   currentDroppable: {
-    status: STATUSES.inProgress.value,
+    status: STATUSES.backlog,
   },
   hoveredCard: {
     id: '',
@@ -31,160 +32,21 @@ const initialState: StateType = {
   },
 };
 
-export default function Statuses() {
+type StatusesType = {
+  boards: BoardType[];
+  requestUrl: string;
+};
+
+export default function Statuses(props: StatusesType) {
+  const { boards, requestUrl } = props;
+
+  const pathname = usePathname();
+
   const [cards, setCards] = useState<StatusesCardType>({
-    [STATUSES.backlog.value]: [
-      {
-        id: 'id-1',
-        name: 'Backlog 1',
-        status: STATUSES.backlog.value,
-        order: 1,
-      },
-      // {
-      //   id: 'id-2',
-      //   name: 'Backlog 2',
-      //   status: STATUSES.backlog.value,
-      //   order: 2,
-      // },
-      // {
-      //   id: 'id-3',
-      //   name: 'Backlog 3',
-      //   status: STATUSES.backlog.value,
-      //   order: 3,
-      // },
-      // {
-      //   id: 'id-4',
-      //   name: 'Backlog 4',
-      //   status: STATUSES.backlog.value,
-      //   order: 4,
-      // },
-      // {
-      //   id: 'id-5',
-      //   name: 'Backlog 5',
-      //   status: STATUSES.backlog.value,
-      //   order: 5,
-      // },
-      // {
-      //   id: 'id-6',
-      //   name: 'Backlog 6',
-      //   status: STATUSES.backlog.value,
-      //   order: 6,
-      // },
-    ],
-    [STATUSES.inProgress.value]: [
-      {
-        id: 'id-11',
-        name: 'In Progress 11',
-        status: STATUSES.inProgress.value,
-        order: 1,
-      },
-      {
-        id: 'id-22',
-        name: 'In Progress 22',
-        status: STATUSES.inProgress.value,
-        order: 2,
-      },
-      {
-        id: 'id-33',
-        name: 'In Progress 33',
-        status: STATUSES.inProgress.value,
-        order: 3,
-      },
-      {
-        id: 'id-44',
-        name: 'In Progress 44',
-        status: STATUSES.inProgress.value,
-        order: 4,
-      },
-      {
-        id: 'id-55',
-        name: 'In Progress 55',
-        status: STATUSES.inProgress.value,
-        order: 5,
-      },
-      {
-        id: 'id-66',
-        name: 'In Progress 66',
-        status: STATUSES.inProgress.value,
-        order: 6,
-      },
-    ],
-    [STATUSES.inReview.value]: [
-      {
-        id: 'id-111',
-        name: 'In Review 111',
-        status: STATUSES.inReview.value,
-        order: 1,
-      },
-      {
-        id: 'id-222',
-        name: 'In Review 222',
-        status: STATUSES.inReview.value,
-        order: 2,
-      },
-      {
-        id: 'id-333',
-        name: 'In Review 333',
-        status: STATUSES.inReview.value,
-        order: 3,
-      },
-      {
-        id: 'id-444',
-        name: 'In Review 444',
-        status: STATUSES.inReview.value,
-        order: 4,
-      },
-      {
-        id: 'id-555',
-        name: 'In Review 555',
-        status: STATUSES.inReview.value,
-        order: 5,
-      },
-      {
-        id: 'id-666',
-        name: 'In Review 666',
-        status: STATUSES.inReview.value,
-        order: 6,
-      },
-    ],
-    [STATUSES.completed.value]: [
-      {
-        id: 'id-1111',
-        name: 'Completed 1111',
-        status: STATUSES.completed.value,
-        order: 1,
-      },
-      {
-        id: 'id-2222',
-        name: 'Completed 2222',
-        status: STATUSES.completed.value,
-        order: 2,
-      },
-      {
-        id: 'id-3333',
-        name: 'Completed 3333',
-        status: STATUSES.completed.value,
-        order: 3,
-      },
-      {
-        id: 'id-4444',
-        name: 'Completed 4444',
-        status: STATUSES.completed.value,
-        order: 4,
-      },
-      {
-        id: 'id-5555',
-        name: 'Completed 5555',
-        status: STATUSES.completed.value,
-        order: 5,
-      },
-      {
-        id: 'id-6666',
-        name: 'Completed 6666',
-        status: STATUSES.completed.value,
-        order: 6,
-      },
-    ],
+    [STATUSES.backlog]: [],
+    [STATUSES.inProgress]: [],
+    [STATUSES.inReview]: [],
+    [STATUSES.completed]: [],
   });
   const cardsRef = useRef(cards);
 
@@ -197,7 +59,7 @@ export default function Statuses() {
   const onDragStartHandler = (e: DragEvent) => {
     if (e.dataTransfer) {
       const id = e.dataTransfer.getData('id');
-      const status = e.dataTransfer.getData('status') as keyof typeof STATUSES;
+      const status = e.dataTransfer.getData('status') as keyof typeof STATUSES_OBJ;
       const index = parseInt(e.dataTransfer.getData('index'));
 
       setState((prev) => ({
@@ -224,7 +86,11 @@ export default function Statuses() {
    * Find nearest element id
    */
   const findNearestElementId = ({ y, layouts }: { y: number; layouts: CardLayoutType[] }) => {
-    const nearest: { id: string | null; index: number; status: keyof typeof STATUSES | null } = {
+    const nearest: {
+      id: string | null;
+      index: number;
+      status: keyof typeof STATUSES_OBJ | null;
+    } = {
       id: null,
       index: 0,
       status: null,
@@ -253,7 +119,7 @@ export default function Statuses() {
    * On drag over handler
    */
   const onDragOverHandler =
-    (status: keyof typeof STATUSES) =>
+    (status: keyof typeof STATUSES_OBJ) =>
     (e: DragEvent, dropContainer: HTMLDivElement | null, layouts: CardLayoutType[]) => {
       e.preventDefault();
 
@@ -303,7 +169,7 @@ export default function Statuses() {
   /**
    * On drop handler
    */
-  const onDropHandler = (newStatus: keyof typeof STATUSES) => () => {
+  const onDropHandler = (newStatus: keyof typeof STATUSES_OBJ) => () => {
     if (!state.hoveredCard.id) {
       return;
     }
@@ -316,7 +182,7 @@ export default function Statuses() {
     const newIndex = stateRef.current.hoveredCard.index;
 
     const item = compose(
-      assocPath(['order'], newIndex),
+      assocPath(['position'], newIndex),
       assocPath(['status'], newStatus),
       path([oldStatus, oldIndex]),
     )(clone) as CardType;
@@ -327,7 +193,10 @@ export default function Statuses() {
 
     const newCards = compose(
       (cardsArr: StatusesCardType) => {
-        cardsArr[newStatus] = cardsArr[newStatus].map((card, index) => ({ ...card, order: index }));
+        cardsArr[newStatus] = cardsArr[newStatus].map((card, index) => ({
+          ...card,
+          position: index,
+        }));
         return cardsArr;
       },
       (cardsArr: StatusesCardType) => {
@@ -335,7 +204,10 @@ export default function Statuses() {
         return cardsArr;
       },
       (cardsArr: StatusesCardType) => {
-        cardsArr[oldStatus] = cardsArr[oldStatus].map((card, index) => ({ ...card, order: index }));
+        cardsArr[oldStatus] = cardsArr[oldStatus].map((card, index) => ({
+          ...card,
+          position: index,
+        }));
         return cardsArr;
       },
       (cardsArr: StatusesCardType) => {
@@ -351,21 +223,56 @@ export default function Statuses() {
     setState(initialState);
   };
 
+  const fetchCards = async () => {
+    try {
+      const activeBoardIndex = boards.findIndex((item) => item.href === pathname);
+      if (activeBoardIndex !== -1) {
+        const activeBoardId = boards[activeBoardIndex].id;
+
+        const searchParams = new URLSearchParams();
+        searchParams.set('board', activeBoardId);
+        const url = new URL(`${requestUrl}/api/card/list?${searchParams.toString()}`);
+
+        const res = await fetch(url.toString(), {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const json = await res.json();
+        if ('error' in json) {
+          throw json.error;
+        }
+
+        setCards(json);
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log('fetchCards error - ', err);
+    }
+  };
+
   useEffect(() => {
     cardsRef.current = cards;
     stateRef.current = state;
   }, [cards, state]);
 
+  useEffect(() => {
+    fetchCards();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [boards, pathname, requestUrl]);
+
   return (
     <div className={styles.container}>
-      {Object.values(STATUSES).map((status) => {
+      {Object.values(STATUSES_OBJ).map((status) => {
         return (
           <StatusRow
             name={status.name}
             key={status.name}
             color={status.color}
             status={status.value}
-            cards={cards[status.value]}
+            cards={cards[status.value] || []}
             onDragStart={onDragStartHandler}
             onDragEnd={onDragEndHandler}
             onDragOver={onDragOverHandler(status.value)}

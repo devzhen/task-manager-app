@@ -1,8 +1,10 @@
 import { useEffect, useRef } from 'react';
 
-import { STATUSES } from '@/app/constants';
-import type { CardLayoutType } from '@/app/types';
+import { STATUSES_OBJ } from '@/app/constants';
+import type { CardLayoutType, TagType } from '@/app/types';
 import getCoords from '@/app/utils/getCoords';
+
+import Tags from '../Tags';
 
 import styles from './Card.module.css';
 
@@ -10,31 +12,19 @@ type CardProps = {
   hovered: boolean;
   id: string;
   index: number;
-  name: string;
+  title: string;
+  description?: string;
   onDragEnd: (e: DragEvent) => void;
   onDragStart: (e: DragEvent) => void;
   onLayout: (layout: CardLayoutType) => void;
-  status: keyof typeof STATUSES;
+  status: keyof typeof STATUSES_OBJ;
+  tags: TagType[];
 };
 
 export default function Card(props: CardProps) {
-  const { name, id, status, index, onDragStart, hovered, onDragEnd, onLayout } = props;
+  const { title, id, status, index, onDragStart, hovered, onDragEnd, onLayout, tags } = props;
 
   const ref = useRef<HTMLDivElement | null>(null);
-
-  let color;
-  if (status === 'backlog') {
-    color = 'gray';
-  }
-  if (status === 'inProgress') {
-    color = 'orange';
-  }
-  if (status === 'inReview') {
-    color = 'blue';
-  }
-  if (status === 'completed') {
-    color = 'green';
-  }
 
   const onDragStartHandler = (e: DragEvent) => {
     if (e.dataTransfer) {
@@ -79,10 +69,9 @@ export default function Card(props: CardProps) {
       draggable
       onDragStart={onDragStartHandler as VoidFunction}
       onDragEnd={onDragEnd as VoidFunction}
-      style={{ backgroundColor: color }}
     >
-      <img src={`https://placehold.co/70x70.png?text=${id}`} alt="" />
-      {name}
+      <span className={styles.title}>{title}</span>
+      <Tags tags={tags} />
     </div>
   );
 }

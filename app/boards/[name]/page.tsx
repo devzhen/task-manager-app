@@ -39,7 +39,7 @@ export default async function Home() {
     <>
       <SideBar initialBoards={boards} requestUrl={requestUrl as string} />
       <div className={styles.cardsBackground}>
-        <Statuses />
+        <Statuses boards={boards} requestUrl={requestUrl as string} />
       </div>
     </>
   );

@@ -1,0 +1,20 @@
+.container {
+  display: flex;
+  margin-top: 20px;
+}
+
+.tag {
+  display: flex;
+  align-items: center;
+  padding: 2px 4px;
+  border-radius: 4px;
+  margin-right: 6px;
+}
+
+.tag:last-child {
+  margin: 0;
+}
+
+.tagName {
+  font-size: 10px;
+}

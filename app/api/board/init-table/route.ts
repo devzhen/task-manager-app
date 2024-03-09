@@ -9,6 +9,7 @@ export async function GET(req: Request) {
   }
 
   try {
+    await sql`TRUNCATE Boards;`;
     await sql`
         INSERT INTO Boards 
           (name, href) 

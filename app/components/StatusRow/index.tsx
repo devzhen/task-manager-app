@@ -71,12 +71,14 @@ export default function StatusRow(props: StatusRowProps) {
               hovered={card.id === currentHoveredState.id}
               id={card.id}
               index={index}
-              key={card.order}
-              name={card.name}
+              key={card.id}
+              title={card.title}
+              description={card.description}
               onDragEnd={onDragEnd}
               onDragStart={onDragStart}
               onLayout={onCardLayout}
               status={card.status}
+              tags={card.tags}
             />
           );
         })}
