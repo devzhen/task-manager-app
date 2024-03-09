@@ -1,16 +1,22 @@
 .container {
   display: flex;
+  justify-content: center;
   position: relative;
   width: 100%;
   min-height: 100px;
   min-width: 260px;
-  flex-direction: column;
   margin-bottom: 20px;
-  padding: 20px;
   border-radius: 10px;
   background-color: #191b1f;
   cursor: pointer;
   transform: translate(0, 0);
+}
+
+.content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 20px;
 }
 
 .title {

@@ -70,8 +70,10 @@ export default function Card(props: CardProps) {
       onDragStart={onDragStartHandler as VoidFunction}
       onDragEnd={onDragEnd as VoidFunction}
     >
-      <span className={styles.title}>{title}</span>
-      <Tags tags={tags} />
+      <div className={styles.content}>
+        <span className={styles.title}>{title}</span>
+        <Tags tags={tags} />
+      </div>
     </div>
   );
 }
