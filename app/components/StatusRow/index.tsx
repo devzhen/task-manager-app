@@ -3,15 +3,18 @@ import { useEffect, useRef } from 'react';
 import { FAKE_CARD_ID, STATUSES } from '@/app/constants';
 import type { CardLayoutType, CardType, StateType } from '@/app/types';
 
+import ButtonAddCard from '../ButtonAddCard';
 import Card from '../Card';
 import FakeCard from '../FakeCard';
 
 import styles from './StatusRow.module.css';
 
 type StatusRowProps = {
+  addCard: () => void;
   cards: CardType[];
   color: string;
   currentHoveredState: StateType['hoveredCard'];
+  isLoading: boolean;
   name: string;
   onDragEnd: (e: DragEvent) => void;
   onDragOver: (e: DragEvent, container: HTMLDivElement | null, layouts: CardLayoutType[]) => void;
@@ -22,9 +25,11 @@ type StatusRowProps = {
 
 export default function StatusRow(props: StatusRowProps) {
   const {
+    addCard,
     cards,
     color,
     currentHoveredState,
+    isLoading,
     name,
     onDragEnd,
     onDragOver,
@@ -65,6 +70,7 @@ export default function StatusRow(props: StatusRowProps) {
         onDragOver={onDragOverHandler as VoidFunction}
         onDrop={onDrop as VoidFunction}
       >
+        {status === STATUSES.backlog && <ButtonAddCard addCard={addCard} disabled={isLoading} />}
         {cards.map((card, index) => {
           return (
             <Card

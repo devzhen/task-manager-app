@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from 'react';
 import { STATUSES, STATUSES_OBJ } from '@/app/constants';
 import type { BoardType, CardLayoutType, CardType, StateType, StatusesCardType } from '@/app/types';
 
+import StatusesLoading from '../StatusesLoading';
 import StatusRow from '../StatusRow';
 
 import styles from './Statuses.module.css';
@@ -52,6 +53,8 @@ export default function Statuses(props: StatusesType) {
 
   const [state, setState] = useState<StateType>(initialState);
   const stateRef = useRef(state);
+
+  const [isLoading, setIsLoading] = useState(true);
 
   /**
    * On drag start handler
@@ -223,11 +226,16 @@ export default function Statuses(props: StatusesType) {
     setState(initialState);
   };
 
+  /**
+   * Fetch cards
+   */
   const fetchCards = async () => {
     try {
       const activeBoardIndex = boards.findIndex((item) => item.href === pathname);
       if (activeBoardIndex !== -1) {
         const activeBoardId = boards[activeBoardIndex].id;
+
+        setIsLoading(true);
 
         const searchParams = new URLSearchParams();
         searchParams.set('board', activeBoardId);
@@ -250,8 +258,15 @@ export default function Statuses(props: StatusesType) {
     } catch (err) {
       // eslint-disable-next-line no-console
       console.log('fetchCards error - ', err);
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  /**
+   * Add card
+   */
+  const addCard = () => {};
 
   useEffect(() => {
     cardsRef.current = cards;
@@ -278,9 +293,12 @@ export default function Statuses(props: StatusesType) {
             onDragOver={onDragOverHandler(status.value)}
             onDrop={onDropHandler(status.value)}
             currentHoveredState={state.hoveredCard}
+            addCard={addCard}
+            isLoading={isLoading}
           />
         );
       })}
+      {isLoading && <StatusesLoading />}
     </div>
   );
 }
