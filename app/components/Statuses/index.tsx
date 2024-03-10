@@ -142,8 +142,7 @@ export default function Statuses(props: StatusesType) {
         layouts,
       });
       if (!insertBeforeId) {
-        // eslint-disable-next-line no-console
-        console.log(`Couldn't find a nearest card id`, insertBeforeId);
+        // console.log(`Couldn't find a nearest card id`, insertBeforeId);
         return;
       }
 

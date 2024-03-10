@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     fileUrl = blob.url;
 
     const insertRes = await sql`
-      INSERT INTO Attachment
+      INSERT INTO Attachments
         (name, url, cardId)
       VALUES
         (${file.name}, ${blob.url}, ${cardId})

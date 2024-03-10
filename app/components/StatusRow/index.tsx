@@ -90,6 +90,7 @@ export default function StatusRow(props: StatusRowProps) {
               status={card.status}
               tags={card.tags}
               parentScrollTop={scrollTop}
+              attachments={card.attachments}
             />
           );
         })}

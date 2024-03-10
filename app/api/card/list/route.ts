@@ -2,7 +2,7 @@ import { sql } from '@vercel/postgres';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { STATUSES } from '@/app/constants';
-import type { CardType, TagType } from '@/app/types';
+import type { CardType } from '@/app/types';
 
 export const GET = async (req: NextRequest) => {
   const searchParams = req.nextUrl.searchParams;
@@ -15,7 +15,38 @@ export const GET = async (req: NextRequest) => {
       });
     }
 
-    const res = await sql<CardType>`SELECT * FROM Cards WHERE boardId = ${board};`;
+    const res = await sql<CardType>`
+      SELECT 
+        Cards.*, 
+        ARRAY(
+            SELECT json_build_object(
+              'id', Tags.id, 
+              'name', Tags.name, 
+              'color', Tags.color, 
+              'fontColor', Tags.fontcolor,
+              'cardId', Tags.cardid,
+              'created', Tags.created
+            )
+            FROM Tags 
+            WHERE Cards.id = Tags.cardId
+        ) AS tags,
+        ARRAY(
+            SELECT json_build_object(
+              'id', Attachments.id, 
+              'name', Attachments.name, 
+              'url', Attachments.url,
+              'cardId', Attachments.cardid,
+              'created', Attachments.created
+            )
+            FROM Attachments 
+            WHERE Cards.id = Attachments.cardId
+        ) AS attachments
+      FROM 
+        Cards
+      WHERE 
+        Cards.boardid = ${board};
+    `;
+
     const acc = {} as Record<keyof typeof STATUSES, CardType[]>;
 
     for (let i = 0; i < res.rows.length; i++) {
@@ -23,11 +54,9 @@ export const GET = async (req: NextRequest) => {
 
       const prev = acc[card.status] || [];
 
-      const tags = await sql<TagType>`SELECT * FROM Tags WHERE cardId = ${card.id};`;
-      card.tags = tags.rows;
-
       acc[card.status] = [...prev, card];
     }
+
     return NextResponse.json(acc);
   } catch (error) {
     return NextResponse.json({ error, message: (error as Error).message }, { status: 500 });

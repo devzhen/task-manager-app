@@ -17,6 +17,7 @@ export async function GET(req: Request) {
         color varchar(255),
         fontColor varchar(255),
         cardId uuid NOT NULL,
+        created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         CONSTRAINT fk_tagName
             FOREIGN KEY(cardId) 
               REFERENCES Cards(id)

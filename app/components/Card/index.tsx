@@ -1,14 +1,16 @@
+import Image from 'next/image';
 import { useRef } from 'react';
 
 import { STATUSES_OBJ } from '@/app/constants';
 import useCardLayout from '@/app/hooks/useCardLayout';
-import type { CardLayoutType, TagType } from '@/app/types';
+import type { AttachmentType, CardLayoutType, TagType } from '@/app/types';
 
 import Tags from '../Tags';
 
 import styles from './Card.module.css';
 
 type CardProps = {
+  attachments: AttachmentType[];
   hovered: boolean;
   id: string;
   index: number;
@@ -24,6 +26,7 @@ type CardProps = {
 
 export default function Card(props: CardProps) {
   const {
+    attachments,
     title,
     id,
     status,
@@ -62,6 +65,8 @@ export default function Card(props: CardProps) {
     onLayout,
   });
 
+  const attachment = attachments[0];
+
   return (
     <div
       ref={ref}
@@ -75,6 +80,21 @@ export default function Card(props: CardProps) {
       onDragEnd={onDragEnd as VoidFunction}
     >
       <div className={styles.content}>
+        {attachment && (
+          <div className={styles.imageWrapper}>
+            <Image
+              alt="Img"
+              src={attachment.url}
+              fill
+              sizes="100%"
+              style={{
+                objectFit: 'cover',
+              }}
+              priority
+              draggable={false}
+            />
+          </div>
+        )}
         <span className={styles.title}>{title}</span>
         <Tags tags={tags} />
       </div>

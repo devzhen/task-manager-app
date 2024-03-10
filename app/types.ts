@@ -21,6 +21,7 @@ export type CardType = {
   title: string;
   description?: string;
   status: keyof typeof STATUSES;
+  attachments: AttachmentType[];
   position: number;
   tags: TagType[];
   willBeRemoved?: boolean;
@@ -56,4 +57,12 @@ export type CardLayoutType = {
   bottom: number;
   index: number;
   status: keyof typeof STATUSES_OBJ;
+};
+
+export type AttachmentType = {
+  id: string;
+  name: string;
+  url: string;
+  cardId: string;
+  created: string;
 };

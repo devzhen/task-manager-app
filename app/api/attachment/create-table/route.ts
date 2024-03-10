@@ -9,9 +9,9 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Auth Required' }, { status: 401 });
     }
 
-    await sql`DROP TABLE IF EXISTS Attachment CASCADE;`;
+    await sql`DROP TABLE IF EXISTS Attachments CASCADE;`;
     const result = await sql`
-        CREATE TABLE Attachment ( 
+        CREATE TABLE Attachments ( 
           id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
           name varchar(255) NOT NULL, 
           url varchar(255) NOT NULL, 
