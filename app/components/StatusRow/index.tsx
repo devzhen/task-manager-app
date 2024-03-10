@@ -61,7 +61,9 @@ export default function StatusRow(props: StatusRowProps) {
     <div className={styles.container}>
       <div className={styles.header}>
         <div style={{ backgroundColor: color }} />
-        <span>{name} (0)</span>
+        <span>
+          {name} ({cards.length})
+        </span>
       </div>
       <div
         ref={containerRef}

@@ -4,12 +4,15 @@
   position: relative;
   width: 100%;
   min-height: 100px;
-  min-width: 260px;
   margin-bottom: 20px;
   border-radius: 10px;
   background-color: #191b1f;
   cursor: pointer;
   transform: translate(0, 0);
+}
+
+.container:first-child {
+  margin-top: 20px;
 }
 
 .content {

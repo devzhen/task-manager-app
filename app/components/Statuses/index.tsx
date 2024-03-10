@@ -191,8 +191,8 @@ export default function Statuses(props: StatusesType) {
     )(clone) as CardType;
 
     // TODO: remove
-    // console.log('prev', clone);
-    // console.log('meta', { oldStatus, oldIndex, newIndex, newStatus, item });
+    console.log('prev', clone);
+    console.log('meta', { oldStatus, oldIndex, newIndex, newStatus, item });
 
     const newCards = compose(
       (cardsArr: StatusesCardType) => {
@@ -220,7 +220,7 @@ export default function Statuses(props: StatusesType) {
     )(clone);
 
     // TODO: remove
-    // console.log('next', clone, '\n\n');
+    console.log('next', clone, '\n\n');
 
     setCards(newCards);
     setState(initialState);
@@ -278,8 +278,13 @@ export default function Statuses(props: StatusesType) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boards, pathname, requestUrl]);
 
+  const classNames = [styles.container];
+  if (isLoading) {
+    classNames.push(styles.containerInActive);
+  }
+
   return (
-    <div className={styles.container}>
+    <div className={classNames.join(' ')}>
       {Object.values(STATUSES_OBJ).map((status) => {
         return (
           <StatusRow
