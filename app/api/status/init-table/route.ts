@@ -11,7 +11,7 @@ export async function GET(req: Request) {
   }
 
   try {
-    await sql`TRUNCATE Statuses;`;
+    await sql`TRUNCATE Statuses CASCADE;`;
     await sql`
       INSERT INTO Statuses 
         (name)

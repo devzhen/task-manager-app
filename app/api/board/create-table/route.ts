@@ -9,12 +9,13 @@ export async function GET(req: Request) {
   }
 
   try {
-    sql`DROP TABLE IF EXISTS Boards`;
+    sql`DROP TABLE IF EXISTS Boards CASCADE`;
     const result = await sql`CREATE TABLE Boards ( 
         id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
         name varchar(255), 
         href varchar(255),
-        created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        protected BOOLEAN NOT NULL
       );`;
 
     return NextResponse.json({ result }, { status: 200 });

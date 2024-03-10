@@ -13,7 +13,7 @@ export async function GET(req: Request) {
 
   try {
     const cardsRes = await sql<CardType>`SELECT * FROM Cards;`;
-    await sql`TRUNCATE Tags;`;
+    await sql`TRUNCATE Tags CASCADE;`;
     cardsRes.rows.forEach(async (card) => {
       const number = Math.floor(Math.random() * (4 - 1) + 1);
       if (number === 1) {

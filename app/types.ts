@@ -1,6 +1,12 @@
-import { BOARDS, STATUSES_OBJ, STATUSES } from './constants';
+import { STATUSES_OBJ, STATUSES } from './constants';
 
-export type BoardType = (typeof BOARDS)[keyof typeof BOARDS];
+export type BoardType = {
+  id: string;
+  name: string;
+  href: string;
+  created: string;
+  protected: boolean;
+};
 
 export type TagType = {
   id: string;

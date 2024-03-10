@@ -6,11 +6,11 @@ import constructBoardHref from '@/app/utils/constructBoardHref';
 
 export const GET = async () => {
   try {
-    const res = await sql`SELECT * FROM Boards ORDER BY created`;
+    const res = await sql<BoardType>`SELECT * FROM Boards ORDER BY created`;
 
     const boards = res.rows.map((item) => ({
       ...item,
-      href: constructBoardHref(item as BoardType).href,
+      href: constructBoardHref(item).href,
     }));
 
     return NextResponse.json(boards);

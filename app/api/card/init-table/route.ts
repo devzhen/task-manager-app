@@ -12,7 +12,7 @@ export async function GET(req: Request) {
   }
 
   try {
-    await sql`TRUNCATE Cards;`;
+    await sql`TRUNCATE Cards CASCADE;`;
     const boardsRes = await sql<BoardType>`SELECT * FROM Boards;`;
     boardsRes.rows.map(async (board) => {
       if (board.name === 'Home board') {

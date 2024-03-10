@@ -9,7 +9,7 @@ export async function GET(req: Request) {
   }
 
   try {
-    await sql`DROP TABLE IF EXISTS Cards;`;
+    await sql`DROP TABLE IF EXISTS Cards CASCADE;`;
     const result = await sql`
       CREATE TABLE Cards ( 
         id uuid DEFAULT gen_random_uuid() PRIMARY KEY,

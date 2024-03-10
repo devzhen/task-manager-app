@@ -184,7 +184,7 @@ export default function SideBar(props: SideBarProps) {
 
   return (
     <div className={styles.container}>
-      {boards.map((item, index) => {
+      {boards.map((item) => {
         const className = [styles.board];
 
         if (pathname === item.href) {
@@ -194,7 +194,7 @@ export default function SideBar(props: SideBarProps) {
         return (
           <Link href={item.href} key={item.id} className={className.join(' ')}>
             <span>{item.name}</span>
-            {index > 0 && (
+            {!item.protected && (
               <div className={styles.boardActions}>
                 <Image
                   alt="Img"

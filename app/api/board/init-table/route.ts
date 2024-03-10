@@ -9,28 +9,28 @@ export async function GET(req: Request) {
   }
 
   try {
-    await sql`TRUNCATE Boards;`;
+    await sql`TRUNCATE Boards CASCADE;`;
     await sql`
         INSERT INTO Boards 
-          (name, href) 
+          (name, href, protected) 
         VALUES 
-          ('Home board', '/');`;
+          ('Home board', '/', TRUE);`;
     await new Promise((res) => setTimeout(res, 1000));
     await sql`
         INSERT INTO Boards 
-          (name, href) 
+          (name, href, protected) 
         VALUES 
-          ('Design board', '/');`;
+          ('Design board', '/', FALSE);`;
     await new Promise((res) => setTimeout(res, 1000));
     await sql`
         INSERT INTO Boards 
-          (name, href) 
+          (name, href, protected) 
         VALUES 
-          ('Learning board', '/');`;
-  } catch (error) {
-    return NextResponse.json({ error }, { status: 500 });
-  }
+          ('Learning board', '/', FALSE);`;
 
-  const boards = await sql`SELECT * FROM Boards;`;
-  return NextResponse.json({ boards }, { status: 200 });
+    const boards = await sql`SELECT * FROM Boards;`;
+    return NextResponse.json({ boards }, { status: 200 });
+  } catch (error) {
+    return NextResponse.json({ error, message: (error as Error).message }, { status: 500 });
+  }
 }
