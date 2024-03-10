@@ -17,6 +17,7 @@ export type CardType = {
   status: keyof typeof STATUSES;
   position: number;
   tags: TagType[];
+  willBeRemoved?: boolean;
 };
 
 export type StatusesCardType = {
@@ -37,8 +38,8 @@ export type StateType = {
     status: keyof typeof STATUSES_OBJ;
   };
   hoveredCard: {
-    id: string;
-    index: number;
+    insertBeforeId: string;
+    insertBeforeIndex: number;
   };
 };
 

@@ -6,10 +6,9 @@ import ramdaClone from 'ramda/es/clone';
 import compose from 'ramda/es/compose';
 import insert from 'ramda/es/insert';
 import path from 'ramda/es/path';
-import remove from 'ramda/es/remove';
 import { useEffect, useRef, useState } from 'react';
 
-import { STATUSES, STATUSES_OBJ } from '@/app/constants';
+import { FAKE_CARD_ID, STATUSES, STATUSES_OBJ } from '@/app/constants';
 import type { BoardType, CardLayoutType, CardType, StateType, StatusesCardType } from '@/app/types';
 
 import StatusesLoading from '../StatusesLoading';
@@ -28,8 +27,8 @@ const initialState: StateType = {
     status: STATUSES.backlog,
   },
   hoveredCard: {
-    id: '',
-    index: 0,
+    insertBeforeId: '',
+    insertBeforeIndex: 0,
   },
 };
 
@@ -88,15 +87,15 @@ export default function Statuses(props: StatusesType) {
   /**
    * Find nearest element id
    */
-  const findNearestElementId = ({ y, layouts }: { y: number; layouts: CardLayoutType[] }) => {
-    const nearest: {
-      id: string | null;
-      index: number;
-      status: keyof typeof STATUSES_OBJ | null;
+  const findInsertBeforeElement = ({ y, layouts }: { y: number; layouts: CardLayoutType[] }) => {
+    const insertBeforeElement: {
+      insertBeforeId: string | null;
+      insertBeforeIndex: number;
+      insertBeforeStatus: keyof typeof STATUSES_OBJ | null;
     } = {
-      id: null,
-      index: 0,
-      status: null,
+      insertBeforeId: null,
+      insertBeforeIndex: 0,
+      insertBeforeStatus: null,
     };
 
     for (let i = 0; i < layouts.length; i++) {
@@ -107,15 +106,15 @@ export default function Statuses(props: StatusesType) {
       }
 
       if (y <= layout.middle) {
-        nearest.id = layout.id;
-        nearest.index = layout.index;
-        nearest.status = layout.status;
+        insertBeforeElement.insertBeforeId = layout.id;
+        insertBeforeElement.insertBeforeIndex = layout.index;
+        insertBeforeElement.insertBeforeStatus = layout.status;
 
         break;
       }
     }
 
-    return nearest;
+    return insertBeforeElement;
   };
 
   /**
@@ -138,24 +137,20 @@ export default function Statuses(props: StatusesType) {
         return;
       }
 
-      const {
-        id,
-        index,
-        status: nearestStatus,
-      } = findNearestElementId({
+      const { insertBeforeId, insertBeforeIndex, insertBeforeStatus } = findInsertBeforeElement({
         y: e.pageY + dropContainer.scrollTop,
         layouts,
       });
-      if (!id) {
+      if (!insertBeforeId) {
         // eslint-disable-next-line no-console
-        console.log(`Couldn't find a nearest card id`, id);
+        console.log(`Couldn't find a nearest card id`, insertBeforeId);
         return;
       }
 
       // When sorting in the same drop area
       if (
-        nearestStatus === state.currentDraggable.status &&
-        index - state.currentDraggable.index === 1
+        insertBeforeStatus === state.currentDraggable.status &&
+        insertBeforeIndex - state.currentDraggable.index === 1
       ) {
         return;
       }
@@ -163,66 +158,154 @@ export default function Statuses(props: StatusesType) {
       setState((prev) => ({
         ...prev,
         hoveredCard: {
-          id,
-          index,
+          insertBeforeId,
+          insertBeforeIndex,
         },
       }));
     };
 
   /**
+   * Mark as will be removed
+   */
+  const markCardAsWillBeRemoved = ({
+    cardsObj,
+    status,
+    id,
+  }: {
+    cardsObj: StatusesCardType;
+    status: keyof typeof STATUSES;
+    id: string;
+  }) => {
+    let clone = ramdaClone(cardsObj);
+
+    const index = clone[status].findIndex((item) => item.id === id);
+    if (index !== -1) {
+      clone = assocPath([status, index, 'willBeRemoved'], true, clone);
+    }
+
+    return clone;
+  };
+
+  /**
+   * Insert a cart to a board.
+   */
+  const insertCardToBoard = ({
+    cardsObj,
+    status,
+    insertBeforeId,
+    card,
+  }: {
+    cardsObj: StatusesCardType;
+    status: keyof typeof STATUSES;
+    insertBeforeId: string;
+    card: CardType;
+  }) => {
+    const clone = ramdaClone(cardsObj);
+
+    const isInsertBeforeFakeCard = insertBeforeId.indexOf(FAKE_CARD_ID);
+
+    const insertionIndex =
+      isInsertBeforeFakeCard === -1
+        ? clone[status].findIndex((item) => item.id === insertBeforeId)
+        : clone[status].length;
+
+    if (insertionIndex !== -1) {
+      clone[status] = insert(insertionIndex, card, clone[status]);
+    }
+
+    return clone;
+  };
+
+  /**
+   * Delete a cart from a board.
+   */
+  const deleteCardFromBoard = ({
+    cardsObj,
+    status,
+  }: {
+    cardsObj: StatusesCardType;
+    status: keyof typeof STATUSES;
+  }) => {
+    const clone = ramdaClone(cardsObj);
+
+    clone[status] = clone[status].filter((item) => item.willBeRemoved !== true);
+
+    return clone;
+  };
+
+  /**
+   * Update cards position property
+   */
+  const updateCardsPositionProperty = (cardsObj: StatusesCardType) => {
+    const clone = ramdaClone(cardsObj);
+
+    const keys = Object.keys(clone);
+
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i] as keyof typeof STATUSES;
+
+      const cardsArr = clone[key];
+
+      for (let j = 0; j < cardsArr.length; j++) {
+        const card = cardsArr[j];
+        card.position = j + 1;
+        card.willBeRemoved = false;
+      }
+    }
+
+    return clone;
+  };
+
+  /**
    * On drop handler
    */
   const onDropHandler = (newStatus: keyof typeof STATUSES_OBJ) => () => {
-    if (!state.hoveredCard.id) {
+    if (!state.hoveredCard.insertBeforeId) {
       return;
     }
 
-    const clone = ramdaClone(cardsRef.current);
+    let clone = ramdaClone(cardsRef.current);
 
     const oldStatus = stateRef.current.currentDraggable.status;
     const oldIndex = stateRef.current.currentDraggable.index;
 
-    const newIndex = stateRef.current.hoveredCard.index;
-
-    const item = compose(
-      assocPath(['position'], newIndex),
+    const card = compose(
       assocPath(['status'], newStatus),
       path([oldStatus, oldIndex]),
     )(clone) as CardType;
 
     // TODO: remove
-    console.log('prev', clone);
-    console.log('meta', { oldStatus, oldIndex, newIndex, newStatus, item });
+    // console.log('prev', clone);
+    // console.log('meta', { oldStatus, oldIndex, newStatus, card });
 
-    const newCards = compose(
-      (cardsArr: StatusesCardType) => {
-        cardsArr[newStatus] = cardsArr[newStatus].map((card, index) => ({
-          ...card,
-          position: index,
-        }));
-        return cardsArr;
-      },
-      (cardsArr: StatusesCardType) => {
-        cardsArr[newStatus] = insert(newIndex, item, cardsArr[newStatus]);
-        return cardsArr;
-      },
-      (cardsArr: StatusesCardType) => {
-        cardsArr[oldStatus] = cardsArr[oldStatus].map((card, index) => ({
-          ...card,
-          position: index,
-        }));
-        return cardsArr;
-      },
-      (cardsArr: StatusesCardType) => {
-        cardsArr[oldStatus] = remove(oldIndex, 1, cardsArr[oldStatus]);
-        return cardsArr;
-      },
-    )(clone);
+    // Mark an old card as will be removed.
+    clone = markCardAsWillBeRemoved({
+      cardsObj: clone,
+      status: oldStatus,
+      id: stateRef.current.currentDraggable.id,
+    });
+
+    // Insert to a new board
+    clone = insertCardToBoard({
+      cardsObj: clone,
+      status: newStatus,
+      insertBeforeId: state.hoveredCard.insertBeforeId,
+      card,
+    });
+
+    // Delete from a previous board
+    clone = deleteCardFromBoard({
+      cardsObj: clone,
+      status: oldStatus,
+    });
+
+    // Update cards position property
+    clone = updateCardsPositionProperty(clone);
 
     // TODO: remove
-    console.log('next', clone, '\n\n');
+    // console.log('next', clone, '\n\n');
 
-    setCards(newCards);
+    setCards(clone);
     setState(initialState);
   };
 

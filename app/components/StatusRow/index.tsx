@@ -76,7 +76,7 @@ export default function StatusRow(props: StatusRowProps) {
         {cards.map((card, index) => {
           return (
             <Card
-              hovered={card.id === currentHoveredState.id}
+              hovered={card.id === currentHoveredState.insertBeforeId}
               id={card.id}
               index={index}
               key={card.id}
@@ -91,7 +91,7 @@ export default function StatusRow(props: StatusRowProps) {
           );
         })}
         <FakeCard
-          hovered={`${FAKE_CARD_ID}-${status}` === currentHoveredState.id}
+          hovered={`${FAKE_CARD_ID}-${status}` === currentHoveredState.insertBeforeId}
           id={`${FAKE_CARD_ID}-${status}`}
           index={cards.length}
           onLayout={onCardLayout}
