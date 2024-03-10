@@ -57,6 +57,8 @@ export default function StatusRow(props: StatusRowProps) {
     layoutsArr.current = [];
   }, [cards.length]);
 
+  const scrollTop = containerRef.current?.scrollTop || 0;
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -87,6 +89,7 @@ export default function StatusRow(props: StatusRowProps) {
               onLayout={onCardLayout}
               status={card.status}
               tags={card.tags}
+              parentScrollTop={scrollTop}
             />
           );
         })}
@@ -96,6 +99,7 @@ export default function StatusRow(props: StatusRowProps) {
           index={cards.length}
           onLayout={onCardLayout}
           status={status}
+          parentScrollTop={scrollTop}
         />
       </div>
     </div>

@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 
 import { STATUSES_OBJ } from '@/app/constants';
+import useCardLayout from '@/app/hooks/useCardLayout';
 import type { CardLayoutType, TagType } from '@/app/types';
-import getCoords from '@/app/utils/getCoords';
 
 import Tags from '../Tags';
 
@@ -19,10 +19,22 @@ type CardProps = {
   onLayout: (layout: CardLayoutType) => void;
   status: keyof typeof STATUSES_OBJ;
   tags: TagType[];
+  parentScrollTop: number;
 };
 
 export default function Card(props: CardProps) {
-  const { title, id, status, index, onDragStart, hovered, onDragEnd, onLayout, tags } = props;
+  const {
+    title,
+    id,
+    status,
+    index,
+    onDragStart,
+    hovered,
+    onDragEnd,
+    onLayout,
+    tags,
+    parentScrollTop,
+  } = props;
 
   const ref = useRef<HTMLDivElement | null>(null);
 
@@ -41,22 +53,14 @@ export default function Card(props: CardProps) {
     classes.push(styles.containerActive);
   }
 
-  useEffect(() => {
-    if (ref.current) {
-      const coords = getCoords(ref.current);
-
-      const layout = {
-        id,
-        top: coords.top,
-        middle: coords.middle,
-        bottom: coords.bottom,
-        index,
-        status,
-      };
-
-      onLayout(layout);
-    }
-  }, [index, id, status, onLayout]);
+  useCardLayout({
+    cardElement: ref.current,
+    parentScrollTop,
+    index,
+    id,
+    status,
+    onLayout,
+  });
 
   return (
     <div

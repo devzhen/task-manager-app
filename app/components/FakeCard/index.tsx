@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 
 import { STATUSES_OBJ } from '@/app/constants';
+import useCardLayout from '@/app/hooks/useCardLayout';
 import type { CardLayoutType } from '@/app/types';
-import getCoords from '@/app/utils/getCoords';
 
 import style from './FakeCard.module.css';
 
@@ -12,10 +12,11 @@ type FakeCardProps = {
   hovered: boolean;
   onLayout: (layout: CardLayoutType) => void;
   status: keyof typeof STATUSES_OBJ;
+  parentScrollTop: number;
 };
 
 export default function FakeCard(props: FakeCardProps) {
-  const { index, hovered, onLayout, id, status } = props;
+  const { index, hovered, onLayout, id, status, parentScrollTop } = props;
 
   const ref = useRef(null);
 
@@ -28,22 +29,14 @@ export default function FakeCard(props: FakeCardProps) {
     classNames.push(style.containerMargin);
   }
 
-  useEffect(() => {
-    if (ref.current) {
-      const coords = getCoords(ref.current);
-
-      const layout = {
-        id,
-        top: coords.top,
-        middle: coords.bottom,
-        bottom: coords.bottom,
-        index,
-        status,
-      };
-
-      onLayout(layout);
-    }
-  }, [index, id, onLayout, status]);
+  useCardLayout({
+    cardElement: ref.current,
+    parentScrollTop,
+    index,
+    id,
+    status,
+    onLayout,
+  });
 
   return (
     <div
