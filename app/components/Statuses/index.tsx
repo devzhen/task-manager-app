@@ -1,19 +1,19 @@
 'use client';
 
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import assocPath from 'ramda/es/assocPath';
 import ramdaClone from 'ramda/es/clone';
 import compose from 'ramda/es/compose';
-import insert from 'ramda/es/insert';
-import last from 'ramda/es/last';
 import path from 'ramda/es/path';
-import split from 'ramda/es/split';
 import { useEffect, useRef, useState } from 'react';
 
-import { API_HOST, FAKE_CARD_ID, STATUSES, STATUSES_OBJ } from '@/app/constants';
+import { STATUSES, STATUSES_OBJ } from '@/app/constants';
 import type { CardLayoutType, CardType, StateType, StatusesCardType } from '@/app/types';
+import deleteCardFromBoard from '@/app/utils/deleteCardFromBoard';
+import insertCardToBoard from '@/app/utils/insertCardToBoard';
+import markCardAsWillBeRemoved from '@/app/utils/markCardAsWillBeRemoved';
+import updateCardsPositionProperty from '@/app/utils/updateCardsPositionProperty';
 
-import StatusesLoading from '../StatusesLoading';
 import StatusRow from '../StatusRow';
 
 import styles from './Statuses.module.css';
@@ -34,23 +34,20 @@ const initialState: StateType = {
   },
 };
 
-export default function Statuses() {
-  const pathname = usePathname();
+type StatusesProps = {
+  initialCards: StatusesCardType;
+};
+
+export default function Statuses(props: StatusesProps) {
+  const { initialCards } = props;
 
   const router = useRouter();
 
-  const [cards, setCards] = useState<StatusesCardType>({
-    [STATUSES.backlog]: [],
-    [STATUSES.inProgress]: [],
-    [STATUSES.inReview]: [],
-    [STATUSES.completed]: [],
-  });
+  const [cards, setCards] = useState<StatusesCardType>(initialCards);
   const cardsRef = useRef(cards);
 
   const [state, setState] = useState<StateType>(initialState);
   const stateRef = useRef(state);
-
-  const [isLoading, setIsLoading] = useState(true);
 
   /**
    * On drag start handler
@@ -162,98 +159,6 @@ export default function Statuses() {
     };
 
   /**
-   * Mark as will be removed
-   */
-  const markCardAsWillBeRemoved = ({
-    cardsObj,
-    status,
-    id,
-  }: {
-    cardsObj: StatusesCardType;
-    status: keyof typeof STATUSES;
-    id: string;
-  }) => {
-    let clone = ramdaClone(cardsObj);
-
-    const index = clone[status].findIndex((item) => item.id === id);
-    if (index !== -1) {
-      clone = assocPath([status, index, 'willBeRemoved'], true, clone);
-    }
-
-    return clone;
-  };
-
-  /**
-   * Insert a cart to a board.
-   */
-  const insertCardToBoard = ({
-    cardsObj,
-    status,
-    insertBeforeId,
-    card,
-  }: {
-    cardsObj: StatusesCardType;
-    status: keyof typeof STATUSES;
-    insertBeforeId: string;
-    card: CardType;
-  }) => {
-    const clone = ramdaClone(cardsObj);
-
-    const isInsertBeforeFakeCard = insertBeforeId.indexOf(FAKE_CARD_ID);
-
-    const insertionIndex =
-      isInsertBeforeFakeCard === -1
-        ? clone[status].findIndex((item) => item.id === insertBeforeId)
-        : clone[status].length;
-
-    if (insertionIndex !== -1) {
-      clone[status] = insert(insertionIndex, card, clone[status]);
-    }
-
-    return clone;
-  };
-
-  /**
-   * Delete a cart from a board.
-   */
-  const deleteCardFromBoard = ({
-    cardsObj,
-    status,
-  }: {
-    cardsObj: StatusesCardType;
-    status: keyof typeof STATUSES;
-  }) => {
-    const clone = ramdaClone(cardsObj);
-
-    clone[status] = clone[status].filter((item) => item.willBeRemoved !== true);
-
-    return clone;
-  };
-
-  /**
-   * Update cards position property
-   */
-  const updateCardsPositionProperty = (cardsObj: StatusesCardType) => {
-    const clone = ramdaClone(cardsObj);
-
-    const keys = Object.keys(clone);
-
-    for (let i = 0; i < keys.length; i++) {
-      const key = keys[i] as keyof typeof STATUSES;
-
-      const cardsArr = clone[key];
-
-      for (let j = 0; j < cardsArr.length; j++) {
-        const card = cardsArr[j];
-        card.position = j + 1;
-        card.willBeRemoved = false;
-      }
-    }
-
-    return clone;
-  };
-
-  /**
    * On drop handler
    */
   const onDropHandler = (newStatus: keyof typeof STATUSES_OBJ) => () => {
@@ -307,40 +212,6 @@ export default function Statuses() {
   };
 
   /**
-   * Fetch cards
-   */
-  const fetchCards = async () => {
-    try {
-      const activeBoardId = compose(last, split('/'))(pathname) as string;
-
-      setIsLoading(true);
-
-      const searchParams = new URLSearchParams();
-      searchParams.set('board', activeBoardId);
-      const url = new URL(`${API_HOST}/api/card/list?${searchParams.toString()}`);
-
-      const res = await fetch(url.toString(), {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const json = await res.json();
-      if ('error' in json) {
-        throw json.error;
-      }
-
-      setCards(json);
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.log('fetchCards error - ', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  /**
    * ON card click handler
    */
   const onCardClick = (id: string) => {
@@ -357,15 +228,7 @@ export default function Statuses() {
     stateRef.current = state;
   }, [cards, state]);
 
-  useEffect(() => {
-    fetchCards();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
-
   const classNames = [styles.container];
-  if (isLoading) {
-    classNames.push(styles.containerInActive);
-  }
 
   return (
     <div className={classNames.join(' ')}>
@@ -376,7 +239,7 @@ export default function Statuses() {
             cards={cards[status.value] || []}
             color={status.color}
             currentHoveredState={state.hoveredCard}
-            isLoading={isLoading}
+            isLoading={false}
             key={status.name}
             name={status.name}
             onCardClick={onCardClick}
@@ -388,7 +251,6 @@ export default function Statuses() {
           />
         );
       })}
-      {isLoading && <StatusesLoading />}
     </div>
   );
 }

@@ -1,9 +1,6 @@
 import { sql } from '@vercel/postgres';
 import { NextResponse } from 'next/server';
 
-import type { BoardType } from '@/app/types';
-import constructBoardHref from '@/app/utils/constructBoardHref';
-
 export const POST = async (req: Request) => {
   try {
     const { name } = await new Response(req.body).json();
@@ -20,8 +17,7 @@ export const POST = async (req: Request) => {
         (name) 
       VALUES (${name}) 
         RETURNING *;`;
-    let board = res.rows[0];
-    board = constructBoardHref(board as BoardType);
+    const board = res.rows[0];
 
     return NextResponse.json({ board });
   } catch (error) {
