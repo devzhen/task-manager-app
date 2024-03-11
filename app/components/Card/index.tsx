@@ -11,32 +11,34 @@ import styles from './Card.module.css';
 
 type CardProps = {
   attachments: AttachmentType[];
+  description?: string;
   hovered: boolean;
   id: string;
   index: number;
-  title: string;
-  description?: string;
+  onClick: (id: string) => void;
   onDragEnd: (e: DragEvent) => void;
   onDragStart: (e: DragEvent) => void;
   onLayout: (layout: CardLayoutType) => void;
+  parentScrollTop: number;
   status: keyof typeof STATUSES_OBJ;
   tags: TagType[];
-  parentScrollTop: number;
+  title: string;
 };
 
 export default function Card(props: CardProps) {
   const {
     attachments,
-    title,
-    id,
-    status,
-    index,
-    onDragStart,
     hovered,
+    id,
+    index,
+    onClick,
     onDragEnd,
+    onDragStart,
     onLayout,
-    tags,
     parentScrollTop,
+    status,
+    tags,
+    title,
   } = props;
 
   const ref = useRef<HTMLDivElement | null>(null);
@@ -49,6 +51,9 @@ export default function Card(props: CardProps) {
     }
 
     onDragStart(e);
+  };
+  const onClickHandler = () => {
+    onClick(id);
   };
 
   const classes = [styles.container];
@@ -78,6 +83,8 @@ export default function Card(props: CardProps) {
       draggable
       onDragStart={onDragStartHandler as VoidFunction}
       onDragEnd={onDragEnd as VoidFunction}
+      onClick={onClickHandler as VoidFunction}
+      role="presentation"
     >
       <div className={styles.content}>
         {attachment && (

@@ -3,7 +3,6 @@ import { STATUSES_OBJ, STATUSES } from './constants';
 export type BoardType = {
   id: string;
   name: string;
-  href: string;
   created: string;
   protected: boolean;
 };

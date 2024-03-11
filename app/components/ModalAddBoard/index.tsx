@@ -7,8 +7,6 @@ import type { BoardType } from '@/app/types';
 
 import styles from './ModalAddBoard.module.css';
 
-Modal.setAppElement('.container');
-
 type ModalAddBoardProps = {
   isOpen: boolean;
   closeModal: () => void;

@@ -21,6 +21,7 @@ type StatusRowProps = {
   onDragStart: (e: DragEvent) => void;
   onDrop: (e: DragEvent) => void;
   status: keyof typeof STATUSES;
+  onCardClick: (id: string) => void;
 };
 
 export default function StatusRow(props: StatusRowProps) {
@@ -36,6 +37,7 @@ export default function StatusRow(props: StatusRowProps) {
     onDragStart,
     onDrop,
     status,
+    onCardClick,
   } = props;
 
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -78,19 +80,20 @@ export default function StatusRow(props: StatusRowProps) {
         {cards.map((card, index) => {
           return (
             <Card
+              attachments={card.attachments}
+              description={card.description}
               hovered={card.id === currentHoveredState.insertBeforeId}
               id={card.id}
               index={index}
               key={card.id}
-              title={card.title}
-              description={card.description}
+              onClick={onCardClick}
               onDragEnd={onDragEnd}
               onDragStart={onDragStart}
               onLayout={onCardLayout}
+              parentScrollTop={scrollTop}
               status={card.status}
               tags={card.tags}
-              parentScrollTop={scrollTop}
-              attachments={card.attachments}
+              title={card.title}
             />
           );
         })}
@@ -99,8 +102,8 @@ export default function StatusRow(props: StatusRowProps) {
           id={`${FAKE_CARD_ID}-${status}`}
           index={cards.length}
           onLayout={onCardLayout}
-          status={status}
           parentScrollTop={scrollTop}
+          status={status}
         />
       </div>
     </div>

@@ -4,8 +4,6 @@ import Modal from 'react-modal';
 
 import styles from './ModalDelete.module.css';
 
-Modal.setAppElement('.container');
-
 type ModalDeleteProps = {
   isOpen: boolean;
   closeModal: () => void;

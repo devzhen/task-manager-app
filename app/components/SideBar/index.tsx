@@ -10,6 +10,7 @@ import last from 'ramda/es/last';
 import split from 'ramda/es/split';
 import remove from 'ramda/src/remove';
 import { useState } from 'react';
+import Modal from 'react-modal';
 
 import { API_HOST } from '@/app/constants';
 import type { BoardType } from '@/app/types';
@@ -18,6 +19,8 @@ import ModalAddBoard from '../ModalAddBoard';
 import ModalDelete from '../ModalDelete';
 
 import styles from './SideBar.module.css';
+
+Modal.setAppElement('.container');
 
 type SideBarProps = {
   initialBoards: BoardType[];
@@ -98,12 +101,12 @@ export default function SideBar(props: SideBarProps) {
 
         setBoards((prev) => compose(insert(index, json.board), remove(index, 1))(prev));
 
-        router.push(json.board.href);
+        router.push(`/boards/${board.id}`);
       } else {
         // Add
         setBoards((prev) => [...prev, json.board]);
 
-        router.push(json.board.href);
+        router.push(`/boards/${json.board.id}`);
       }
 
       setModalAddState({
@@ -164,12 +167,14 @@ export default function SideBar(props: SideBarProps) {
 
       setBoards((prev) => prev.filter((item) => item.id !== modalDeleteState.board?.id));
 
-      if (modalDeleteState.board?.href === pathname) {
+      const activeBoardId = compose(last, split('/'))(pathname) as string;
+
+      if (modalDeleteState.board?.id === activeBoardId) {
         const index = boards.findIndex((item) => item.id === modalDeleteState.board?.id);
         const prevIndex = index - 1;
 
         const prevBoard = boards[prevIndex];
-        router.replace(prevBoard.href);
+        router.replace(`/boards/${prevBoard.id}`);
       }
     } catch (error) {
       // eslint-disable-next-line no-console

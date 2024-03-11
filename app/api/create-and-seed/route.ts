@@ -1,13 +1,18 @@
 import { NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    const basicAuth = req.headers.get('Authorization');
+
+    if (basicAuth !== process.env.API_AUTH_TOKEN) {
+      return NextResponse.json({ error: 'Auth Required' }, { status: 401 });
+    }
+
     const requestUrl = 'http://localhost:3000';
 
     // Boards
     let url = new URL(`${requestUrl}/api/board/create-table`);
     await fetch(url.toString(), {
-      cache: 'no-store',
       headers: {
         Authorization: process.env.API_AUTH_TOKEN as string,
       },

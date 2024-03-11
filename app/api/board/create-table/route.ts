@@ -14,11 +14,12 @@ export async function GET(req: Request) {
         id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
         name varchar(255), 
         created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        protected BOOLEAN NOT NULL
+        protected BOOLEAN NOT NULL DEFAULT FALSE,
+        UNIQUE(name)
       );`;
 
     return NextResponse.json({ result }, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ error }, { status: 500 });
+    return NextResponse.json({ error, message: (error as Error).message }, { status: 500 });
   }
 }

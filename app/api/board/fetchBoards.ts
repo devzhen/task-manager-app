@@ -9,7 +9,7 @@ const fetchBoards = async (): Promise<BoardType[]> => {
 
   try {
     const url = new URL(`${API_HOST}/api/board/list`);
-    const response = await fetch(url.toString(), { cache: 'no-store' });
+    const response = await fetch(url.toString());
     boards = await response.json();
 
     if ('error' in boards) {

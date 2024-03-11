@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 
 import type { BoardType } from '@/app/types';
 
+export const dynamic = 'force-dynamic';
+
 export const GET = async () => {
   try {
     const res = await sql<BoardType>`SELECT * FROM Boards ORDER BY created`;

@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import assocPath from 'ramda/es/assocPath';
 import ramdaClone from 'ramda/es/clone';
 import compose from 'ramda/es/compose';
@@ -37,6 +37,8 @@ const initialState: StateType = {
 export default function Statuses() {
   const pathname = usePathname();
 
+  const router = useRouter();
+
   const [cards, setCards] = useState<StatusesCardType>({
     [STATUSES.backlog]: [],
     [STATUSES.inProgress]: [],
@@ -61,6 +63,7 @@ export default function Statuses() {
 
       setState((prev) => ({
         ...prev,
+        isInitialized: true,
         currentDraggable: {
           id,
           status,
@@ -338,6 +341,13 @@ export default function Statuses() {
   };
 
   /**
+   * ON card click handler
+   */
+  const onCardClick = (id: string) => {
+    router.push(`/cards/${id}`);
+  };
+
+  /**
    * Add card
    */
   const addCard = () => {};
@@ -362,18 +372,19 @@ export default function Statuses() {
       {Object.values(STATUSES_OBJ).map((status) => {
         return (
           <StatusRow
-            name={status.name}
-            key={status.name}
-            color={status.color}
-            status={status.value}
+            addCard={addCard}
             cards={cards[status.value] || []}
-            onDragStart={onDragStartHandler}
+            color={status.color}
+            currentHoveredState={state.hoveredCard}
+            isLoading={isLoading}
+            key={status.name}
+            name={status.name}
+            onCardClick={onCardClick}
             onDragEnd={onDragEndHandler}
             onDragOver={onDragOverHandler(status.value)}
+            onDragStart={onDragStartHandler}
             onDrop={onDropHandler(status.value)}
-            currentHoveredState={state.hoveredCard}
-            addCard={addCard}
-            isLoading={isLoading}
+            status={status.value}
           />
         );
       })}

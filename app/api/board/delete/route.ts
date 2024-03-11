@@ -16,6 +16,6 @@ export const POST = async (req: Request) => {
 
     return NextResponse.json({ boardId });
   } catch (error) {
-    return NextResponse.json({ error }, { status: 500 });
+    return NextResponse.json({ error, message: (error as Error).message }, { status: 500 });
   }
 };
