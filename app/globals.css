@@ -79,3 +79,9 @@ body {
     transform: rotate(360deg);
   }
 }
+
+.cards-wrapper {
+  display: flex;
+  flex: 1;
+  padding: 10px;
+}

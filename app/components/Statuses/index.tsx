@@ -5,11 +5,13 @@ import assocPath from 'ramda/es/assocPath';
 import ramdaClone from 'ramda/es/clone';
 import compose from 'ramda/es/compose';
 import insert from 'ramda/es/insert';
+import last from 'ramda/es/last';
 import path from 'ramda/es/path';
+import split from 'ramda/es/split';
 import { useEffect, useRef, useState } from 'react';
 
-import { FAKE_CARD_ID, STATUSES, STATUSES_OBJ } from '@/app/constants';
-import type { BoardType, CardLayoutType, CardType, StateType, StatusesCardType } from '@/app/types';
+import { API_HOST, FAKE_CARD_ID, STATUSES, STATUSES_OBJ } from '@/app/constants';
+import type { CardLayoutType, CardType, StateType, StatusesCardType } from '@/app/types';
 
 import StatusesLoading from '../StatusesLoading';
 import StatusRow from '../StatusRow';
@@ -32,14 +34,7 @@ const initialState: StateType = {
   },
 };
 
-type StatusesType = {
-  boards: BoardType[];
-  requestUrl: string;
-};
-
-export default function Statuses(props: StatusesType) {
-  const { boards, requestUrl } = props;
-
+export default function Statuses() {
   const pathname = usePathname();
 
   const [cards, setCards] = useState<StatusesCardType>({
@@ -313,30 +308,27 @@ export default function Statuses(props: StatusesType) {
    */
   const fetchCards = async () => {
     try {
-      const activeBoardIndex = boards.findIndex((item) => item.href === pathname);
-      if (activeBoardIndex !== -1) {
-        const activeBoardId = boards[activeBoardIndex].id;
+      const activeBoardId = compose(last, split('/'))(pathname) as string;
 
-        setIsLoading(true);
+      setIsLoading(true);
 
-        const searchParams = new URLSearchParams();
-        searchParams.set('board', activeBoardId);
-        const url = new URL(`${requestUrl}/api/card/list?${searchParams.toString()}`);
+      const searchParams = new URLSearchParams();
+      searchParams.set('board', activeBoardId);
+      const url = new URL(`${API_HOST}/api/card/list?${searchParams.toString()}`);
 
-        const res = await fetch(url.toString(), {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+      const res = await fetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-        const json = await res.json();
-        if ('error' in json) {
-          throw json.error;
-        }
-
-        setCards(json);
+      const json = await res.json();
+      if ('error' in json) {
+        throw json.error;
       }
+
+      setCards(json);
     } catch (err) {
       // eslint-disable-next-line no-console
       console.log('fetchCards error - ', err);
@@ -358,7 +350,7 @@ export default function Statuses(props: StatusesType) {
   useEffect(() => {
     fetchCards();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [boards, pathname, requestUrl]);
+  }, [pathname]);
 
   const classNames = [styles.container];
   if (isLoading) {

@@ -4,11 +4,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
-import compose from 'ramda/src/compose';
-import insert from 'ramda/src/insert';
+import compose from 'ramda/es/compose';
+import insert from 'ramda/es/insert';
+import last from 'ramda/es/last';
+import split from 'ramda/es/split';
 import remove from 'ramda/src/remove';
 import { useState } from 'react';
 
+import { API_HOST } from '@/app/constants';
 import type { BoardType } from '@/app/types';
 
 import ModalAddBoard from '../ModalAddBoard';
@@ -18,11 +21,10 @@ import styles from './SideBar.module.css';
 
 type SideBarProps = {
   initialBoards: BoardType[];
-  requestUrl: string;
 };
 
 export default function SideBar(props: SideBarProps) {
-  const { initialBoards, requestUrl } = props;
+  const { initialBoards } = props;
 
   const pathname = usePathname();
 
@@ -71,7 +73,7 @@ export default function SideBar(props: SideBarProps) {
    */
   const createBoard = async (name: string, board: BoardType | null) => {
     const method = board?.id ? 'PUT' : 'POST';
-    const apiUrl = board?.id ? `${requestUrl}/api/board/update` : `${requestUrl}/api/board/add`;
+    const apiUrl = board?.id ? `${API_HOST}/api/board/update` : `${API_HOST}/api/board/add`;
     const body = board?.id
       ? JSON.stringify({ name, id: board.id, created: board.created })
       : JSON.stringify({ name });
@@ -147,7 +149,7 @@ export default function SideBar(props: SideBarProps) {
    */
   const deleteBoard = async () => {
     try {
-      const url = new URL(`${requestUrl}/api/board/delete`);
+      const url = new URL(`${API_HOST}/api/board/delete`);
       const res = await fetch(url.toString(), {
         method: 'POST',
         body: JSON.stringify({ boardId: modalDeleteState.board?.id }),
@@ -187,12 +189,14 @@ export default function SideBar(props: SideBarProps) {
       {boards.map((item) => {
         const className = [styles.board];
 
-        if (pathname === item.href) {
+        const activeBoardId = compose(last, split('/'))(pathname) as string;
+
+        if (activeBoardId === item.id) {
           className.push(styles.boardActive);
         }
 
         return (
-          <Link href={item.href} key={item.id} className={className.join(' ')}>
+          <Link href={`/boards/${item.id}`} key={item.id} className={className.join(' ')}>
             <span>{item.name}</span>
             {!item.protected && (
               <div className={styles.boardActions}>
