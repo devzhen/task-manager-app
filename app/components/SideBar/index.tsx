@@ -9,7 +9,7 @@ import insert from 'ramda/es/insert';
 import last from 'ramda/es/last';
 import split from 'ramda/es/split';
 import remove from 'ramda/src/remove';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 
 import { API_HOST } from '@/app/constants';
@@ -19,8 +19,6 @@ import ModalAddBoard from '../ModalAddBoard';
 import ModalDelete from '../ModalDelete';
 
 import styles from './SideBar.module.css';
-
-Modal.setAppElement('.container');
 
 type SideBarProps = {
   initialBoards: BoardType[];
@@ -188,6 +186,10 @@ export default function SideBar(props: SideBarProps) {
       }));
     }
   };
+
+  useEffect(() => {
+    Modal.setAppElement('.container');
+  }, []);
 
   return (
     <div className={styles.container}>

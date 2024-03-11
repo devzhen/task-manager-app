@@ -75,7 +75,7 @@ export default function StatusRow(props: StatusRowProps) {
           onDragOver={onDragOverHandler as VoidFunction}
           onDrop={onDrop as VoidFunction}
         >
-          {status === STATUSES.backlog && <ButtonAddCard addCard={addCard} />}
+          {status === STATUSES.backlog && <ButtonAddCard addCard={addCard} stickyPosition />}
           {cards.map((card, index) => {
             return (
               <Card
