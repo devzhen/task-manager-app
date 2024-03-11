@@ -14,6 +14,7 @@ import insertCardToBoard from '@/app/utils/insertCardToBoard';
 import markCardAsWillBeRemoved from '@/app/utils/markCardAsWillBeRemoved';
 import updateCardsPositionProperty from '@/app/utils/updateCardsPositionProperty';
 
+import CardsEmptyState from '../CardsEmptyState';
 import StatusRow from '../StatusRow';
 
 import styles from './Statuses.module.css';
@@ -36,10 +37,11 @@ const initialState: StateType = {
 
 type StatusesProps = {
   initialCards: StatusesCardType;
+  total: number;
 };
 
 export default function Statuses(props: StatusesProps) {
-  const { initialCards } = props;
+  const { initialCards, total } = props;
 
   const router = useRouter();
 
@@ -236,10 +238,9 @@ export default function Statuses(props: StatusesProps) {
         return (
           <StatusRow
             addCard={addCard}
-            cards={cards[status.value] || []}
+            cards={cards?.[status.value] || []}
             color={status.color}
             currentHoveredState={state.hoveredCard}
-            isLoading={false}
             key={status.name}
             name={status.name}
             onCardClick={onCardClick}
@@ -251,6 +252,7 @@ export default function Statuses(props: StatusesProps) {
           />
         );
       })}
+      {total === 0 && <CardsEmptyState addCard={addCard} />}
     </div>
   );
 }

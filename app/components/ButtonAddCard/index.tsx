@@ -4,7 +4,7 @@ import styles from './ButtonAddCard.module.css';
 
 type ButtonAddCardProps = {
   addCard: () => void;
-  disabled: boolean;
+  disabled?: boolean;
 };
 
 export default function ButtonAddCard(props: ButtonAddCardProps) {

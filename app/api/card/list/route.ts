@@ -56,17 +56,21 @@ export const GET = async (req: NextRequest) => {
         Cards.boardid = ${board};
     `;
 
-    const acc = {} as Record<keyof typeof STATUSES, CardType[]>;
+    let total = 0;
+
+    const cards = {} as Record<keyof typeof STATUSES, CardType[]>;
 
     for (let i = 0; i < res.rows.length; i++) {
       const card = res.rows[i];
 
-      const prev = acc[card.status] || [];
+      const prev = cards[card.status] || [];
 
-      acc[card.status] = [...prev, card];
+      cards[card.status] = [...prev, card];
+
+      total = total + 1;
     }
 
-    return NextResponse.json(acc);
+    return NextResponse.json({ cards, total });
   } catch (error) {
     return NextResponse.json({ error, message: (error as Error).message }, { status: 500 });
   }

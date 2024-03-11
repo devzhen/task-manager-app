@@ -14,7 +14,6 @@ type StatusRowProps = {
   cards: CardType[];
   color: string;
   currentHoveredState: StateType['hoveredCard'];
-  isLoading: boolean;
   name: string;
   onDragEnd: (e: DragEvent) => void;
   onDragOver: (e: DragEvent, container: HTMLDivElement | null, layouts: CardLayoutType[]) => void;
@@ -30,7 +29,6 @@ export default function StatusRow(props: StatusRowProps) {
     cards,
     color,
     currentHoveredState,
-    isLoading,
     name,
     onDragEnd,
     onDragOver,
@@ -69,43 +67,45 @@ export default function StatusRow(props: StatusRowProps) {
           {name} ({cards.length})
         </span>
       </div>
-      <div
-        ref={containerRef}
-        className={styles.cardWrappers}
-        data-role="drop-container"
-        onDragOver={onDragOverHandler as VoidFunction}
-        onDrop={onDrop as VoidFunction}
-      >
-        {status === STATUSES.backlog && <ButtonAddCard addCard={addCard} disabled={isLoading} />}
-        {cards.map((card, index) => {
-          return (
-            <Card
-              attachments={card.attachments}
-              description={card.description}
-              hovered={card.id === currentHoveredState.insertBeforeId}
-              id={card.id}
-              index={index}
-              key={card.id}
-              onClick={onCardClick}
-              onDragEnd={onDragEnd}
-              onDragStart={onDragStart}
-              onLayout={onCardLayout}
-              parentScrollTop={scrollTop}
-              status={card.status}
-              tags={card.tags}
-              title={card.title}
-            />
-          );
-        })}
-        <FakeCard
-          hovered={`${FAKE_CARD_ID}-${status}` === currentHoveredState.insertBeforeId}
-          id={`${FAKE_CARD_ID}-${status}`}
-          index={cards.length}
-          onLayout={onCardLayout}
-          parentScrollTop={scrollTop}
-          status={status}
-        />
-      </div>
+      {cards.length > 0 && (
+        <div
+          ref={containerRef}
+          className={styles.cardWrappers}
+          data-role="drop-container"
+          onDragOver={onDragOverHandler as VoidFunction}
+          onDrop={onDrop as VoidFunction}
+        >
+          {status === STATUSES.backlog && <ButtonAddCard addCard={addCard} />}
+          {cards.map((card, index) => {
+            return (
+              <Card
+                attachments={card.attachments}
+                description={card.description}
+                hovered={card.id === currentHoveredState.insertBeforeId}
+                id={card.id}
+                index={index}
+                key={card.id}
+                onClick={onCardClick}
+                onDragEnd={onDragEnd}
+                onDragStart={onDragStart}
+                onLayout={onCardLayout}
+                parentScrollTop={scrollTop}
+                status={card.status}
+                tags={card.tags}
+                title={card.title}
+              />
+            );
+          })}
+          <FakeCard
+            hovered={`${FAKE_CARD_ID}-${status}` === currentHoveredState.insertBeforeId}
+            id={`${FAKE_CARD_ID}-${status}`}
+            index={cards.length}
+            onLayout={onCardLayout}
+            parentScrollTop={scrollTop}
+            status={status}
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -13,15 +13,20 @@ type BoardPageProps = {
 export default async function BoardPage(props: BoardPageProps) {
   const { id: boardId } = props.params;
 
-  const cards = (await fetchCards(boardId)) as StatusesCardType;
+  const data = await fetchCards(boardId);
 
-  if (!cards) {
+  if (data === null) {
     notFound();
   }
 
+  const { cards, total } = data as {
+    cards: StatusesCardType;
+    total: number;
+  };
+
   return (
     <div className="cards-wrapper">
-      <Statuses initialCards={cards} />
+      <Statuses initialCards={cards} total={total} />
     </div>
   );
 }
