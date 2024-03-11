@@ -44,3 +44,20 @@
   margin-bottom: 14px;
   overflow: hidden;
 }
+
+.imageLoaderWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.imageLoaderWrapper div {
+  width: 40px;
+  height: 40px;
+  border-width: 4px;
+}

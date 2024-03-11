@@ -13,7 +13,6 @@ export async function GET(req: Request) {
     const result = await sql`CREATE TABLE Boards ( 
         id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
         name varchar(255), 
-        href varchar(255),
         created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         protected BOOLEAN NOT NULL
       );`;

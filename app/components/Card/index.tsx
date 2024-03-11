@@ -82,6 +82,9 @@ export default function Card(props: CardProps) {
       <div className={styles.content}>
         {attachment && (
           <div className={styles.imageWrapper}>
+            <div className={styles.imageLoaderWrapper}>
+              <div className="loader" />
+            </div>
             <Image
               alt="Img"
               src={attachment.url}

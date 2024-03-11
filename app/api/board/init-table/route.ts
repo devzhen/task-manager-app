@@ -12,21 +12,21 @@ export async function GET(req: Request) {
     await sql`TRUNCATE Boards CASCADE;`;
     await sql`
         INSERT INTO Boards 
-          (name, href, protected) 
+          (name, protected) 
         VALUES 
-          ('Home board', '/', TRUE);`;
+          ('Home board', TRUE);`;
     await new Promise((res) => setTimeout(res, 1000));
     await sql`
         INSERT INTO Boards 
-          (name, href, protected) 
+          (name, protected) 
         VALUES 
-          ('Design board', '/', FALSE);`;
+          ('Design board', FALSE);`;
     await new Promise((res) => setTimeout(res, 1000));
     await sql`
         INSERT INTO Boards 
-          (name, href, protected) 
+          (name, protected) 
         VALUES 
-          ('Learning board', '/', FALSE);`;
+          ('Learning board', FALSE);`;
 
     const boards = await sql`SELECT * FROM Boards;`;
     return NextResponse.json({ boards }, { status: 200 });

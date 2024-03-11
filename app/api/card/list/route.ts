@@ -2,7 +2,7 @@ import { sql } from '@vercel/postgres';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { STATUSES } from '@/app/constants';
-import type { CardType } from '@/app/types';
+import type { BoardType, CardType } from '@/app/types';
 
 export const GET = async (req: NextRequest) => {
   const searchParams = req.nextUrl.searchParams;
@@ -10,9 +10,18 @@ export const GET = async (req: NextRequest) => {
 
   try {
     if (!board) {
-      return new Response(`The required query param 'board' was not provided`, {
-        status: 500,
-      });
+      return NextResponse.json(
+        { error: `The required query param 'board' was not provided` },
+        { status: 422 },
+      );
+    }
+
+    const select = await sql<BoardType>`SELECT * FROM Boards WHERE id = ${board}`;
+    if (select.rowCount === 0) {
+      return NextResponse.json(
+        { error: `The board with the id - '${board}' was not found` },
+        { status: 404 },
+      );
     }
 
     const res = await sql<CardType>`
