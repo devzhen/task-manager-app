@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import Image from 'next/image';
 import { useRef } from 'react';
 
@@ -56,11 +57,6 @@ export default function Card(props: CardProps) {
     onClick(id);
   };
 
-  const classes = [styles.container];
-  if (hovered) {
-    classes.push(styles.containerActive);
-  }
-
   useCardLayout({
     cardElement: ref.current,
     parentScrollTop,
@@ -75,7 +71,9 @@ export default function Card(props: CardProps) {
   return (
     <div
       ref={ref}
-      className={classes.join(' ')}
+      className={classNames(styles.container, {
+        [styles.containerActive]: hovered,
+      })}
       data-id={id}
       data-role="card"
       data-index={index}

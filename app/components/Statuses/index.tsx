@@ -8,6 +8,7 @@ import path from 'ramda/es/path';
 import { useEffect, useRef, useState } from 'react';
 
 import { STATUSES, STATUSES_OBJ } from '@/app/constants';
+import usePrevious from '@/app/hooks/usePrevious';
 import type { CardLayoutType, CardType, StateType, StatusesCardType } from '@/app/types';
 import deleteCardFromBoard from '@/app/utils/deleteCardFromBoard';
 import insertCardToBoard from '@/app/utils/insertCardToBoard';
@@ -50,6 +51,8 @@ export default function Statuses(props: StatusesProps) {
 
   const [state, setState] = useState<StateType>(initialState);
   const stateRef = useRef(state);
+
+  const currentDraggableIdPrev = usePrevious(state.currentDraggable.id);
 
   /**
    * On drag start handler
@@ -230,10 +233,20 @@ export default function Statuses(props: StatusesProps) {
     stateRef.current = state;
   }, [cards, state]);
 
-  const classNames = [styles.container];
+  useEffect(() => {
+    if (currentDraggableIdPrev && !state.currentDraggable.id) {
+      const element = document.querySelector(`[data-id="${currentDraggableIdPrev}"]`);
+
+      const nextElement = element?.nextElementSibling;
+
+      if (nextElement && 'scrollIntoView' in nextElement) {
+        nextElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }, [currentDraggableIdPrev, state.currentDraggable.id]);
 
   return (
-    <div className={classNames.join(' ')}>
+    <div className={styles.container}>
       {Object.values(STATUSES_OBJ).map((status) => {
         return (
           <StatusRow
