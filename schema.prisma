@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model Attachments {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  url       String
+  cardId    String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  cards     Cards    @relation(fields: [cardId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_cardid")
+}
+
+model Boards {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderId   Int      @default(autoincrement())
+  name      String   @unique
+  protected Boolean  @default(false)
+  createdAt DateTime @default(now())
+  cards     Cards[]
+}
+
+model Cards {
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String
+  description String?
+  boardId     String        @db.Uuid
+  position    Int
+  status      String
+  attachments Attachments[]
+  boards      Boards        @relation(fields: [boardId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_boardid")
+  statuses    Statuses      @relation(fields: [status], references: [name], onDelete: NoAction, onUpdate: NoAction, map: "fk_statusname")
+  tags        Tags[]
+  createdAt   DateTime      @default(now())
+}
+
+model Statuses {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String?  @unique
+  cards     Cards[]
+  createdAt DateTime @default(now())
+}
+
+model Tags {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String?
+  color     String?
+  fontColor String?
+  cardId    String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  cards     Cards    @relation(fields: [cardId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tagname")
+}

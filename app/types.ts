@@ -65,3 +65,9 @@ export type AttachmentType = {
   cardId: string;
   created: string;
 };
+
+export type UpdateCardBodyType = {
+  id: string;
+  fields: (keyof CardType)[];
+  values: (string | number)[];
+};

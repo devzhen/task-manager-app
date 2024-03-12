@@ -11,14 +11,21 @@
     "prepare": "husky",
     "format": "prettier --check --ignore-path .gitignore node_modules .",
     "format:fix": "prettier --write --ignore-path .gitignore .",
-    "lint:css": "stylelint './app/**/*.module.css'"
+    "lint:css": "stylelint './app/**/*.module.css'",
+    "seed": "sh ./seed.sh"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts",
+    "drop-tables": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/drop-tables.ts"
   },
   "dependencies": {
+    "@prisma/client": "^5.10.2",
     "@vercel/blob": "^0.22.1",
     "@vercel/postgres": "^0.7.2",
     "classnames": "^2.5.1",
     "next": "14.1.1",
     "next-absolute-url": "^1.2.2",
+    "prisma": "^5.10.2",
     "ramda": "^0.29.1",
     "react": "^18",
     "react-dnd": "^16.0.1",

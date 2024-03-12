@@ -53,7 +53,9 @@ export const GET = async (req: NextRequest) => {
       FROM 
         Cards
       WHERE 
-        Cards.boardid = ${board};
+        Cards.boardid = ${board}
+      ORDER BY
+        position;
     `;
 
     let total = 0;

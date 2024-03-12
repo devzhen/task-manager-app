@@ -7,9 +7,15 @@ import compose from 'ramda/es/compose';
 import path from 'ramda/es/path';
 import { useEffect, useRef, useState } from 'react';
 
-import { STATUSES, STATUSES_OBJ } from '@/app/constants';
+import { API_HOST, STATUSES, STATUSES_OBJ } from '@/app/constants';
 import usePrevious from '@/app/hooks/usePrevious';
-import type { CardLayoutType, CardType, StateType, StatusesCardType } from '@/app/types';
+import type {
+  CardLayoutType,
+  CardType,
+  StateType,
+  StatusesCardType,
+  UpdateCardBodyType,
+} from '@/app/types';
 import deleteCardFromBoard from '@/app/utils/deleteCardFromBoard';
 import insertCardToBoard from '@/app/utils/insertCardToBoard';
 import markCardAsWillBeRemoved from '@/app/utils/markCardAsWillBeRemoved';
@@ -45,6 +51,8 @@ export default function Statuses(props: StatusesProps) {
   const { initialCards, total } = props;
 
   const router = useRouter();
+
+  const updateCardsObj = useRef<Record<string, UpdateCardBodyType>>({});
 
   const [cards, setCards] = useState<StatusesCardType>(initialCards);
   const cardsRef = useRef(cards);
@@ -181,6 +189,17 @@ export default function Statuses(props: StatusesProps) {
       path([oldStatus, oldIndex]),
     )(clone) as CardType;
 
+    if (oldStatus !== newStatus) {
+      updateCardsObj.current[stateRef.current.currentDraggable.id] = {
+        id: stateRef.current.currentDraggable.id,
+        fields: [],
+        values: [],
+      };
+
+      updateCardsObj.current[stateRef.current.currentDraggable.id].fields.push('status');
+      updateCardsObj.current[stateRef.current.currentDraggable.id].values.push(newStatus);
+    }
+
     // TODO: remove
     // console.log('prev', clone);
     // console.log('meta', { oldStatus, oldIndex, newStatus, card });
@@ -207,7 +226,7 @@ export default function Statuses(props: StatusesProps) {
     });
 
     // Update cards position property
-    clone = updateCardsPositionProperty(clone);
+    clone = updateCardsPositionProperty(clone, updateCardsObj.current);
 
     // TODO: remove
     // console.log('next', clone, '\n\n');
@@ -224,6 +243,27 @@ export default function Statuses(props: StatusesProps) {
   };
 
   /**
+   * Update cards position
+   */
+  const updateCardsPositions = () => {
+    if (updateCardsObj.current) {
+      console.log(updateCardsObj.current);
+
+      // Make fetch request
+      Object.values(updateCardsObj.current).forEach((item) => {
+        const url = new URL(`${API_HOST}/api/card/update`);
+
+        fetch(url.toString(), {
+          method: 'PUT',
+          body: JSON.stringify(item),
+        });
+      });
+
+      updateCardsObj.current = {};
+    }
+  };
+
+  /**
    * Add card
    */
   const addCard = () => {};
@@ -232,6 +272,10 @@ export default function Statuses(props: StatusesProps) {
     cardsRef.current = cards;
     stateRef.current = state;
   }, [cards, state]);
+
+  useEffect(() => {
+    updateCardsPositions();
+  }, [cards]);
 
   useEffect(() => {
     if (currentDraggableIdPrev && !state.currentDraggable.id) {

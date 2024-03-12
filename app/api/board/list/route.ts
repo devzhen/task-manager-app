@@ -1,16 +1,24 @@
-import { sql } from '@vercel/postgres';
+import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
-
-import type { BoardType } from '@/app/types';
 
 export const dynamic = 'force-dynamic';
 
 export const GET = async () => {
-  try {
-    const res = await sql<BoardType>`SELECT * FROM Boards ORDER BY created`;
+  const prisma = new PrismaClient();
 
-    return NextResponse.json(res.rows);
+  try {
+    const boards = await prisma.boards.findMany({
+      orderBy: [
+        {
+          createdAt: 'asc',
+        },
+      ],
+    });
+
+    return NextResponse.json(boards);
   } catch (error) {
     return NextResponse.json({ error }, { status: 500 });
+  } finally {
+    prisma.$disconnect;
   }
 };
