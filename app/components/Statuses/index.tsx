@@ -249,6 +249,7 @@ export default function Statuses(props: StatusesProps) {
             onDragStart={onDragStartHandler}
             onDrop={onDropHandler(status.value)}
             status={status.value}
+            totalCards={total}
           />
         );
       })}

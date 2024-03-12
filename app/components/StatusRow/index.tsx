@@ -15,12 +15,13 @@ type StatusRowProps = {
   color: string;
   currentHoveredState: StateType['hoveredCard'];
   name: string;
+  onCardClick: (id: string) => void;
   onDragEnd: (e: DragEvent) => void;
   onDragOver: (e: DragEvent, container: HTMLDivElement | null, layouts: CardLayoutType[]) => void;
   onDragStart: (e: DragEvent) => void;
   onDrop: (e: DragEvent) => void;
   status: keyof typeof STATUSES;
-  onCardClick: (id: string) => void;
+  totalCards: number;
 };
 
 export default function StatusRow(props: StatusRowProps) {
@@ -36,6 +37,7 @@ export default function StatusRow(props: StatusRowProps) {
     onDrop,
     status,
     onCardClick,
+    totalCards,
   } = props;
 
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -67,7 +69,7 @@ export default function StatusRow(props: StatusRowProps) {
           {name} ({cards.length})
         </span>
       </div>
-      {cards.length > 0 && (
+      {totalCards !== 0 && (
         <div
           ref={containerRef}
           className={styles.cardWrappers}
