@@ -247,8 +247,6 @@ export default function Statuses(props: StatusesProps) {
    */
   const updateCardsPositions = () => {
     if (updateCardsObj.current) {
-      console.log(updateCardsObj.current);
-
       // Make fetch request
       Object.values(updateCardsObj.current).forEach((item) => {
         const url = new URL(`${API_HOST}/api/card/update`);

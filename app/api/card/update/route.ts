@@ -1,9 +1,19 @@
-import { sql } from '@vercel/postgres';
+import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 
 import type { UpdateCardBodyType } from '@/app/types';
 
+/**
+ * PUT body example
+ *  {
+      "id": "d13cdb99-0ce7-49e3-9aeb-1bd999d0c311",
+      "fields": ["position"],
+      "values": [10]
+    }
+ */
 export const PUT = async (req: NextRequest) => {
+  const prisma = new PrismaClient();
+
   try {
     const body = (await req.json()) as UpdateCardBodyType;
 
@@ -28,28 +38,24 @@ export const PUT = async (req: NextRequest) => {
       );
     }
 
+    const data: Record<string, string | number> = {};
     body.fields.forEach(async (field, index) => {
       const value = body.values[index];
 
-      const query = `
-      UPDATE Cards
-        SET ${field} = '${value}'
-      WHERE
-        id = ${body.id};`;
-
-      console.log(query);
-
-      await sql`
-        UPDATE Cards
-          SET ${field} = '${value}'
-        WHERE
-          id = ${body.id};`;
+      data[field] = value;
     });
 
-    const card = await sql`SELECT * FROM Cards WHERE id = ${body.id}`;
+    const updatedCard = await prisma.cards.update({
+      where: {
+        id: body.id,
+      },
+      data,
+    });
 
-    return NextResponse.json(card);
+    return NextResponse.json(updatedCard);
   } catch (error) {
     return NextResponse.json({ error, message: (error as Error).message }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 };

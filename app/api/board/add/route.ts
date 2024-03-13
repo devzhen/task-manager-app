@@ -1,7 +1,9 @@
-import { sql } from '@vercel/postgres';
+import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
 
 export const POST = async (req: Request) => {
+  const prisma = new PrismaClient({ log: ['query', 'info', 'error', 'warn'] });
+
   try {
     const { name } = await new Response(req.body).json();
 
@@ -12,15 +14,15 @@ export const POST = async (req: Request) => {
       );
     }
 
-    const res = await sql`
-      INSERT INTO Boards 
-        (name) 
-      VALUES (${name}) 
-        RETURNING *;`;
-    const board = res.rows[0];
+    const board = await prisma.boards.create({
+      data: {
+        name,
+      },
+    });
 
-    return NextResponse.json({ board });
+    return NextResponse.json(board);
   } catch (error) {
-    return NextResponse.json({ error, message: (error as Error).message }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 };

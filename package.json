@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "prisma generate && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -21,7 +21,6 @@
   "dependencies": {
     "@prisma/client": "^5.10.2",
     "@vercel/blob": "^0.22.1",
-    "@vercel/postgres": "^0.7.2",
     "classnames": "^2.5.1",
     "next": "14.1.1",
     "next-absolute-url": "^1.2.2",

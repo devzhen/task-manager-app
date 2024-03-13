@@ -1,9 +1,11 @@
+import { PrismaClient } from '@prisma/client';
 import { put, del } from '@vercel/blob';
-import { sql } from '@vercel/postgres';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   let fileUrl = '';
+
+  const prisma = new PrismaClient({ log: ['query', 'info', 'error', 'warn'] });
 
   try {
     const formData = await request.formData();
@@ -14,18 +16,20 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: `The required body param 'cardId' was not provided` },
         {
-          status: 500,
+          status: 422,
         },
       );
     }
 
-    const res = await sql`SELECT COUNT(id) FROM Cards WHERE id = ${cardId};`;
-    if (res.rows[0]?.count !== '1') {
+    const currentBoard = await prisma.cards.findUnique({
+      where: {
+        id: cardId,
+      },
+    });
+    if (!currentBoard) {
       return NextResponse.json(
-        { error: `There is no card with the id ${cardId}` },
-        {
-          status: 500,
-        },
+        { error: `The card with the id - '${cardId}' was not found` },
+        { status: 422 },
       );
     }
 
@@ -33,7 +37,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: `The required body param 'file' was not provided` },
         {
-          status: 500,
+          status: 422,
         },
       );
     }
@@ -43,19 +47,22 @@ export async function POST(request: Request) {
     });
     fileUrl = blob.url;
 
-    const insertRes = await sql`
-      INSERT INTO Attachments
-        (name, url, cardId)
-      VALUES
-        (${file.name}, ${blob.url}, ${cardId})
-      RETURNING *;`;
+    const attachment = await prisma.attachments.create({
+      data: {
+        name: file.name,
+        url: blob.url,
+        cardId: cardId,
+      },
+    });
 
-    return NextResponse.json({ blob, rows: insertRes.rows });
+    return NextResponse.json({ blob, attachment });
   } catch (error) {
     if (fileUrl) {
       del(fileUrl);
     }
 
     return NextResponse.json({ error, message: (error as Error).message }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 }

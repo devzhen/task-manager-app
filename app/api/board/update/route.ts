@@ -1,7 +1,9 @@
-import { sql } from '@vercel/postgres';
+import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
 
 export const PUT = async (req: Request) => {
+  const prisma = new PrismaClient({ log: ['query', 'info', 'error', 'warn'] });
+
   try {
     const { name, id } = await new Response(req.body).json();
 
@@ -12,12 +14,31 @@ export const PUT = async (req: Request) => {
       );
     }
 
-    const res = await sql`UPDATE Boards SET name = ${name} WHERE id = ${id} RETURNING *;`;
+    const currentBoard = await prisma.boards.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!currentBoard) {
+      return NextResponse.json(
+        { error: `The board with the id - '${id}' was not found` },
+        { status: 422 },
+      );
+    }
 
-    const board = res.rows[0];
+    const board = await prisma.boards.update({
+      data: {
+        name,
+      },
+      where: {
+        id,
+      },
+    });
 
-    return NextResponse.json({ board });
+    return NextResponse.json(board);
   } catch (error) {
     return NextResponse.json({ error }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 };

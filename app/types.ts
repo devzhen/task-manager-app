@@ -71,3 +71,16 @@ export type UpdateCardBodyType = {
   fields: (keyof CardType)[];
   values: (string | number)[];
 };
+
+// Update cards multiple body
+type NonEmptyArray<T> = [T, ...T[]];
+type CardTypeOmitted = Omit<CardType, 'id' | 'attachments' | 'tags' | 'willBeRemoved'>;
+type FilteredKeysArray = keyof CardTypeOmitted;
+type FilteredValues = {
+  [K in keyof CardTypeOmitted]?: string | number;
+};
+export type UpdateCardMultipleBodyType = {
+  ids: NonEmptyArray<string>;
+  fields: NonEmptyArray<FilteredKeysArray>;
+  values: NonEmptyArray<FilteredValues>;
+};
