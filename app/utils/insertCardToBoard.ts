@@ -25,10 +25,10 @@ const insertCardToBoard = ({
   const insertionIndex =
     isInsertBeforeFakeCard === -1
       ? clone[status].findIndex((item) => item.id === insertBeforeId)
-      : clone[status].length;
+      : (clone[status] || []).length;
 
   if (insertionIndex !== -1) {
-    clone[status] = insert(insertionIndex, card, clone[status]);
+    clone[status] = insert(insertionIndex, card, clone[status] || []);
   }
 
   return clone;

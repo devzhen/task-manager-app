@@ -26,15 +26,19 @@ const updateCardsPositionProperty = (
       card.position = j + 1;
       card.willBeRemoved = false;
 
-      if (oldPosition !== card.position) {
+      if (oldPosition !== card.position || 'oldStatus' in card) {
         const updateData = updateCardsObj[card.id] || {
           id: card.id,
           fields: [],
           values: [],
         };
 
+        updateData.fields.push('status');
+        updateData.values.push(card.status);
         updateData.fields.push('position');
         updateData.values.push(card.position);
+
+        updateCardsObj[card.id] = updateData;
       }
     }
   }

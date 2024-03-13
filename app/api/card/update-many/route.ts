@@ -48,7 +48,7 @@ export const PUT = async (req: NextRequest) => {
       );
     }
 
-    if (ids.length !== fields.length || ids.length !== values.length) {
+    if (ids.length !== values.length) {
       return NextResponse.json({ error: `Incorrect body` }, { status: 422 });
     }
 

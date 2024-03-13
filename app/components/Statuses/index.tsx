@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import assocPath from 'ramda/es/assocPath';
 import ramdaClone from 'ramda/es/clone';
 import compose from 'ramda/es/compose';
+import isEmpty from 'ramda/es/isEmpty';
 import path from 'ramda/es/path';
 import { useEffect, useRef, useState } from 'react';
 
@@ -12,9 +13,11 @@ import usePrevious from '@/app/hooks/usePrevious';
 import type {
   CardLayoutType,
   CardType,
+  NonEmptyArray,
   StateType,
   StatusesCardType,
   UpdateCardBodyType,
+  UpdateCardMultipleBodyType,
 } from '@/app/types';
 import deleteCardFromBoard from '@/app/utils/deleteCardFromBoard';
 import insertCardToBoard from '@/app/utils/insertCardToBoard';
@@ -186,19 +189,9 @@ export default function Statuses(props: StatusesProps) {
 
     const card = compose(
       assocPath(['status'], newStatus),
+      assocPath(['oldStatus'], oldStatus),
       path([oldStatus, oldIndex]),
     )(clone) as CardType;
-
-    if (oldStatus !== newStatus) {
-      updateCardsObj.current[stateRef.current.currentDraggable.id] = {
-        id: stateRef.current.currentDraggable.id,
-        fields: [],
-        values: [],
-      };
-
-      updateCardsObj.current[stateRef.current.currentDraggable.id].fields.push('status');
-      updateCardsObj.current[stateRef.current.currentDraggable.id].values.push(newStatus);
-    }
 
     // TODO: remove
     // console.log('prev', clone);
@@ -247,14 +240,41 @@ export default function Statuses(props: StatusesProps) {
    */
   const updateCardsPositions = () => {
     if (updateCardsObj.current) {
-      // Make fetch request
-      Object.values(updateCardsObj.current).forEach((item) => {
-        const url = new URL(`${API_HOST}/api/card/update`);
+      const ids = Object.keys(updateCardsObj.current) as NonEmptyArray<string>;
+      if (isEmpty(ids)) {
+        return;
+      }
 
-        fetch(url.toString(), {
-          method: 'PUT',
-          body: JSON.stringify(item),
+      const data: UpdateCardMultipleBodyType = {
+        ids,
+        fields: [],
+        values: [],
+      };
+
+      for (const id of ids) {
+        const fields = updateCardsObj.current[id].fields;
+        const values = updateCardsObj.current[id].values;
+
+        if (isEmpty(fields) || isEmpty(values)) {
+          return;
+        }
+
+        data.fields = fields;
+
+        const obj: Record<string, string | number> = {};
+
+        fields.forEach((field, index) => {
+          obj[field] = values[index];
         });
+
+        data.values.push(obj);
+      }
+
+      // Make fetch request
+      const url = new URL(`${API_HOST}/api/card/update-many`);
+      fetch(url.toString(), {
+        method: 'PUT',
+        body: JSON.stringify(data),
       });
 
       updateCardsObj.current = {};
