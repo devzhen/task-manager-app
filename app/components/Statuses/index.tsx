@@ -48,10 +48,11 @@ const initialState: StateType = {
 type StatusesProps = {
   initialCards: StatusesCardType;
   total: number;
+  boardId: string;
 };
 
 export default function Statuses(props: StatusesProps) {
-  const { initialCards, total } = props;
+  const { initialCards, total, boardId } = props;
 
   const router = useRouter();
 
@@ -281,11 +282,6 @@ export default function Statuses(props: StatusesProps) {
     }
   };
 
-  /**
-   * Add card
-   */
-  const addCard = () => {};
-
   useEffect(() => {
     cardsRef.current = cards;
     stateRef.current = state;
@@ -312,7 +308,7 @@ export default function Statuses(props: StatusesProps) {
       {Object.values(STATUSES_OBJ).map((status) => {
         return (
           <StatusRow
-            addCard={addCard}
+            boardId={boardId}
             cards={cards?.[status.value] || []}
             color={status.color}
             currentHoveredState={state.hoveredCard}
@@ -328,7 +324,7 @@ export default function Statuses(props: StatusesProps) {
           />
         );
       })}
-      {total === 0 && <CardsEmptyState addCard={addCard} />}
+      {total === 0 && <CardsEmptyState boardId={boardId} />}
     </div>
   );
 }

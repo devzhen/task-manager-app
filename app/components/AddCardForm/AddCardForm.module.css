@@ -1,0 +1,48 @@
+.row {
+  grid-column: span 2;
+  display: flex;
+  flex: 1;
+}
+
+.column label {
+  color: #f5f4f1;
+}
+
+.input {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border: none;
+  background-color: inherit;
+  outline: none;
+  z-index: 1;
+  caret-color: #f8f2fc;
+  color: #f8f2fc;
+}
+
+.textarea {
+  padding: 10px;
+  border: none;
+  background-color: inherit;
+  outline: none;
+  z-index: 1;
+  caret-color: #f8f2fc;
+  color: #f8f2fc;
+  resize: none;
+}
+
+.inputWrapper {
+  height: 40px;
+}
+
+.inputWrapper, .textAreWrapper {
+  position: relative;
+  margin-bottom: 20px;
+  margin-top: 10px;
+  border: 1px solid #696e73;
+  border-radius: 8px;
+  overflow: hidden;
+  pointer-events: all;
+}

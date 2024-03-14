@@ -8,51 +8,57 @@ datasource db {
   // directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
-model Attachments {
+model Attachment {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name      String
   url       String
   cardId    String   @db.Uuid
-  createdAt DateTime @default(now()) @db.Timestamp(6)
-  cards     Cards    @relation(fields: [cardId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_cardid")
+  createdAt DateTime @default(now())
+  card      Card     @relation(fields: [cardId], references: [id])
 }
 
-model Boards {
+model Board {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   orderId   Int      @default(autoincrement())
   name      String   @unique
   protected Boolean  @default(false)
   createdAt DateTime @default(now())
-  cards     Cards[]
+  cards     Card[]
+  statuses  Status[]
+  tags      Tag[]
 }
 
-model Cards {
-  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+model Card {
+  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title       String
   description String?
-  boardId     String        @db.Uuid
+  boardId     String       @db.Uuid
   position    Int
-  status      String
-  attachments Attachments[]
-  boards      Boards        @relation(fields: [boardId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_boardid")
-  statuses    Statuses      @relation(fields: [status], references: [name], onDelete: NoAction, onUpdate: NoAction, map: "fk_statusname")
-  tags        Tags[]
-  createdAt   DateTime      @default(now())
+  attachments Attachment[]
+  board       Board        @relation(fields: [boardId], references: [id])
+  status      Status       @relation(fields: [statusId], references: [id])
+  tags        Tag[]
+  createdAt   DateTime     @default(now())
+  statusId    String       @db.Uuid
 }
 
-model Statuses {
+model Status {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name      String?  @unique
-  cards     Cards[]
+  name      String
   createdAt DateTime @default(now())
+  boardId   String   @db.Uuid
+  boards    Board    @relation(fields: [boardId], references: [id])
+  cards     Card[]
 }
 
-model Tags {
+model Tag {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name      String?
-  color     String?
-  fontColor String?
-  cardId    String   @db.Uuid
-  createdAt DateTime @default(now()) @db.Timestamp(6)
-  cards     Cards    @relation(fields: [cardId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tagname")
+  name      String
+  color     String
+  fontColor String
+  boardId   String   @db.Uuid
+  createdAt DateTime @default(now())
+  board     Board    @relation(fields: [boardId], references: [id])
+  Card      Card?    @relation(fields: [cardId], references: [id])
+  cardId    String?  @db.Uuid
 }

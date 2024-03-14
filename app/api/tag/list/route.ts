@@ -44,7 +44,7 @@ export const GET = async (req: NextRequest) => {
       },
     });
     */
-    const cardsRes: CardType[] = await prisma.$queryRaw`
+    const boards: CardType[] = await prisma.$queryRaw`
       SELECT 
         "Cards".*,
         ARRAY(
@@ -69,16 +69,7 @@ export const GET = async (req: NextRequest) => {
         )
         FROM "Attachments" 
         WHERE "Cards".id = "Attachments"."cardId"
-      ) AS attachments,
-      (SELECT json_build_object(
-          'id', "Statuses".id, 
-          'name', "Statuses".name, 
-          'boardId', "Statuses"."boardId",
-          'createdAt', "Statuses"."createdAt"
-        )
-        FROM "Statuses" 
-        WHERE "Cards"."statusId" = "Statuses"."id"
-      ) AS status
+      ) AS attachments
       FROM 
         "Cards"
       WHERE 
@@ -91,9 +82,9 @@ export const GET = async (req: NextRequest) => {
 
     const cards = {} as Record<keyof typeof STATUSES, CardType[]>;
 
-    for (let i = 0; i < cardsRes.length; i++) {
-      const card = cardsRes[i] as CardType;
-      const cardStatus = card.status.name as keyof typeof STATUSES;
+    for (let i = 0; i < boards.length; i++) {
+      const card = boards[i] as CardType;
+      const cardStatus = card.status as keyof typeof STATUSES;
 
       const prev = cards[cardStatus] || [];
 

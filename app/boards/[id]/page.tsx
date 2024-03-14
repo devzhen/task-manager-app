@@ -26,7 +26,7 @@ export default async function BoardPage(props: BoardPageProps) {
 
   return (
     <div className="cards-wrapper">
-      <Statuses initialCards={cards} total={total} />
+      <Statuses initialCards={cards} total={total} boardId={boardId} />
     </div>
   );
 }

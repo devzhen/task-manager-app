@@ -19,7 +19,12 @@ export type CardType = {
   id: string;
   title: string;
   description?: string;
-  status: keyof typeof STATUSES;
+  status: {
+    id: string;
+    name: keyof typeof STATUSES;
+    createdAt: string;
+    boardId: string;
+  };
   attachments: AttachmentType[];
   position: number;
   tags: TagType[];

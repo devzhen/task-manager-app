@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Statuses } from '@prisma/client';
 import * as R from 'ramda';
 
 import { STATUSES, TAGS } from '../app/constants';
@@ -6,16 +6,6 @@ import { STATUSES, TAGS } from '../app/constants';
 const prisma = new PrismaClient({ log: ['query', 'info', 'warn', 'error'] });
 
 async function main() {
-  // Init statuses
-  await prisma.statuses.createMany({
-    data: [
-      { name: STATUSES.backlog },
-      { name: STATUSES.inProgress },
-      { name: STATUSES.inReview },
-      { name: STATUSES.completed },
-    ],
-  });
-
   // Init boards
   await prisma.boards.createMany({
     data: [
@@ -28,6 +18,18 @@ async function main() {
   // Init cards
   const boards = await prisma.boards.findMany();
   for (const board of boards) {
+    await prisma.statuses.createMany({
+      data: [
+        { name: STATUSES.backlog, boardId: board.id },
+        { name: STATUSES.inReview, boardId: board.id },
+        { name: STATUSES.inProgress, boardId: board.id },
+        { name: STATUSES.completed, boardId: board.id },
+      ],
+    });
+
+    const statuses = await prisma.statuses.findMany();
+    const grouped = R.indexBy(R.prop('name'), statuses) as Record<string, Statuses>;
+
     if (board.name === 'Home board') {
       await prisma.cards.createMany({
         data: [
@@ -35,55 +37,55 @@ async function main() {
             title: 'Investigate Framer-Motion for animations.',
             boardId: board.id,
             position: 1,
-            status: STATUSES.backlog,
+            statusId: grouped[STATUSES.backlog].id,
           },
           {
             title: 'Implement CRUD operations',
             boardId: board.id,
             position: 2,
-            status: STATUSES.backlog,
+            statusId: grouped[STATUSES.backlog].id,
           },
           {
             title: 'Implement the ability for users to edit tasks',
             boardId: board.id,
             position: 1,
-            status: STATUSES.inProgress,
+            statusId: grouped[STATUSES.inProgress].id,
           },
           {
             title: 'Implement the ability for users to view a specific subset of tasks',
             boardId: board.id,
             position: 2,
-            status: STATUSES.inProgress,
+            statusId: grouped[STATUSES.inProgress].id,
           },
           {
             title: 'Use the useEffect hook to update the number of pending tasks',
             boardId: board.id,
             position: 3,
-            status: STATUSES.inProgress,
+            statusId: grouped[STATUSES.inProgress].id,
           },
           {
             title: 'Implement the ability for users to delete tasks using the mouse or keyboard',
             boardId: board.id,
             position: 1,
-            status: STATUSES.inReview,
+            statusId: grouped[STATUSES.inReview].id,
           },
           {
             title: 'Implement the ability for users to add tasks using the mouse or keyboard',
             boardId: board.id,
             position: 2,
-            status: STATUSES.inReview,
+            statusId: grouped[STATUSES.inReview].id,
           },
           {
             title: 'Create a basic App component structure and styling',
             boardId: board.id,
             position: 1,
-            status: STATUSES.completed,
+            statusId: grouped[STATUSES.completed].id,
           },
           {
             title: 'Implement a layout according to the design',
             boardId: board.id,
             position: 3,
-            status: STATUSES.completed,
+            statusId: grouped[STATUSES.completed].id,
           },
         ],
       });
@@ -103,6 +105,7 @@ async function main() {
             name: TAGS.concept.name,
             color: TAGS.concept.color,
             fontColor: TAGS.concept.fontColor,
+            boardId: card.boardId,
           },
         ]),
       ],
@@ -114,12 +117,14 @@ async function main() {
             name: TAGS.frontEnd.name,
             color: TAGS.frontEnd.color,
             fontColor: TAGS.frontEnd.fontColor,
+            boardId: card.boardId,
           },
           {
             cardId: card.id,
             name: TAGS.technical.name,
             color: TAGS.technical.color,
             fontColor: TAGS.technical.fontColor,
+            boardId: card.boardId,
           },
         ]),
       ],
@@ -131,18 +136,21 @@ async function main() {
             name: TAGS.design.name,
             color: TAGS.design.color,
             fontColor: TAGS.design.fontColor,
+            boardId: card.boardId,
           },
           {
             cardId: card.id,
             name: TAGS.frontEnd.name,
             color: TAGS.frontEnd.color,
             fontColor: TAGS.frontEnd.fontColor,
+            boardId: card.boardId,
           },
           {
             cardId: card.id,
             name: TAGS.technical.name,
             color: TAGS.technical.color,
             fontColor: TAGS.technical.fontColor,
+            boardId: card.boardId,
           },
         ]),
       ],
@@ -154,24 +162,28 @@ async function main() {
             name: TAGS.design.name,
             color: TAGS.design.color,
             fontColor: TAGS.design.fontColor,
+            boardId: card.boardId,
           },
           {
             cardId: card.id,
             name: TAGS.frontEnd.name,
             color: TAGS.frontEnd.color,
             fontColor: TAGS.frontEnd.fontColor,
+            boardId: card.boardId,
           },
           {
             cardId: card.id,
             name: TAGS.technical.name,
             color: TAGS.technical.color,
             fontColor: TAGS.technical.fontColor,
+            boardId: card.boardId,
           },
           {
             cardId: card.id,
             name: TAGS.concept.name,
             color: TAGS.concept.color,
             fontColor: TAGS.concept.fontColor,
+            boardId: card.boardId,
           },
         ]),
       ],

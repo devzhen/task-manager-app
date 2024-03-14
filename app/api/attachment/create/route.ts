@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
   let fileUrl = '';
 
-  const prisma = new PrismaClient({ log: ['query', 'info', 'error', 'warn'] });
+  const prisma = new PrismaClient();
 
   try {
     const formData = await request.formData();

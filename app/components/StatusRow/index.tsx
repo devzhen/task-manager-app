@@ -10,7 +10,7 @@ import FakeCard from '../FakeCard';
 import styles from './StatusRow.module.css';
 
 type StatusRowProps = {
-  addCard: () => void;
+  boardId: string;
   cards: CardType[];
   color: string;
   currentHoveredState: StateType['hoveredCard'];
@@ -26,7 +26,7 @@ type StatusRowProps = {
 
 export default function StatusRow(props: StatusRowProps) {
   const {
-    addCard,
+    boardId,
     cards,
     color,
     currentHoveredState,
@@ -77,7 +77,7 @@ export default function StatusRow(props: StatusRowProps) {
           onDragOver={onDragOverHandler as VoidFunction}
           onDrop={onDrop as VoidFunction}
         >
-          {status === STATUSES.backlog && <ButtonAddCard addCard={addCard} stickyPosition />}
+          {status === STATUSES.backlog && <ButtonAddCard stickyPosition boardId={boardId} />}
           {cards.map((card, index) => {
             return (
               <Card

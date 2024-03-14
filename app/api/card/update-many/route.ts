@@ -36,7 +36,7 @@ import type { UpdateCardMultipleBodyType } from '@/app/types';
   }
  */
 export const PUT = async (req: NextRequest) => {
-  const prisma = new PrismaClient({ log: ['query'] });
+  const prisma = new PrismaClient();
 
   try {
     const { ids, fields, values } = (await req.json()) as UpdateCardMultipleBodyType;

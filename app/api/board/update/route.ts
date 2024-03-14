@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
 
 export const PUT = async (req: Request) => {
-  const prisma = new PrismaClient({ log: ['query', 'info', 'error', 'warn'] });
+  const prisma = new PrismaClient();
 
   try {
     const { name, id } = await new Response(req.body).json();
