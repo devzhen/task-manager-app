@@ -45,7 +45,7 @@ export const PUT = async (req: NextRequest) => {
       data[field] = value;
     });
 
-    const updatedCard = await prisma.cards.update({
+    const updatedCard = await prisma.card.update({
       where: {
         id: body.id,
       },

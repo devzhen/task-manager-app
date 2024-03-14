@@ -7,10 +7,10 @@ export const GET = async () => {
   const prisma = new PrismaClient();
 
   try {
-    const boards = await prisma.boards.findMany({
+    const boards = await prisma.board.findMany({
       orderBy: [
         {
-          createdAt: 'asc',
+          orderId: 'asc',
         },
       ],
     });

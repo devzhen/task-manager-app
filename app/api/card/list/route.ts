@@ -18,7 +18,7 @@ export const GET = async (req: NextRequest) => {
       );
     }
 
-    const currentBoard = await prisma.boards.findUnique({
+    const currentBoard = await prisma.board.findUnique({
       where: {
         id: board,
       },
@@ -31,60 +31,65 @@ export const GET = async (req: NextRequest) => {
     }
 
     /*
-    !!!!!! 1.5 times slower
-
-    const cardsRes = await prisma.cards.findMany({
-      where: {
-        boardId: board,
-      },
-      orderBy: [{ position: 'asc' }],
-      include: {
-        attachments: true,
-        tags: true,
-      },
-    });
+      !!!!!! 1.5 times slower
     */
+    // const cardsRes = await prisma.card.findMany({
+    //   where: {
+    //     boardId: board,
+    //   },
+    //   orderBy: [{ position: 'asc' }],
+    //   include: {
+    //     attachments: true,
+    //     tags: {
+    //       include: {
+    //         tag: true,
+    //       },
+    //     },
+    //     status: true,
+    //   },
+    // });
     const cardsRes: CardType[] = await prisma.$queryRaw`
-      SELECT 
-        "Cards".*,
+      SELECT
+        "Card".*,
         ARRAY(
           SELECT json_build_object(
-            'id', "Tags".id, 
-            'name', "Tags".name, 
-            'color', "Tags".color, 
-            'fontColor', "Tags"."fontColor",
-            'cardId', "Tags"."cardId",
-            'createdAt', "Tags"."createdAt"
+            'id', "TagLinker".id,
+            'createdAt', "TagLinker"."createdAt",
+            'name', "Tag".name,
+            'color', "Tag".color,
+            'fontColor', "Tag"."fontColor",
+            'tagId', "Tag"."id"
           )
-          FROM "Tags" 
-          WHERE "Cards".id = "Tags"."cardId"
+          FROM "TagLinker"
+          JOIN "Tag" On "Tag".id = "TagLinker"."tagId"
+          WHERE "Card".id = "TagLinker"."cardId"
       ) AS tags,
       ARRAY(
         SELECT json_build_object(
-          'id', "Attachments".id, 
-          'name', "Attachments".name, 
-          'url', "Attachments".url,
-          'cardId', "Attachments"."cardId",
-          'createdAt', "Attachments"."createdAt"
+          'id', "Attachment".id,
+          'name', "Attachment".name,
+          'url', "Attachment".url,
+          'cardId', "Attachment"."cardId",
+          'createdAt', "Attachment"."createdAt"
         )
-        FROM "Attachments" 
-        WHERE "Cards".id = "Attachments"."cardId"
+        FROM "Attachment"
+        WHERE "Card".id = "Attachment"."cardId"
       ) AS attachments,
       (SELECT json_build_object(
-          'id', "Statuses".id, 
-          'name', "Statuses".name, 
-          'boardId', "Statuses"."boardId",
-          'createdAt', "Statuses"."createdAt"
+          'id', "Status".id,
+          'name', "Status".name,
+          'boardId', "Status"."boardId",
+          'createdAt', "Status"."createdAt"
         )
-        FROM "Statuses" 
-        WHERE "Cards"."statusId" = "Statuses"."id"
+        FROM "Status"
+        WHERE "Card"."statusId" = "Status"."id"
       ) AS status
-      FROM 
-        "Cards"
-      WHERE 
-        "Cards"."boardId"::text = ${board}
+      FROM
+        "Card"
+      WHERE
+        "Card"."boardId"::text = ${board}
       ORDER BY
-        "Cards".position;
+        "Card".position;
     `;
 
     let total = 0;
@@ -92,7 +97,7 @@ export const GET = async (req: NextRequest) => {
     const cards = {} as Record<keyof typeof STATUSES, CardType[]>;
 
     for (let i = 0; i < cardsRes.length; i++) {
-      const card = cardsRes[i] as CardType;
+      const card = cardsRes[i] as unknown as CardType;
       const cardStatus = card.status.name as keyof typeof STATUSES;
 
       const prev = cards[cardStatus] || [];

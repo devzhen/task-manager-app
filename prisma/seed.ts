@@ -1,4 +1,4 @@
-import { PrismaClient, Statuses } from '@prisma/client';
+import { PrismaClient, Status } from '@prisma/client';
 import * as R from 'ramda';
 
 import { STATUSES, TAGS } from '../app/constants';
@@ -7,7 +7,7 @@ const prisma = new PrismaClient({ log: ['query', 'info', 'warn', 'error'] });
 
 async function main() {
   // Init boards
-  await prisma.boards.createMany({
+  await prisma.board.createMany({
     data: [
       { name: 'Home board', protected: true },
       { name: 'Design board', protected: false },
@@ -16,22 +16,53 @@ async function main() {
   });
 
   // Init cards
-  const boards = await prisma.boards.findMany();
+  const boards = await prisma.board.findMany();
   for (const board of boards) {
-    await prisma.statuses.createMany({
+    // Init statuses
+    await prisma.status.createMany({
       data: [
-        { name: STATUSES.backlog, boardId: board.id },
-        { name: STATUSES.inReview, boardId: board.id },
-        { name: STATUSES.inProgress, boardId: board.id },
-        { name: STATUSES.completed, boardId: board.id },
+        { name: STATUSES.backlog, boardId: board.id, position: 1 },
+        { name: STATUSES.inReview, boardId: board.id, position: 2 },
+        { name: STATUSES.inProgress, boardId: board.id, position: 3 },
+        { name: STATUSES.completed, boardId: board.id, position: 4 },
       ],
     });
 
-    const statuses = await prisma.statuses.findMany();
-    const grouped = R.indexBy(R.prop('name'), statuses) as Record<string, Statuses>;
+    // Init tags
+    await prisma.tag.createMany({
+      data: [
+        {
+          name: TAGS.concept.name,
+          color: TAGS.concept.color,
+          fontColor: TAGS.concept.fontColor,
+          boardId: board.id,
+        },
+        {
+          name: TAGS.design.name,
+          color: TAGS.design.color,
+          fontColor: TAGS.design.fontColor,
+          boardId: board.id,
+        },
+        {
+          name: TAGS.frontEnd.name,
+          color: TAGS.frontEnd.color,
+          fontColor: TAGS.frontEnd.fontColor,
+          boardId: board.id,
+        },
+        {
+          name: TAGS.technical.name,
+          color: TAGS.technical.color,
+          fontColor: TAGS.technical.fontColor,
+          boardId: board.id,
+        },
+      ],
+    });
+
+    const statuses = await prisma.status.findMany();
+    const grouped = R.indexBy(R.prop('name'), statuses) as Record<string, Status>;
 
     if (board.name === 'Home board') {
-      await prisma.cards.createMany({
+      await prisma.card.createMany({
         data: [
           {
             title: 'Investigate Framer-Motion for animations.',
@@ -92,9 +123,18 @@ async function main() {
     }
   }
 
-  // Init tags
-  const cards = await prisma.cards.findMany();
+  // Init tag linkers
+  const cards = await prisma.card.findMany();
   for (const card of cards) {
+    const tags = await prisma.tag.findMany({
+      where: {
+        boardId: card.boardId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
     const number = Math.floor(Math.random() * (4 - 1) + 1);
     const data: any = R.cond([
       [
@@ -102,10 +142,8 @@ async function main() {
         R.always([
           {
             cardId: card.id,
-            name: TAGS.concept.name,
-            color: TAGS.concept.color,
-            fontColor: TAGS.concept.fontColor,
             boardId: card.boardId,
+            tagId: tags[0].id,
           },
         ]),
       ],
@@ -114,17 +152,13 @@ async function main() {
         R.always([
           {
             cardId: card.id,
-            name: TAGS.frontEnd.name,
-            color: TAGS.frontEnd.color,
-            fontColor: TAGS.frontEnd.fontColor,
             boardId: card.boardId,
+            tagId: tags[0].id,
           },
           {
             cardId: card.id,
-            name: TAGS.technical.name,
-            color: TAGS.technical.color,
-            fontColor: TAGS.technical.fontColor,
             boardId: card.boardId,
+            tagId: tags[1].id,
           },
         ]),
       ],
@@ -133,24 +167,18 @@ async function main() {
         R.always([
           {
             cardId: card.id,
-            name: TAGS.design.name,
-            color: TAGS.design.color,
-            fontColor: TAGS.design.fontColor,
             boardId: card.boardId,
+            tagId: tags[0].id,
           },
           {
             cardId: card.id,
-            name: TAGS.frontEnd.name,
-            color: TAGS.frontEnd.color,
-            fontColor: TAGS.frontEnd.fontColor,
             boardId: card.boardId,
+            tagId: tags[1].id,
           },
           {
             cardId: card.id,
-            name: TAGS.technical.name,
-            color: TAGS.technical.color,
-            fontColor: TAGS.technical.fontColor,
             boardId: card.boardId,
+            tagId: tags[2].id,
           },
         ]),
       ],
@@ -159,37 +187,29 @@ async function main() {
         R.always([
           {
             cardId: card.id,
-            name: TAGS.design.name,
-            color: TAGS.design.color,
-            fontColor: TAGS.design.fontColor,
             boardId: card.boardId,
+            tagId: tags[0].id,
           },
           {
             cardId: card.id,
-            name: TAGS.frontEnd.name,
-            color: TAGS.frontEnd.color,
-            fontColor: TAGS.frontEnd.fontColor,
             boardId: card.boardId,
+            tagId: tags[1].id,
           },
           {
             cardId: card.id,
-            name: TAGS.technical.name,
-            color: TAGS.technical.color,
-            fontColor: TAGS.technical.fontColor,
             boardId: card.boardId,
+            tagId: tags[2].id,
           },
           {
             cardId: card.id,
-            name: TAGS.concept.name,
-            color: TAGS.concept.color,
-            fontColor: TAGS.concept.fontColor,
             boardId: card.boardId,
+            tagId: tags[3].id,
           },
         ]),
       ],
     ])(number);
 
-    await prisma.tags.createMany({
+    await prisma.tagLinker.createMany({
       data,
     });
   }
@@ -204,7 +224,7 @@ async function main() {
     const randomIndex = Math.floor(Math.random() * (cards.length - 1 - 0) + 0);
     const card = cards[randomIndex];
 
-    await prisma.attachments.create({
+    await prisma.attachment.create({
       data: {
         name: `name ${i + 1}`,
         url: images[i],

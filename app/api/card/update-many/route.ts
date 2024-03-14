@@ -100,7 +100,7 @@ export const PUT = async (req: NextRequest) => {
 
     await prisma.$queryRawUnsafe(sql);
 
-    const result = await prisma.cards.findMany({
+    const result = await prisma.card.findMany({
       where: {
         OR: ids.map((id) => ({ id })),
       },

@@ -18,7 +18,7 @@ export const GET = async (req: NextRequest) => {
       );
     }
 
-    const currentBoard = await prisma.boards.findUnique({
+    const currentBoard = await prisma.board.findUnique({
       where: {
         id: board,
       },

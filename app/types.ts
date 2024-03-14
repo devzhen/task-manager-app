@@ -3,8 +3,16 @@ import { STATUSES_OBJ, STATUSES } from './constants';
 export type BoardType = {
   id: string;
   name: string;
-  created: string;
+  createdAt: string;
   protected: boolean;
+  statuses: StatusType[];
+};
+
+export type StatusType = {
+  id: string;
+  name: keyof typeof STATUSES;
+  createdAt: string;
+  position: number;
 };
 
 export type TagType = {
@@ -12,7 +20,7 @@ export type TagType = {
   name: string;
   color: string;
   fontcolor: string;
-  cardid: string;
+  cardId: string;
 };
 
 export type CardType = {
@@ -42,7 +50,7 @@ export type StateType = {
   isInitialized: boolean;
   currentDraggable: {
     id: string;
-    status: keyof typeof STATUSES_OBJ;
+    status: StatusType;
     index: number;
   };
   currentDroppable: {

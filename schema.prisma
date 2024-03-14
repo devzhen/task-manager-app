@@ -18,14 +18,15 @@ model Attachment {
 }
 
 model Board {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  orderId   Int      @default(autoincrement())
-  name      String   @unique
-  protected Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id        String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderId   Int         @default(autoincrement())
+  name      String      @unique
+  protected Boolean     @default(false)
+  createdAt DateTime    @default(now())
   cards     Card[]
   statuses  Status[]
   tags      Tag[]
+  TagLinker TagLinker[]
 }
 
 model Card {
@@ -37,7 +38,7 @@ model Card {
   attachments Attachment[]
   board       Board        @relation(fields: [boardId], references: [id])
   status      Status       @relation(fields: [statusId], references: [id])
-  tags        Tag[]
+  tags        TagLinker[]
   createdAt   DateTime     @default(now())
   statusId    String       @db.Uuid
 }
@@ -46,19 +47,30 @@ model Status {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name      String
   createdAt DateTime @default(now())
+  position  Int
   boardId   String   @db.Uuid
   boards    Board    @relation(fields: [boardId], references: [id])
   cards     Card[]
 }
 
 model Tag {
+  id         String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String
+  color      String
+  fontColor  String
+  boardId    String      @db.Uuid
+  createdAt  DateTime    @default(now())
+  board      Board       @relation(fields: [boardId], references: [id])
+  tagLinkers TagLinker[]
+}
+
+model TagLinker {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name      String
-  color     String
-  fontColor String
-  boardId   String   @db.Uuid
   createdAt DateTime @default(now())
+  boardId   String   @db.Uuid
+  cardId    String   @db.Uuid
+  tagId     String   @db.Uuid
+  card      Card     @relation(fields: [cardId], references: [id])
   board     Board    @relation(fields: [boardId], references: [id])
-  Card      Card?    @relation(fields: [cardId], references: [id])
-  cardId    String?  @db.Uuid
+  tag       Tag      @relation(fields: [tagId], references: [id])
 }

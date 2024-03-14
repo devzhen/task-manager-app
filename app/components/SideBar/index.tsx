@@ -76,7 +76,7 @@ export default function SideBar(props: SideBarProps) {
     const method = board?.id ? 'PUT' : 'POST';
     const apiUrl = board?.id ? `${API_HOST}/api/board/update` : `${API_HOST}/api/board/add`;
     const body = board?.id
-      ? JSON.stringify({ name, id: board.id, created: board.created })
+      ? JSON.stringify({ name, id: board.id, created: board.createdAt })
       : JSON.stringify({ name });
 
     try {
