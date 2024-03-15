@@ -1,7 +1,6 @@
 import ramdaClone from 'ramda/es/clone';
 
-import { STATUSES } from '../constants';
-import type { StatusesCardType } from '../types';
+import type { StatusType, StatusesCardType } from '../types';
 
 /**
  * Delete a cart from a board.
@@ -11,11 +10,11 @@ const deleteCardFromBoard = ({
   status,
 }: {
   cardsObj: StatusesCardType;
-  status: keyof typeof STATUSES;
+  status: StatusType;
 }): StatusesCardType => {
   const clone = ramdaClone(cardsObj);
 
-  clone[status] = clone[status].filter((item) => item.willBeRemoved !== true);
+  clone[status.name] = clone[status.name].filter((item) => item.willBeRemoved !== true);
 
   return clone;
 };

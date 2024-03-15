@@ -1,10 +1,11 @@
 .row {
   grid-column: span 2;
   display: flex;
+  flex-direction: column;
   flex: 1;
 }
 
-.column label {
+.column label, .row label {
   color: #f5f4f1;
 }
 
@@ -23,26 +24,138 @@
 }
 
 .textarea {
+  width: 100%;
   padding: 10px;
-  border: none;
   background-color: inherit;
   outline: none;
   z-index: 1;
   caret-color: #f8f2fc;
   color: #f8f2fc;
   resize: none;
+  border: 1px solid #696e73;
+  border-radius: 8px;
 }
 
-.inputWrapper {
+.inputWrapper input{
   height: 40px;
+  min-width: 100%;
+  border: 1px solid #696e73;
+  border-radius: 8px;
 }
 
 .inputWrapper, .textAreWrapper {
   position: relative;
   margin-bottom: 20px;
   margin-top: 10px;
-  border: 1px solid #696e73;
-  border-radius: 8px;
+}
+
+.tag {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 4px 22px 4px 4px;
+  border-radius: 4px;
+  margin-right: 8px;
   overflow: hidden;
-  pointer-events: all;
+}
+
+.tag span {
+  font-size: 12px;
+}
+
+.tagClear {
+  position: absolute;
+  right: 0;
+  height: 100%;
+  width: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #191b1f;
+  cursor: pointer;
+}
+
+.attachmentsText p {
+  color: #f8f2fc;
+}
+
+.attachmentsText p:last-child {
+  margin-top: 10px;
+  margin-bottom: 20px;
+  font-size: 12px;
+}
+
+.attachments {
+  display: flex;
+}
+
+.dropZone {
+  max-width: 160px;
+  min-width: 160px;
+  min-height: 160px;
+  max-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  margin-right: 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  background: linear-gradient(to right, #c7d9f8, #c8d8f7);
+}
+
+.dropZone span {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #5578d4;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  min-height: 35px;
+  cursor: pointer;
+}
+
+.option span {
+  color: #f8f2fc;
+}
+
+.optionCircle {
+  width: 16px;
+  height: 16px;
+  margin-right: 10px;
+  border-radius: 8px;
+}
+
+.error {
+  padding-top: 2px;
+  color: #d85045;
+  font-size: 12px;
+}
+
+.submitButton {
+  display: flex;
+  justify-content: center;
+  min-width: 200px;
+  max-width: 200px;
+  background-color: #3f65dd;
+  padding: 10px 20px;
+  margin-top: 40px;
+  margin-left: auto;
+  color: #f8f2fc;
+  outline: none;
+  border: 1px solid #696e73;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.submitButton:active, .submitButton:disabled {
+  opacity: 0.5;
+}
+
+.submitButton:disabled {
+  cursor: not-allowed;
 }

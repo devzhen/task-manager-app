@@ -7,12 +7,12 @@ import type { StatusesCardType } from '@/app/types';
 
 type BoardPageProps = {
   params: {
-    id: string;
+    boardId: string;
   };
 };
 
 export default async function BoardPage(props: BoardPageProps) {
-  const { id: boardId } = props.params;
+  const { boardId } = props.params;
 
   const data = await fetchCards(boardId);
 

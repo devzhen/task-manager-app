@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "prisma generate && next dev",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -19,6 +19,8 @@
     "drop-tables": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/drop-tables.ts"
   },
   "dependencies": {
+    "@hookform/error-message": "^2.0.1",
+    "@hookform/resolvers": "^3.3.4",
     "@prisma/client": "^5.10.2",
     "@vercel/blob": "^0.22.1",
     "classnames": "^2.5.1",
@@ -27,12 +29,13 @@
     "prisma": "^5.10.2",
     "ramda": "^0.29.1",
     "react": "^18",
-    "react-dnd": "^16.0.1",
-    "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18",
+    "react-dropzone": "^14.2.3",
+    "react-hook-form": "^7.51.0",
     "react-modal": "^3.16.1",
     "react-select": "^5.8.0",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@types/node": "^20",

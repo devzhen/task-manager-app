@@ -2,12 +2,9 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import compose from 'ramda/es/compose';
 import insert from 'ramda/es/insert';
-import last from 'ramda/es/last';
-import split from 'ramda/es/split';
 import remove from 'ramda/src/remove';
 import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
@@ -27,9 +24,9 @@ type SideBarProps = {
 export default function SideBar(props: SideBarProps) {
   const { initialBoards } = props;
 
-  const pathname = usePathname();
-
   const router = useRouter();
+
+  const params = useParams();
 
   const [boards, setBoards] = useState(initialBoards);
 
@@ -165,9 +162,7 @@ export default function SideBar(props: SideBarProps) {
 
       setBoards((prev) => prev.filter((item) => item.id !== modalDeleteState.board?.id));
 
-      const activeBoardId = compose(last, split('/'))(pathname) as string;
-
-      if (modalDeleteState.board?.id === activeBoardId) {
+      if (modalDeleteState.board?.id === params.boardId) {
         const index = boards.findIndex((item) => item.id === modalDeleteState.board?.id);
         const prevIndex = index - 1;
 
@@ -196,9 +191,7 @@ export default function SideBar(props: SideBarProps) {
       {boards.map((item) => {
         const className = [styles.board];
 
-        const activeBoardId = compose(last, split('/'))(pathname) as string;
-
-        if (activeBoardId === item.id) {
+        if (params.boardId === item.id) {
           className.push(styles.boardActive);
         }
 

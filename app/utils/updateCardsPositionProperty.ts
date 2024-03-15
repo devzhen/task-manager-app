@@ -33,8 +33,8 @@ const updateCardsPositionProperty = (
           values: [],
         };
 
-        updateData.fields.push('status');
-        updateData.values.push(card.status);
+        updateData.fields.push('statusId');
+        updateData.values.push(card.status.id);
         updateData.fields.push('position');
         updateData.values.push(card.position);
 

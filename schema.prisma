@@ -12,6 +12,7 @@ model Attachment {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name      String
   url       String
+  position  Int
   cardId    String   @db.Uuid
   createdAt DateTime @default(now())
   card      Card     @relation(fields: [cardId], references: [id])

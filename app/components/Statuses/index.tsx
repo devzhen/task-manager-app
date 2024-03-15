@@ -8,13 +8,15 @@ import isEmpty from 'ramda/es/isEmpty';
 import path from 'ramda/es/path';
 import { useEffect, useRef, useState } from 'react';
 
-import { API_HOST, STATUSES, STATUSES_OBJ } from '@/app/constants';
+import { API_HOST, STATUSES } from '@/app/constants';
 import usePrevious from '@/app/hooks/usePrevious';
 import type {
+  BoardType,
   CardLayoutType,
   CardType,
   NonEmptyArray,
   StateType,
+  StatusType,
   StatusesCardType,
   UpdateCardBodyType,
   UpdateCardMultipleBodyType,
@@ -33,11 +35,21 @@ const initialState: StateType = {
   isInitialized: false,
   currentDraggable: {
     id: '',
-    status: STATUSES.backlog,
+    status: {
+      id: '',
+      name: STATUSES.backlog,
+      createdAt: '',
+      position: 0,
+    },
     index: 0,
   },
   currentDroppable: {
-    status: STATUSES.backlog,
+    status: {
+      id: '',
+      name: STATUSES.backlog,
+      createdAt: '',
+      position: 0,
+    },
   },
   hoveredCard: {
     insertBeforeId: '',
@@ -48,11 +60,11 @@ const initialState: StateType = {
 type StatusesProps = {
   initialCards: StatusesCardType;
   total: number;
-  boardId: string;
+  board: BoardType;
 };
 
 export default function Statuses(props: StatusesProps) {
-  const { initialCards, total, boardId } = props;
+  const { initialCards, total, board } = props;
 
   const router = useRouter();
 
@@ -69,22 +81,16 @@ export default function Statuses(props: StatusesProps) {
   /**
    * On drag start handler
    */
-  const onDragStartHandler = (e: DragEvent) => {
-    if (e.dataTransfer) {
-      const id = e.dataTransfer.getData('id');
-      const status = e.dataTransfer.getData('status') as keyof typeof STATUSES_OBJ;
-      const index = parseInt(e.dataTransfer.getData('index'));
-
-      setState((prev) => ({
-        ...prev,
-        isInitialized: true,
-        currentDraggable: {
-          id,
-          status,
-          index,
-        },
-      }));
-    }
+  const onDragStartHandler = (card: CardType, index: number) => () => {
+    setState((prev) => ({
+      ...prev,
+      isInitialized: true,
+      currentDraggable: {
+        id: card.id,
+        status: card.status,
+        index,
+      },
+    }));
   };
 
   /**
@@ -103,7 +109,7 @@ export default function Statuses(props: StatusesProps) {
     const insertBeforeElement: {
       insertBeforeId: string | null;
       insertBeforeIndex: number;
-      insertBeforeStatus: keyof typeof STATUSES_OBJ | null;
+      insertBeforeStatus: StatusType | null;
     } = {
       insertBeforeId: null,
       insertBeforeIndex: 0,
@@ -133,7 +139,7 @@ export default function Statuses(props: StatusesProps) {
    * On drag over handler
    */
   const onDragOverHandler =
-    (status: keyof typeof STATUSES_OBJ) =>
+    (status: StatusType) =>
     (e: DragEvent, dropContainer: HTMLDivElement | null, layouts: CardLayoutType[]) => {
       e.preventDefault();
 
@@ -160,7 +166,7 @@ export default function Statuses(props: StatusesProps) {
 
       // When sorting in the same drop area
       if (
-        insertBeforeStatus === state.currentDraggable.status &&
+        insertBeforeStatus?.name === state.currentDraggable.status.name &&
         insertBeforeIndex - state.currentDraggable.index === 1
       ) {
         return;
@@ -178,7 +184,7 @@ export default function Statuses(props: StatusesProps) {
   /**
    * On drop handler
    */
-  const onDropHandler = (newStatus: keyof typeof STATUSES_OBJ) => () => {
+  const onDropHandler = (newStatus: StatusType) => () => {
     if (!state.hoveredCard.insertBeforeId) {
       return;
     }
@@ -191,7 +197,7 @@ export default function Statuses(props: StatusesProps) {
     const card = compose(
       assocPath(['status'], newStatus),
       assocPath(['oldStatus'], oldStatus),
-      path([oldStatus, oldIndex]),
+      path([oldStatus.name, oldIndex]),
     )(clone) as CardType;
 
     // TODO: remove
@@ -305,26 +311,24 @@ export default function Statuses(props: StatusesProps) {
 
   return (
     <div className={styles.container}>
-      {Object.values(STATUSES_OBJ).map((status) => {
+      {board.statuses.map((status) => {
         return (
           <StatusRow
-            boardId={boardId}
-            cards={cards?.[status.value] || []}
-            color={status.color}
+            boardId={board.id}
+            cards={cards?.[status.name] || []}
             currentHoveredState={state.hoveredCard}
             key={status.name}
-            name={status.name}
             onCardClick={onCardClick}
             onDragEnd={onDragEndHandler}
-            onDragOver={onDragOverHandler(status.value)}
+            onDragOver={onDragOverHandler(status)}
             onDragStart={onDragStartHandler}
-            onDrop={onDropHandler(status.value)}
-            status={status.value}
+            onDrop={onDropHandler(status)}
+            status={status}
             totalCards={total}
           />
         );
       })}
-      {total === 0 && <CardsEmptyState boardId={boardId} />}
+      {total === 0 && <CardsEmptyState boardId={board.id} />}
     </div>
   );
 }

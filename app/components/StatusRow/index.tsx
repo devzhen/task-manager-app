@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
-import { FAKE_CARD_ID, STATUSES } from '@/app/constants';
-import type { CardLayoutType, CardType, StateType } from '@/app/types';
+import { FAKE_CARD_ID, STATUSES, STATUSES_OBJ } from '@/app/constants';
+import type { CardLayoutType, CardType, StateType, StatusType } from '@/app/types';
 
 import ButtonAddCard from '../ButtonAddCard';
 import Card from '../Card';
@@ -12,15 +12,13 @@ import styles from './StatusRow.module.css';
 type StatusRowProps = {
   boardId: string;
   cards: CardType[];
-  color: string;
   currentHoveredState: StateType['hoveredCard'];
-  name: string;
   onCardClick: (id: string) => void;
   onDragEnd: (e: DragEvent) => void;
   onDragOver: (e: DragEvent, container: HTMLDivElement | null, layouts: CardLayoutType[]) => void;
-  onDragStart: (e: DragEvent) => void;
+  onDragStart: (card: CardType, index: number) => (e: DragEvent) => void;
   onDrop: (e: DragEvent) => void;
-  status: keyof typeof STATUSES;
+  status: StatusType;
   totalCards: number;
 };
 
@@ -28,9 +26,7 @@ export default function StatusRow(props: StatusRowProps) {
   const {
     boardId,
     cards,
-    color,
     currentHoveredState,
-    name,
     onDragEnd,
     onDragOver,
     onDragStart,
@@ -39,6 +35,8 @@ export default function StatusRow(props: StatusRowProps) {
     onCardClick,
     totalCards,
   } = props;
+
+  const statusMeta = STATUSES_OBJ[status.name];
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -61,12 +59,14 @@ export default function StatusRow(props: StatusRowProps) {
 
   const scrollTop = containerRef.current?.scrollTop || 0;
 
+  const fakeCardId = `${FAKE_CARD_ID}-${status.name}`;
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <div style={{ backgroundColor: color }} />
+        <div style={{ backgroundColor: statusMeta.color }} />
         <span>
-          {name} ({cards.length})
+          {statusMeta.name} ({cards.length})
         </span>
       </div>
       {totalCards !== 0 && (
@@ -77,7 +77,7 @@ export default function StatusRow(props: StatusRowProps) {
           onDragOver={onDragOverHandler as VoidFunction}
           onDrop={onDrop as VoidFunction}
         >
-          {status === STATUSES.backlog && <ButtonAddCard stickyPosition boardId={boardId} />}
+          {status.name === STATUSES.backlog && <ButtonAddCard stickyPosition boardId={boardId} />}
           {cards.map((card, index) => {
             return (
               <Card
@@ -89,7 +89,7 @@ export default function StatusRow(props: StatusRowProps) {
                 key={card.id}
                 onClick={onCardClick}
                 onDragEnd={onDragEnd}
-                onDragStart={onDragStart}
+                onDragStart={onDragStart(card, index)}
                 onLayout={onCardLayout}
                 parentScrollTop={scrollTop}
                 status={card.status}
@@ -99,8 +99,8 @@ export default function StatusRow(props: StatusRowProps) {
             );
           })}
           <FakeCard
-            hovered={`${FAKE_CARD_ID}-${status}` === currentHoveredState.insertBeforeId}
-            id={`${FAKE_CARD_ID}-${status}`}
+            hovered={fakeCardId === currentHoveredState.insertBeforeId}
+            id={fakeCardId}
             index={cards.length}
             onLayout={onCardLayout}
             parentScrollTop={scrollTop}

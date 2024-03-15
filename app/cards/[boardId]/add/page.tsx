@@ -1,3 +1,4 @@
+import fetchBoard from '@/app/api/board/fetchBoard';
 import AddCardForm from '@/app/components/AddCardForm';
 
 import styles from './page.module.css';
@@ -13,25 +14,13 @@ export default async function AddPage(props: AddPageProps) {
     params: { boardId },
   } = props;
 
-  // Fetch statuses by board
-  // Fetch tags by board
+  const board = await fetchBoard(boardId);
 
   return (
     <div className={styles.container}>
       <div className={styles.wrapper}>
-        <AddCardForm
-          statuses={[
-            { value: 'chocolate', label: 'Chocolate' },
-            { value: 'strawberry', label: 'Strawberry' },
-            { value: 'vanilla', label: 'Vanilla' },
-          ]}
-          tags={[
-            { value: 'inProgress', label: 'In Progress' },
-            { value: 'inReview', label: 'In Review' },
-            { value: 'completed', label: 'Completed' },
-            { value: 'backlog', label: 'Backlog' },
-          ]}
-        />
+        <h2>Add Task</h2>
+        <AddCardForm board={board} />
       </div>
     </div>
   );

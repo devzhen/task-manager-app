@@ -24,6 +24,7 @@ export const GET = async (request: NextRequest) => {
             position: 'asc',
           },
         },
+        tags: true,
       },
     });
 

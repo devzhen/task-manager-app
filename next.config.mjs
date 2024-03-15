@@ -7,6 +7,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: '5ryohuhemoegbt23.public.blob.vercel-storage.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'placehold.co',
+      },
     ],
   },
   async redirects() {

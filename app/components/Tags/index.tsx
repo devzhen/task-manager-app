@@ -14,7 +14,7 @@ export default function Tags(props: TagsProps) {
       {tags.map((tag) => {
         return (
           <div className={styles.tag} key={tag.id} style={{ backgroundColor: tag.color }}>
-            <span className={styles.tagName} style={{ color: tag.fontcolor }}>
+            <span className={styles.tagName} style={{ color: tag.fontColor }}>
               {tag.name}
             </span>
           </div>

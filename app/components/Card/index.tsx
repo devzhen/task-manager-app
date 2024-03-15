@@ -2,9 +2,8 @@ import classNames from 'classnames';
 import Image from 'next/image';
 import { useRef } from 'react';
 
-import { STATUSES_OBJ } from '@/app/constants';
 import useCardLayout from '@/app/hooks/useCardLayout';
-import type { AttachmentType, CardLayoutType, TagType } from '@/app/types';
+import type { AttachmentType, CardLayoutType, StatusType, TagType } from '@/app/types';
 
 import Tags from '../Tags';
 
@@ -21,7 +20,7 @@ type CardProps = {
   onDragStart: (e: DragEvent) => void;
   onLayout: (layout: CardLayoutType) => void;
   parentScrollTop: number;
-  status: keyof typeof STATUSES_OBJ;
+  status: StatusType;
   tags: TagType[];
   title: string;
 };
@@ -44,15 +43,6 @@ export default function Card(props: CardProps) {
 
   const ref = useRef<HTMLDivElement | null>(null);
 
-  const onDragStartHandler = (e: DragEvent) => {
-    if (e.dataTransfer) {
-      e.dataTransfer.setData('id', id);
-      e.dataTransfer.setData('status', status);
-      e.dataTransfer.setData('index', `${index}`);
-    }
-
-    onDragStart(e);
-  };
   const onClickHandler = () => {
     onClick(id);
   };
@@ -79,7 +69,7 @@ export default function Card(props: CardProps) {
       data-index={index}
       data-status={status}
       draggable
-      onDragStart={onDragStartHandler as VoidFunction}
+      onDragStart={onDragStart as VoidFunction}
       onDragEnd={onDragEnd as VoidFunction}
       onClick={onClickHandler as VoidFunction}
       role="presentation"

@@ -229,6 +229,7 @@ async function main() {
         name: `name ${i + 1}`,
         url: images[i],
         cardId: card.id,
+        position: i + 1,
       },
     });
   }

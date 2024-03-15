@@ -1,4 +1,4 @@
-import { STATUSES_OBJ, STATUSES } from './constants';
+import { STATUSES } from './constants';
 
 export type BoardType = {
   id: string;
@@ -6,6 +6,7 @@ export type BoardType = {
   createdAt: string;
   protected: boolean;
   statuses: StatusType[];
+  tags: TagType[];
 };
 
 export type StatusType = {
@@ -19,7 +20,7 @@ export type TagType = {
   id: string;
   name: string;
   color: string;
-  fontcolor: string;
+  fontColor: string;
   cardId: string;
 };
 
@@ -27,15 +28,11 @@ export type CardType = {
   id: string;
   title: string;
   description?: string;
-  status: {
-    id: string;
-    name: keyof typeof STATUSES;
-    createdAt: string;
-    boardId: string;
-  };
+  status: StatusType;
   attachments: AttachmentType[];
   position: number;
   tags: TagType[];
+  statusId: string;
   willBeRemoved?: boolean;
 };
 
@@ -54,7 +51,7 @@ export type StateType = {
     index: number;
   };
   currentDroppable: {
-    status: keyof typeof STATUSES_OBJ;
+    status: StatusType;
   };
   hoveredCard: {
     insertBeforeId: string;
@@ -68,7 +65,7 @@ export type CardLayoutType = {
   middle: number;
   bottom: number;
   index: number;
-  status: keyof typeof STATUSES_OBJ;
+  status: StatusType;
 };
 
 export type AttachmentType = {
