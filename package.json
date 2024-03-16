@@ -36,6 +36,7 @@
     "react-select": "^5.8.0",
     "sortablejs": "^1.15.2",
     "uuid": "^9.0.1",
+    "yet-another-react-lightbox": "^3.17.1",
     "yup": "^1.4.0"
   },
   "devDependencies": {

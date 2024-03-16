@@ -5,6 +5,8 @@ import { FileRejection, useDropzone } from 'react-dropzone';
 import { UseControllerProps, useController, UseFormSetValue } from 'react-hook-form';
 import Modal from 'react-modal';
 import Sortable from 'sortablejs';
+import Lightbox from 'yet-another-react-lightbox';
+import 'yet-another-react-lightbox/styles.css';
 
 import { TASK_ATTACHMENT_MAX_SIZE } from '@/app/constants';
 import type { AddCardFormInputs, FormAttachment } from '@/app/types';
@@ -32,6 +34,11 @@ export default function Attachments(props: AttachmentsProps) {
     description: '',
   });
 
+  const [lightBoxState, setLightBoxState] = useState({
+    isOpen: false,
+    src: '',
+  });
+
   /**
    * Set modal visibility
    */
@@ -41,6 +48,18 @@ export default function Attachments(props: AttachmentsProps) {
       isOpen: isVisible,
     }));
   };
+
+  /**
+   * Set modal visibility
+   */
+  const setLightBoxVisibility =
+    (isVisible: boolean, src: string = '') =>
+    () => {
+      setLightBoxState({
+        src,
+        isOpen: isVisible,
+      });
+    };
 
   /**
    * On drop handler
@@ -81,6 +100,16 @@ export default function Attachments(props: AttachmentsProps) {
 
       setValue('attachments', remove(index, 1, attachments));
     }
+  };
+
+  /**
+   * On attachment click
+   */
+  const onAttachmentClick = (attachment: FormAttachment) => () => {
+    setLightBoxState({
+      src: attachment.url,
+      isOpen: true,
+    });
   };
 
   // Dropzone
@@ -146,6 +175,8 @@ export default function Attachments(props: AttachmentsProps) {
               data-id={attachment.id}
               data-role="attachment"
               data-position={index + 1}
+              role="presentation"
+              onClick={onAttachmentClick(attachment)}
             >
               <div className={styles.imageWrapper}>
                 <div className={styles.imageLoaderWrapper}>
@@ -176,6 +207,17 @@ export default function Attachments(props: AttachmentsProps) {
           );
         })}
       </div>
+      {lightBoxState.isOpen && (
+        <Lightbox
+          open={lightBoxState.isOpen}
+          close={setLightBoxVisibility(false)}
+          slides={[{ src: lightBoxState.src }]}
+          render={{
+            buttonPrev: () => null,
+            buttonNext: () => null,
+          }}
+        />
+      )}
       {modalState.isOpen && (
         <ModalInfo
           isOpen={modalState.isOpen}
