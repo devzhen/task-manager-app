@@ -1,5 +1,16 @@
 export const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
 
+export const NEXT_REVALIDATE_TAGS = {
+  cards: 'cards',
+  boards: 'boards',
+  board: 'board',
+};
+
+export const ROUTES = {
+  addBoard: '/boards/add',
+  editBoard: '/boards/edit',
+};
+
 export const BOARD_NAME_MIN_LENGTH = 3;
 
 export const STATUSES = {

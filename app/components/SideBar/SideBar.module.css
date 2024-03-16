@@ -21,22 +21,7 @@
   text-decoration: none;
 }
 
-.boardAddItem {
-  justify-content: flex-start;
-}
-
-.boardAddItem img {
-  margin-right: 10px;
-}
-
 .boardActive {
-  background-color: #545668;
-}
-
-.board:last-child {
-  position: sticky;
-  bottom: 0;
-  margin-top: auto;
   background-color: #545668;
 }
 

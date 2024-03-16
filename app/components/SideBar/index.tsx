@@ -3,16 +3,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import compose from 'ramda/es/compose';
-import insert from 'ramda/es/insert';
-import remove from 'ramda/src/remove';
 import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 
-import { API_HOST } from '@/app/constants';
+import { API_HOST, ROUTES } from '@/app/constants';
 import type { BoardType } from '@/app/types';
 
-import ModalAddBoard from '../ModalAddBoard';
+import ButtonAddBoard from '../ButtonAddBoard';
 import ModalDelete from '../ModalDelete';
 
 import styles from './SideBar.module.css';
@@ -30,16 +27,6 @@ export default function SideBar(props: SideBarProps) {
 
   const [boards, setBoards] = useState(initialBoards);
 
-  const [modalAddState, setModalAddState] = useState<{
-    isOpen: boolean;
-    error: string | undefined;
-    board: BoardType | null;
-  }>({
-    isOpen: false,
-    error: undefined,
-    board: null,
-  });
-
   const [modalDeleteState, setModalDeleteState] = useState<{
     isOpen: boolean;
     board: BoardType | null;
@@ -53,70 +40,10 @@ export default function SideBar(props: SideBarProps) {
   });
 
   /**
-   * Set modal visibility
-   */
-  const setModalAddVisibility = (isVisible: boolean) => () => {
-    setModalAddState((prev) => ({ ...prev, isOpen: isVisible }));
-  };
-
-  /**
    * Set modal delete visibility
    */
   const setModalDeleteVisibility = (isVisible: boolean) => () => {
     setModalDeleteState((prev) => ({ ...prev, isOpen: isVisible }));
-  };
-
-  /**
-   * Create board
-   */
-  const createBoard = async (name: string, board: BoardType | null) => {
-    const method = board?.id ? 'PUT' : 'POST';
-    const apiUrl = board?.id ? `${API_HOST}/api/board/update` : `${API_HOST}/api/board/add`;
-    const body = board?.id
-      ? JSON.stringify({ name, id: board.id, created: board.createdAt })
-      : JSON.stringify({ name });
-
-    try {
-      const url = new URL(apiUrl);
-      const res = await fetch(url.toString(), {
-        method,
-        body,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      const json = await res.json();
-      if ('error' in json) {
-        throw json.error;
-      }
-
-      if (board?.id) {
-        // Update
-        const index = boards.findIndex((item) => item.id === board.id);
-
-        setBoards((prev) => compose(insert(index, json.board), remove(index, 1))(prev));
-
-        router.push(`/boards/${board.id}`);
-      } else {
-        // Add
-        setBoards((prev) => [...prev, json.board]);
-
-        router.push(`/boards/${json.board.id}`);
-      }
-
-      setModalAddState({
-        isOpen: false,
-        error: undefined,
-        board: null,
-      });
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.log('createBoard error - ', error);
-
-      const err = typeof error === 'string' ? error : (error as Error).message;
-
-      setModalAddState((prev) => ({ ...prev, error: err }));
-    }
   };
 
   /**
@@ -131,15 +58,6 @@ export default function SideBar(props: SideBarProps) {
       board,
       description: `Are you sure you want to delete '${board.name}' board?`,
     }));
-  };
-
-  /**
-   * Update board handler
-   */
-  const updateBoardHandler = (board: BoardType) => (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-
-    setModalAddState((prev) => ({ ...prev, isOpen: true, board }));
   };
 
   /**
@@ -205,7 +123,7 @@ export default function SideBar(props: SideBarProps) {
                   src="/edit.svg"
                   width={18}
                   height={18}
-                  onClick={updateBoardHandler(item) as VoidFunction}
+                  onClick={() => router.push(ROUTES.editBoard)}
                 />
                 <Image
                   alt="Img"
@@ -219,23 +137,7 @@ export default function SideBar(props: SideBarProps) {
           </Link>
         );
       })}
-      <button
-        className={`${styles.board} ${styles.boardAddItem}`}
-        onClick={setModalAddVisibility(true)}
-      >
-        <Image alt="Img" src="/add-board.svg" width={16} height={16} priority />
-        <span>Add new board</span>
-      </button>
-      {modalAddState.isOpen && (
-        <ModalAddBoard
-          isOpen={modalAddState.isOpen}
-          modalError={modalAddState.error}
-          closeModal={setModalAddVisibility(false)}
-          boardNames={boards.map((item) => item.name)}
-          createBoard={createBoard}
-          board={modalAddState.board}
-        />
-      )}
+      <ButtonAddBoard />
       {modalDeleteState.isOpen && (
         <ModalDelete
           isOpen={modalDeleteState.isOpen}

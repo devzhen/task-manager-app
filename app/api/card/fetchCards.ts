@@ -1,6 +1,6 @@
-import { revalidateTag } from 'next/cache';
+'use server';
 
-import { API_HOST } from '@/app/constants';
+import { API_HOST, NEXT_REVALIDATE_TAGS } from '@/app/constants';
 import type { StatusesCardType } from '@/app/types';
 
 /**
@@ -12,16 +12,12 @@ const fetchCards = async (
   cards: StatusesCardType;
   total: number;
 } | null> => {
-  'use server';
-
-  revalidateTag('cards');
-
   try {
     const searchParams = new URLSearchParams();
     searchParams.set('board', boardId);
     const url = new URL(`${API_HOST}/api/card/list?${searchParams.toString()}`);
 
-    const res = await fetch(url.toString(), { next: { tags: ['cards'] } });
+    const res = await fetch(url.toString(), { next: { tags: [NEXT_REVALIDATE_TAGS.cards] } });
 
     const json = await res.json();
     if ('error' in json) {

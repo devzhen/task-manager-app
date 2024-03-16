@@ -14,11 +14,9 @@ type BoardPageProps = {
 export default async function BoardPage(props: BoardPageProps) {
   const { boardId } = props.params;
 
-  const data = await fetchCards(boardId);
-
   const [cardsObj, board] = await Promise.all([fetchCards(boardId), fetchBoard(boardId)]);
 
-  if (data === null) {
+  if (cardsObj === null) {
     notFound();
   }
 

@@ -1,15 +1,15 @@
-import { API_HOST } from '@/app/constants';
+'use server';
+
+import { API_HOST, NEXT_REVALIDATE_TAGS } from '@/app/constants';
 import type { BoardType } from '@/app/types';
 
-// Fetch available boards
+// Fetch board
 const fetchBoards = async (boardId: string): Promise<BoardType> => {
-  'use server';
-
   let board = {} as BoardType;
 
   try {
     const url = new URL(`${API_HOST}/api/board/show?boardId=${boardId}`);
-    const response = await fetch(url.toString());
+    const response = await fetch(url.toString(), { next: { tags: [NEXT_REVALIDATE_TAGS.board] } });
     board = await response.json();
 
     if ('error' in board) {

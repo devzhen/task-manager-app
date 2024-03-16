@@ -9,7 +9,8 @@ import { useForm, Controller, Resolver, SubmitHandler } from 'react-hook-form';
 import Select from 'react-select';
 import * as yup from 'yup';
 
-import { API_HOST, STATUSES, STATUSES_OBJ, TASK_TITLE_MIN_LENGTH } from '@/app/constants';
+import addCard from '@/app/api/card/addCard';
+import { STATUSES, STATUSES_OBJ, TASK_TITLE_MIN_LENGTH } from '@/app/constants';
 import { AddCardFormInputs, BoardType, StatusType } from '@/app/types';
 
 import Attachments from '../Attachments';
@@ -86,16 +87,13 @@ export default function AddCardForm(props: AddCardFormProps) {
       data.tags.forEach((tag) => {
         formData.append('tags[]', tag.id);
       });
-      // Object.values(data.attachments).forEach((attachment) => {
-      //   formData.append('attachments[]', attachment);
-      //   formData.append('attachmentsPosition[]', `${attachment.position}`);
-      // });
-
-      const url = new URL(`${API_HOST}/api/card/add`);
-      await fetch(url.toString(), {
-        method: 'POST',
-        body: formData,
+      data.attachments.forEach((attachment) => {
+        formData.append('attachments[]', attachment);
+        formData.append('attachmentsPosition[]', `${attachment.position}`);
       });
+
+      await addCard(formData);
+
       router.back();
     } catch (err) {
       // eslint-disable-next-line no-console

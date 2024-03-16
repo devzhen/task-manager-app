@@ -87,7 +87,7 @@ export const POST = async (req: NextRequest) => {
         attachmentData.push({
           cardId: card.id,
           name: attachment.name,
-          url: 'https://placehold.co/600x600?text=Hello\nWorld',
+          url: 'https://placehold.co/600x600.png?text=Hello\nWorld',
           position: parseInt(position),
         });
       }
