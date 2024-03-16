@@ -15,5 +15,5 @@
 .footer span {
   margin-left: 2px;
   font-size: 14px;
-  color: #f8f2fc;
+  color: var(--textColor);
 }

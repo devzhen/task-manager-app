@@ -8,7 +8,7 @@ import isEmpty from 'ramda/es/isEmpty';
 import path from 'ramda/es/path';
 import { useEffect, useRef, useState } from 'react';
 
-import { API_HOST, STATUSES } from '@/app/constants';
+import { API_HOST, ROUTES, STATUSES } from '@/app/constants';
 import usePrevious from '@/app/hooks/usePrevious';
 import type {
   BoardType,
@@ -239,7 +239,7 @@ export default function Statuses(props: StatusesProps) {
    * ON card click handler
    */
   const onCardClick = (id: string) => {
-    router.push(`/cards/${id}`);
+    router.push(ROUTES.showCard.replace('[boardId]', board.id).replace('[cardId]', id));
   };
 
   /**

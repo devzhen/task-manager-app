@@ -31,7 +31,7 @@
 
 .board span {
   font-size: 16px;
-  color: #f8f2fc;
+  color: var(--textColor);
 }
 
 .board img:first-child() {

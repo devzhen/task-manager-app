@@ -19,8 +19,8 @@
   background-color: inherit;
   outline: none;
   z-index: 1;
-  caret-color: #f8f2fc;
-  color: #f8f2fc;
+  caret-color: var(--textColor);
+  color: var(--textColor);
 }
 
 .textarea {
@@ -29,8 +29,8 @@
   background-color: inherit;
   outline: none;
   z-index: 1;
-  caret-color: #f8f2fc;
-  color: #f8f2fc;
+  caret-color: var(--textColor);
+  color: var(--textColor);
   resize: none;
   border: 1px solid #696e73;
   border-radius: 8px;
@@ -84,7 +84,7 @@
 }
 
 .option span {
-  color: #f8f2fc;
+  color: var(--textColor);
 }
 
 .optionCircle {
@@ -109,7 +109,7 @@
   padding: 10px 20px;
   margin-top: 40px;
   margin-left: auto;
-  color: #f8f2fc;
+  color: var(--textColor);
   outline: none;
   border: 1px solid #696e73;
   border-radius: 10px;

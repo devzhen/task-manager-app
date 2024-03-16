@@ -22,7 +22,7 @@
 
 .footer button {
   padding: 10px 20px;
-  color: #f8f2fc;
+  color: var(--textColor);
   outline: none;
   border: 1px solid #696e73;
   border-radius: 10px;

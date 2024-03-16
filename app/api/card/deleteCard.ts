@@ -1,0 +1,35 @@
+'use server';
+
+import { revalidateTag } from 'next/cache';
+
+import { API_HOST, NEXT_REVALIDATE_TAGS } from '@/app/constants';
+
+/**
+ * Delete card
+ */
+const deleteCard = async ({ boardId, cardId }: { boardId: string; cardId: string }) => {
+  try {
+    const url = new URL(`${API_HOST}/api/card/delete`);
+    const res = await fetch(url.toString(), {
+      method: 'DELETE',
+      body: JSON.stringify({
+        cardId,
+        boardId,
+      }),
+    });
+
+    const json = await res.json();
+    if ('error' in json) {
+      throw json.error;
+    }
+
+    revalidateTag(NEXT_REVALIDATE_TAGS.cards);
+
+    // return json;
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.log('deleteCard error - ', err);
+  }
+};
+
+export default deleteCard;

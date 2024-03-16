@@ -1,5 +1,6 @@
 'use client';
 
+import classNames from 'classnames';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -107,14 +108,14 @@ export default function SideBar(props: SideBarProps) {
   return (
     <div className={styles.container}>
       {boards.map((item) => {
-        const className = [styles.board];
-
-        if (params.boardId === item.id) {
-          className.push(styles.boardActive);
-        }
-
         return (
-          <Link href={`/boards/${item.id}`} key={item.id} className={className.join(' ')}>
+          <Link
+            href={ROUTES.showBoard.replace('[id]', item.id)}
+            key={item.id}
+            className={classNames(styles.board, {
+              [styles.boardActive]: params.boardId === item.id,
+            })}
+          >
             <span>{item.name}</span>
             {!item.protected && (
               <div className={styles.boardActions}>

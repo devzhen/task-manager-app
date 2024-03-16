@@ -11,7 +11,7 @@
 }
 
 .title p {
-  color: #f8f2fc;
+  color: var(--textColor);
 }
 
 .title p:last-child {

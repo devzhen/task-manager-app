@@ -1,0 +1,31 @@
+.container {
+  display: flex;
+  margin-bottom: 20px;
+  background-color: #2a2d43;
+}
+
+.button {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  margin-top: 10px;
+  border: none;
+  outline: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background: linear-gradient(to right, #b82d9a, #aa3b92, #9f468c);
+}
+
+.button:active,
+.button:disabled {
+  opacity: 0.7;
+}
+
+.container span {
+  font-size: 16px;
+  font-weight: 600;
+  margin-right: 10px;
+  color: var(--textColor);
+}

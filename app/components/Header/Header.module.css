@@ -11,7 +11,7 @@
 }
 
 .header span:nth-child(1) {
-  color: #f8f2fc;
+  color: var(--textColor);
 }
 
 .header span:nth-child(2) {

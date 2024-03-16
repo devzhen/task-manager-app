@@ -1,6 +1,7 @@
 :root {
   --max-width: 1100px;
-  --attachment-size: 160px
+  --attachment-size: 160px;
+  --textColor: #f8f2fc;
 }
 
 * {
@@ -43,7 +44,7 @@ body {
   background-color: transparent !important;
   border-radius: 20px !important;
   border: 1px solid #696e73 !important;
-  color: #f8f2fc;
+  color: var(--textColor);
   padding: 28px !important;
 }
 
@@ -100,7 +101,7 @@ body {
 }
 
 #card-status .card-select__single-value, #card-tags .card-select__single-value {
-  color: #f8f2fc;
+  color: var(--textColor);
 }
 
 #card-status .card-select__control--is-focused, #card-tags .card-select__control--is-focused {
@@ -128,7 +129,7 @@ body {
 }
 
 #card-status .card-select__option, #card-tags .card-select__option {
-  color: #f8f2fc;
+  color: var(--textColor);
   cursor: pointer;
 }
 

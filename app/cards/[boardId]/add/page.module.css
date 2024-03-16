@@ -19,5 +19,5 @@
 
 .wrapper h2 {
   grid-column: span 2;
-  color: #f8f2fc;
+  color: var(--textColor);
 }
