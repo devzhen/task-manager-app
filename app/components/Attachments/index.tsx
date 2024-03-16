@@ -1,48 +1,189 @@
 import Image from 'next/image';
+import { indexBy, prop, remove } from 'ramda';
+import { useEffect, useRef, useState } from 'react';
+import { FileRejection, useDropzone } from 'react-dropzone';
+import { UseControllerProps, useController, UseFormSetValue } from 'react-hook-form';
+import Modal from 'react-modal';
+import Sortable from 'sortablejs';
+
+import { TASK_ATTACHMENT_MAX_SIZE } from '@/app/constants';
+import type { AddCardFormInputs, FormAttachment } from '@/app/types';
+
+import ModalInfo from '../ModalInfo';
 
 import styles from './Attachments.module.css';
 
-type AttachmentsProps = {
-  files: (File & { src: string })[];
-  onDelete: (src: string) => () => void;
+type AttachmentsProps = UseControllerProps<AddCardFormInputs> & {
+  setValue: UseFormSetValue<AddCardFormInputs>;
 };
 
 export default function Attachments(props: AttachmentsProps) {
-  const { files, onDelete } = props;
+  const { setValue } = props;
+
+  const attachmentsContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const state = useController(props);
+  const attachments = state.field.value as AddCardFormInputs['attachments'];
+  const attachmentsRef = useRef(indexBy(prop('id'), attachments));
+
+  const [modalState, setModalState] = useState({
+    isOpen: false,
+    title: 'Error',
+    description: '',
+  });
+
+  /**
+   * Set modal visibility
+   */
+  const setModalAddVisibility = (isVisible: boolean) => () => {
+    setModalState((prev) => ({
+      ...prev,
+      isOpen: isVisible,
+    }));
+  };
+
+  /**
+   * On drop handler
+   */
+  const onDrop = (acceptedFiles: File[], fileRejections: FileRejection[]) => {
+    if (fileRejections.length > 0) {
+      setModalState((prev) => ({
+        ...prev,
+        isOpen: true,
+        description: `${fileRejections.length > 1 ? `${fileRejections.length} files` : 'The file'} failed to upload due to format or size restrictions.`,
+      }));
+    }
+
+    const files = acceptedFiles as FormAttachment[];
+
+    const newAttachments = [...attachments];
+
+    for (const file of files) {
+      const src = URL.createObjectURL(file);
+      file.id = src;
+      file.url = src;
+      file.position = attachments.length;
+      newAttachments.push(file);
+    }
+
+    setValue('attachments', newAttachments);
+  };
+
+  /**
+   * On a attachment delete
+   */
+  const onDelete = (id: string) => () => {
+    const index = attachments.findIndex((item) => item.id === id);
+    if (index !== -1) {
+      const item = attachments[index];
+
+      URL.revokeObjectURL(item.url);
+
+      setValue('attachments', remove(index, 1, attachments));
+    }
+  };
+
+  // Dropzone
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: {
+      'image/jpeg': [],
+      'image/png': [],
+    },
+    maxSize: TASK_ATTACHMENT_MAX_SIZE,
+  });
+
+  useEffect(() => {
+    attachmentsRef.current = indexBy(prop('id'), attachments);
+  }, [attachments]);
+
+  useEffect(() => {
+    Modal.setAppElement('.container');
+
+    Sortable.create(attachmentsContainerRef.current as HTMLDivElement, {
+      filter: `.${styles.dropZone}`,
+      onMove(event) {
+        return event.related.className.indexOf(styles.dropZone) === -1;
+      },
+      onChange: () => {
+        const attachmentsElements =
+          attachmentsContainerRef.current?.querySelectorAll('[data-role="attachment"]') || [];
+
+        for (let i = 0; i < attachmentsElements.length; i++) {
+          const element = attachmentsElements[i];
+
+          const id = element.getAttribute('data-id');
+
+          attachmentsRef.current[id as string].position = i + 1;
+        }
+
+        const newAttachments = Object.values(attachmentsRef.current).sort(
+          (a, b) => a.position - b.position,
+        );
+
+        setValue('attachments', newAttachments);
+      },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className={styles.container}>
-      {files.map((file) => {
-        return (
-          <div className={styles.fileContainer} key={file.src}>
-            <div className={styles.imageWrapper}>
-              <div className={styles.imageLoaderWrapper}>
-                <div className="loader" />
+      <div className={styles.title}>
+        <p>Attachments:</p>
+        <p>Only PNG and JPG image formats are permitted, and file sizes must not exceed 4.5 MB.</p>
+      </div>
+      <div className={styles.attachments} ref={attachmentsContainerRef}>
+        <div {...getRootProps({ className: styles.dropZone })}>
+          <input {...getInputProps()} />
+          <span>{`Drag 'n' drop some files here, or click to select files`}</span>
+        </div>
+        {attachments.map((attachment, index) => {
+          return (
+            <div
+              className={styles.fileContainer}
+              key={attachment.url}
+              data-id={attachment.id}
+              data-role="attachment"
+              data-position={index + 1}
+            >
+              <div className={styles.imageWrapper}>
+                <div className={styles.imageLoaderWrapper}>
+                  <div className="loader" />
+                </div>
+                <Image
+                  src={attachment.url}
+                  alt="Img"
+                  fill
+                  sizes="100%"
+                  style={{
+                    objectFit: 'cover',
+                  }}
+                  priority
+                  draggable={false}
+                />
               </div>
-              <Image
-                src={file.src}
-                alt="Img"
-                fill
-                sizes="100%"
-                style={{
-                  objectFit: 'cover',
-                }}
-                priority
-                draggable={false}
-              />
+              <div className={styles.deleteWrapper}>
+                <Image
+                  alt="Img"
+                  src="/delete.svg"
+                  width={18}
+                  height={18}
+                  onClick={onDelete(attachment.id)}
+                />
+              </div>
             </div>
-            <div className={styles.deleteWrapper}>
-              <Image
-                alt="Img"
-                src="/delete.svg"
-                width={18}
-                height={18}
-                onClick={onDelete(file.src)}
-              />
-            </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
+      {modalState.isOpen && (
+        <ModalInfo
+          isOpen={modalState.isOpen}
+          closeModal={setModalAddVisibility(false)}
+          title={modalState.title}
+          description={modalState.description}
+        />
+      )}
     </div>
   );
 }

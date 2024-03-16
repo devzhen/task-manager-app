@@ -75,42 +75,6 @@
   cursor: pointer;
 }
 
-.attachmentsText p {
-  color: #f8f2fc;
-}
-
-.attachmentsText p:last-child {
-  margin-top: 10px;
-  margin-bottom: 20px;
-  font-size: 12px;
-}
-
-.attachments {
-  display: flex;
-}
-
-.dropZone {
-  max-width: 160px;
-  min-width: 160px;
-  min-height: 160px;
-  max-height: 160px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
-  margin-right: 20px;
-  border-radius: 10px;
-  cursor: pointer;
-  background: linear-gradient(to right, #c7d9f8, #c8d8f7);
-}
-
-.dropZone span {
-  text-align: center;
-  font-size: 16px;
-  font-weight: 600;
-  color: #5578d4;
-}
-
 .option {
   display: flex;
   align-items: center;

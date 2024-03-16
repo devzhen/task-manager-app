@@ -94,3 +94,17 @@ export type UpdateCardMultipleBodyType = {
   fields: FilteredKeysArray[];
   values: FilteredValues[];
 };
+
+export type FormAttachment = File & {
+  id: string;
+  url: string;
+  position: number;
+  willBeRemoved?: boolean;
+};
+export type AddCardFormInputs = {
+  title: string;
+  description: string;
+  status: StatusType;
+  tags: (TagType & { label: string })[];
+  attachments: FormAttachment[];
+};

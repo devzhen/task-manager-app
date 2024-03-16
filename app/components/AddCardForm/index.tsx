@@ -5,23 +5,14 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { FileRejection, useDropzone } from 'react-dropzone';
 import { useForm, Controller, Resolver, SubmitHandler } from 'react-hook-form';
-import Modal from 'react-modal';
 import Select from 'react-select';
 import * as yup from 'yup';
 
-import {
-  API_HOST,
-  STATUSES,
-  STATUSES_OBJ,
-  TASK_ATTACHMENT_MAX_SIZE,
-  TASK_TITLE_MIN_LENGTH,
-} from '@/app/constants';
-import { BoardType, StatusType, TagType } from '@/app/types';
+import { API_HOST, STATUSES, STATUSES_OBJ, TASK_TITLE_MIN_LENGTH } from '@/app/constants';
+import { AddCardFormInputs, BoardType, StatusType } from '@/app/types';
 
 import Attachments from '../Attachments';
-import ModalInfo from '../ModalInfo';
 
 import styles from './AddCardForm.module.css';
 
@@ -39,19 +30,6 @@ type AddCardFormProps = {
   board: BoardType;
 };
 
-type FormFileType = File & {
-  src: string;
-  position: number;
-};
-
-type FormInputs = {
-  title: string;
-  description: string;
-  status: StatusType;
-  tags: (TagType & { label: string })[];
-  attachments: Record<string, FormFileType>;
-};
-
 export default function AddCardForm(props: AddCardFormProps) {
   const { board } = props;
 
@@ -60,12 +38,6 @@ export default function AddCardForm(props: AddCardFormProps) {
   const backlogStatusRef = useRef<StatusType | undefined>(undefined);
 
   const [isLoading, setIsLoading] = useState(false);
-
-  const [modalState, setModalState] = useState({
-    isOpen: false,
-    title: 'Error',
-    description: '',
-  });
 
   // prepare status options
   const statuses = board.statuses.map((status) => {
@@ -85,81 +57,24 @@ export default function AddCardForm(props: AddCardFormProps) {
     return { ...tag, value: tag.id, label: tag.name };
   });
 
-  /**
-   * Set modal visibility
-   */
-  const setModalAddVisibility = (isVisible: boolean) => () => {
-    setModalState((prev) => ({
-      ...prev,
-      isOpen: isVisible,
-    }));
-  };
-
   // Form
-  const { formState, handleSubmit, control, register, setValue, getValues } = useForm<FormInputs>({
-    resolver: yupResolver(schema) as unknown as Resolver<FormInputs>,
-    mode: 'onBlur',
-    values: {
-      title: '',
-      description: '',
-      status: backlogStatusRef.current as StatusType,
-      tags: [],
-      attachments: {},
-    },
-  });
-
-  /**
-   * On drop handler
-   */
-  const onDrop = (acceptedFiles: File[], fileRejections: FileRejection[]) => {
-    if (fileRejections.length > 0) {
-      setModalState((prev) => ({
-        ...prev,
-        isOpen: true,
-        description: `${fileRejections.length > 1 ? `${fileRejections.length} files` : 'The file'} failed to upload due to format or size restrictions.`,
-      }));
-    }
-
-    const files = acceptedFiles as FormFileType[];
-
-    const attachments = { ...getValues().attachments };
-
-    for (const file of files) {
-      const src = URL.createObjectURL(file);
-      file.src = src;
-      file.position = Object.keys(attachments).length;
-      attachments[src] = file;
-    }
-
-    setValue('attachments', attachments);
-  };
-
-  /**
-   * On a attachment delete
-   */
-  const onDelete = (src: string) => () => {
-    const attachments = { ...getValues().attachments };
-    delete attachments[src];
-
-    URL.revokeObjectURL(src);
-
-    setValue('attachments', attachments);
-  };
-
-  // Dropzone
-  const { getRootProps, getInputProps } = useDropzone({
-    onDrop,
-    accept: {
-      'image/jpeg': [],
-      'image/png': [],
-    },
-    maxSize: TASK_ATTACHMENT_MAX_SIZE,
-  });
+  const { formState, handleSubmit, control, register, setValue, getValues } =
+    useForm<AddCardFormInputs>({
+      resolver: yupResolver(schema) as unknown as Resolver<AddCardFormInputs>,
+      mode: 'onBlur',
+      values: {
+        title: '',
+        description: '',
+        status: backlogStatusRef.current as StatusType,
+        tags: [],
+        attachments: [],
+      },
+    });
 
   /**
    * Submit handler
    */
-  const onSubmitHandler: SubmitHandler<FormInputs> = async (data) => {
+  const onSubmitHandler: SubmitHandler<AddCardFormInputs> = async (data) => {
     try {
       setIsLoading(true);
 
@@ -171,10 +86,10 @@ export default function AddCardForm(props: AddCardFormProps) {
       data.tags.forEach((tag) => {
         formData.append('tags[]', tag.id);
       });
-      Object.values(data.attachments).forEach((attachment) => {
-        formData.append('attachments[]', attachment);
-        formData.append('attachmentsPosition[]', `${attachment.position}`);
-      });
+      // Object.values(data.attachments).forEach((attachment) => {
+      //   formData.append('attachments[]', attachment);
+      //   formData.append('attachmentsPosition[]', `${attachment.position}`);
+      // });
 
       const url = new URL(`${API_HOST}/api/card/add`);
       await fetch(url.toString(), {
@@ -204,13 +119,6 @@ export default function AddCardForm(props: AddCardFormProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
-
-  /**
-   * Lifecycle
-   */
-  useEffect(() => {
-    Modal.setAppElement('.container');
-  }, []);
 
   return (
     <>
@@ -311,25 +219,7 @@ export default function AddCardForm(props: AddCardFormProps) {
         />
       </div>
       <div className={styles.row}>
-        <div className={styles.attachmentsText}>
-          <p>Attachments:</p>
-          <p>
-            Only PNG and JPG image formats are permitted, and file sizes must not exceed 4.5 MB.
-          </p>
-        </div>
-        <div className={styles.attachments}>
-          <div {...getRootProps({ className: styles.dropZone })}>
-            <input {...getInputProps()} />
-            <span>{`Drag 'n' drop some files here, or click to select files`}</span>
-          </div>
-          <Controller
-            render={({ field }) => {
-              return <Attachments files={Object.values(field.value)} onDelete={onDelete} />;
-            }}
-            name="attachments"
-            control={control}
-          />
-        </div>
+        <Attachments name="attachments" control={control} setValue={setValue} />
       </div>
       <div className={styles.row}>
         <button
@@ -341,14 +231,6 @@ export default function AddCardForm(props: AddCardFormProps) {
           {!isLoading && <>Submit</>}
         </button>
       </div>
-      {modalState.isOpen && (
-        <ModalInfo
-          isOpen={modalState.isOpen}
-          closeModal={setModalAddVisibility(false)}
-          title={modalState.title}
-          description={modalState.description}
-        />
-      )}
     </>
   );
 }
