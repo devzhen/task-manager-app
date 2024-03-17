@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import type { UpdateCardMultipleBodyType } from '@/app/types';
+import type { FilteredValues, UpdateCardMultipleBodyType } from '@/app/types';
 
 /**
   Construct SQl query:
@@ -53,60 +53,92 @@ export const PUT = async (req: NextRequest) => {
       return NextResponse.json({ error: `Incorrect body` }, { status: 422 });
     }
 
-    let sql = `
-      UPDATE "Cards" AS Cards SET
-        id = Temp.id,
-        ...fields
-      FROM (VALUES
-          ...values
-      ) AS Temp(id,...Temp.fields)
-      WHERE Cards.id::text = Temp.id::text;`;
+    const generateUpdateSection = (fieldsArr: string[]) => {
+      let sql = ``;
 
-    let fieldsSql = ``;
-    let tempFieldsSql = ``;
-    for (let i = 0; i < fields.length; i++) {
-      const field = fields[i];
+      for (let i = 0; i < fieldsArr.length; i++) {
+        const field = fieldsArr[i];
 
-      fieldsSql = `${fieldsSql}
-        ${field} = Temp.${field}${i === fields.length - 1 ? '' : ','}`;
+        const end = i === fieldsArr.length - 1 ? '' : ',';
 
-      tempFieldsSql = `${tempFieldsSql} ${field}${i === fields.length - 1 ? '' : ','}`;
-    }
-    sql = sql.replace('...fields', fieldsSql).replace('...Temp.fields', tempFieldsSql);
+        sql = `${sql}"${field}" = Temp."${field}"${end}\n\t`;
+      }
 
-    let valuesSql = ``;
-    for (let i = 0; i < ids.length; i++) {
-      const id = ids[i];
-      valuesSql = `${valuesSql}
-        (uuid('${id}'), `;
+      return sql.trim();
+    };
 
-      const valuesObj = values[i];
-      for (let k = 0; k < fields.length; k++) {
-        const field = fields[k];
+    const generateAsSection = (fieldsArr: string[]) => {
+      return fieldsArr.map((item) => `"${item}"`).toString();
+    };
 
-        const value = valuesObj[field];
+    const generateValuesSection = (
+      cardIds: string[],
+      fieldsArr: string[],
+      valuesArr: Record<string, string | number>[],
+    ) => {
+      let str = ``;
 
-        if (!value || (typeof value !== 'string' && typeof value !== 'number')) {
-          return NextResponse.json(
-            { error: `Incorrect body - ${field} = ${value}` },
-            { status: 422 },
-          );
+      for (let i = 0; i < cardIds.length; i++) {
+        const id = cardIds[i];
+
+        const endI = i === cardIds.length - 1 ? '' : ',';
+
+        str = `${str}('${id}',...)${endI}`;
+
+        let innerString = ``;
+
+        for (let k = 0; k < fieldsArr.length; k++) {
+          const field = fieldsArr[k];
+          let value = valuesArr[i][field];
+
+          if (typeof value === 'string') {
+            const isUUID = field.indexOf('Id') !== -1;
+
+            if (isUUID) {
+              value = `uuid('${value}')`;
+            } else {
+              value = `'${value}'`;
+            }
+          }
+
+          const endK = k === fieldsArr.length - 1 ? '' : ',';
+
+          innerString = `${innerString}${value}${endK}`;
         }
 
-        valuesSql = `${valuesSql}${typeof value === 'string' ? `'${value}'` : value}${k === fields.length - 1 ? '' : ', '}`;
+        str = str.replace('...', innerString);
       }
-      valuesSql = `${valuesSql}${i === ids.length - 1 ? ')' : '),'}`;
-    }
-    sql = sql.replace('...values', valuesSql);
 
-    await prisma.$queryRawUnsafe(sql);
+      return str;
+    };
 
-    const result = await prisma.card.findMany({
-      where: {
-        OR: ids.map((id) => ({ id })),
-      },
+    const updateSectionFields = generateUpdateSection(fields);
+    const asSectionFields = generateAsSection(fields);
+    const valuesSection = generateValuesSection(ids, fields, values as FilteredValues[]);
+
+    const finalSql = `UPDATE "Card" AS Card SET
+      ${updateSectionFields}
+FROM (
+  VALUES
+    ${valuesSection}
+  ) 
+AS Temp(id,${asSectionFields})
+WHERE Card.id::text = Temp.id;`;
+
+    // Transaction
+    const updated = await prisma.$transaction(async (tx) => {
+      await tx.$queryRawUnsafe(finalSql);
+
+      const res = await prisma.card.findMany({
+        where: {
+          id: { in: ids },
+        },
+      });
+
+      return res;
     });
-    return NextResponse.json(result);
+
+    return NextResponse.json(updated);
   } catch (error) {
     return NextResponse.json({ error, message: (error as Error).message }, { status: 500 });
   } finally {
