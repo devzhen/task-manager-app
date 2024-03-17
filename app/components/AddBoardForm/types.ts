@@ -11,6 +11,7 @@ export type AddBoardFormInputs = {
     id: string;
     name: string;
     color: string | undefined;
+    position: number;
     isNew: boolean;
   }[];
 };

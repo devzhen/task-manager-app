@@ -1,11 +1,12 @@
 import { ErrorMessage } from '@hookform/error-message';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Control, useFieldArray, useFormContext } from 'react-hook-form';
 import Modal from 'react-modal';
 import { v4 as uuid } from 'uuid';
 
 import ModalColor from '@/app/components/ModalColor';
+import usePrevious from '@/app/hooks/usePrevious';
 
 import { AddBoardFormInputs } from '../types';
 
@@ -17,6 +18,8 @@ type StatusesProps = {
 
 export default function Statuses(props: StatusesProps) {
   const { name } = props;
+
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
 
   const { register, trigger, getValues, formState, control } = useFormContext();
 
@@ -34,12 +37,21 @@ export default function Statuses(props: StatusesProps) {
     control: control as unknown as Control<AddBoardFormInputs>,
     name: 'statuses',
   });
+  const fieldsLengthPrev = usePrevious(fields.length);
 
   /**
    * Add a new status
    */
   const addNewStatus = () => {
-    append({ id: uuid(), name: '', color: undefined, isNew: true });
+    const existed = getValues().statuses;
+
+    append({
+      id: uuid(),
+      name: '',
+      color: undefined,
+      isNew: true,
+      position: existed.length,
+    });
 
     trigger();
   };
@@ -100,6 +112,19 @@ export default function Statuses(props: StatusesProps) {
     Modal.setAppElement('.container');
   }, []);
 
+  /**
+   * Lifecycle
+   */
+  useEffect(() => {
+    // If new field was added
+    if (fieldsLengthPrev && fields.length > fieldsLengthPrev) {
+      // Scroll
+      if (buttonRef.current && 'scrollIntoView' in buttonRef.current) {
+        buttonRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }, [fields.length, fieldsLengthPrev]);
+
   return (
     <div className={styles.container}>
       <p>Statuses:</p>
@@ -149,7 +174,7 @@ export default function Statuses(props: StatusesProps) {
           </div>
         );
       })}
-      <button className={styles.button} onClick={addNewStatus}>
+      <button className={styles.button} onClick={addNewStatus} ref={buttonRef}>
         <span>Add a new status</span>
         <Image alt="Img" src="/plus.svg" width={20} height={20} priority />
       </button>

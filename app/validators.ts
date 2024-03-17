@@ -12,6 +12,14 @@ declare module 'yup' {
   > {
     uniqueItemProperty(path: string, message: string): this;
   }
+  interface StringSchema<
+    TType extends yup.Maybe<string> = string | undefined,
+    TContext = yup.AnyObject,
+    TDefault = undefined,
+    TFlags extends yup.Flags = '',
+  > {
+    restrictedValues(values: string[], message: string): this;
+  }
 }
 
 yup.addMethod(yup.array, 'uniqueItemProperty', function (path: string, message: string) {
@@ -51,6 +59,27 @@ yup.addMethod(yup.array, 'uniqueItemProperty', function (path: string, message: 
 
       if (!isEmpty(errors)) {
         return new yup.ValidationError(errors);
+      }
+    }
+
+    return true;
+  });
+});
+
+yup.addMethod(yup.string, 'restrictedValues', function (values: string[], message: string) {
+  return this.test('restrictedValues', message, (value, ctx) => {
+    const errors: yup.ValidationError[] = [];
+
+    for (let i = 0; i < values.length; i++) {
+      const item = values[i];
+
+      if (item.toLowerCase().trim() === (value?.trim()?.toLowerCase() as string)) {
+        const error = ctx.createError({
+          path: ctx.path,
+          message,
+        });
+
+        return new yup.ValidationError(error);
       }
     }
 

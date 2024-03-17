@@ -4,16 +4,17 @@ import { ErrorMessage } from '@hookform/error-message';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, Controller, Resolver, SubmitHandler } from 'react-hook-form';
 import Select from 'react-select';
 import * as yup from 'yup';
 
 import addCard from '@/app/api/card/addCard';
-import { STATUSES, STATUSES_OBJ, TASK_TITLE_MIN_LENGTH } from '@/app/constants';
-import { AddCardFormInputs, BoardType, StatusType } from '@/app/types';
+import { TASK_TITLE_MIN_LENGTH } from '@/app/constants';
+import { AddCardFormInputs, BoardType } from '@/app/types';
 
 import Attachments from '../Attachments';
+import SubmitButton from '../SubmitButton';
 
 import styles from './AddCardForm.module.css';
 
@@ -36,19 +37,11 @@ export default function AddCardForm(props: AddCardFormProps) {
 
   const router = useRouter();
 
-  const backlogStatusRef = useRef<StatusType | undefined>(undefined);
-
   const [isLoading, setIsLoading] = useState(false);
 
   // prepare status options
   const statuses = board.statuses.map((status) => {
-    const statusName = STATUSES_OBJ[status.name].name;
-
-    const option = { ...status, value: status.id, label: statusName };
-
-    if (status.name === STATUSES.backlog) {
-      backlogStatusRef.current = option;
-    }
+    const option = { ...status, value: status.id, label: status.name };
 
     return option;
   });
@@ -66,7 +59,7 @@ export default function AddCardForm(props: AddCardFormProps) {
       values: {
         title: '',
         description: '',
-        status: backlogStatusRef.current as StatusType,
+        status: '',
         tags: [],
         attachments: [],
       },
@@ -220,14 +213,11 @@ export default function AddCardForm(props: AddCardFormProps) {
         <Attachments name="attachments" control={control} setValue={setValue} />
       </div>
       <div className={styles.row}>
-        <button
-          className={styles.submitButton}
+        <SubmitButton
+          isLoading={isLoading}
           onClick={handleSubmit(onSubmitHandler)}
           disabled={!formState.isDirty || !formState.isValid}
-        >
-          {isLoading && <div className="loader" />}
-          {!isLoading && <>Submit</>}
-        </button>
+        />
       </div>
     </>
   );

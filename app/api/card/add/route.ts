@@ -73,7 +73,7 @@ export const POST = async (req: NextRequest) => {
       for (const tag of tags) {
         tagData.push({ cardId: card.id, boardId: data.boardId, tagId: tag });
       }
-      await prisma.tagLinker.createMany({
+      await tx.tagLinker.createMany({
         data: tagData,
       });
 
@@ -91,7 +91,7 @@ export const POST = async (req: NextRequest) => {
           position: parseInt(position),
         });
       }
-      await prisma.attachment.createMany({
+      await tx.attachment.createMany({
         data: attachmentData,
       });
 

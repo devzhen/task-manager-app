@@ -27,7 +27,7 @@ const addCard = async (formData: FormData) => {
     // eslint-disable-next-line no-console
     console.log('addCard error - ', err);
 
-    return null;
+    throw err;
   }
 };
 

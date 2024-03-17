@@ -1,9 +1,8 @@
 import { useEffect, useRef } from 'react';
 
-import { FAKE_CARD_ID, STATUSES, STATUSES_OBJ } from '@/app/constants';
+import { FAKE_CARD_ID } from '@/app/constants';
 import type { CardLayoutType, CardType, StateType, StatusType } from '@/app/types';
 
-import ButtonAddCard from '../ButtonAddCard';
 import Card from '../Card';
 import FakeCard from '../FakeCard';
 
@@ -36,8 +35,6 @@ export default function StatusRow(props: StatusRowProps) {
     totalCards,
   } = props;
 
-  const statusMeta = STATUSES_OBJ[status.name];
-
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const layoutsObj = useRef<Record<string, CardLayoutType>>({});
@@ -64,9 +61,9 @@ export default function StatusRow(props: StatusRowProps) {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <div style={{ backgroundColor: statusMeta.color }} />
+        <div style={{ backgroundColor: status.color }} />
         <span>
-          {statusMeta.name} ({cards.length})
+          {status.name} ({cards.length})
         </span>
       </div>
       {totalCards !== 0 && (
@@ -77,16 +74,16 @@ export default function StatusRow(props: StatusRowProps) {
           onDragOver={onDragOverHandler as VoidFunction}
           onDrop={onDrop as VoidFunction}
         >
-          {status.name === STATUSES.backlog && <ButtonAddCard stickyPosition boardId={boardId} />}
           {cards.map((card, index) => {
+            // {index === 0 && <ButtonAddCard stickyPosition boardId={boardId} />}
             return (
               <Card
+                key={card.id}
                 attachments={card.attachments}
                 description={card.description}
                 hovered={card.id === currentHoveredState.insertBeforeId}
                 id={card.id}
                 index={index}
-                key={card.id}
                 onClick={onCardClick}
                 onDragEnd={onDragEnd}
                 onDragStart={onDragStart(card, index)}

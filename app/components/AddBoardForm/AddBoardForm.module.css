@@ -25,3 +25,10 @@
   color: #d85045;
   font-size: 12px;
 }
+
+.submitSection {
+  display: flex;
+  justify-content: center;
+  margin-top: 60px;
+  margin-bottom: 40px;
+}

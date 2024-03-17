@@ -7,7 +7,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 
-import { API_HOST, ROUTES } from '@/app/constants';
+import deleteBoard from '@/app/api/board/deleteBoard';
+import { ROUTES } from '@/app/constants';
 import type { BoardType } from '@/app/types';
 
 import ButtonAddBoard from '../ButtonAddBoard';
@@ -16,17 +17,15 @@ import ModalDelete from '../ModalDelete';
 import styles from './SideBar.module.css';
 
 type SideBarProps = {
-  initialBoards: BoardType[];
+  boards: BoardType[];
 };
 
 export default function SideBar(props: SideBarProps) {
-  const { initialBoards } = props;
+  const { boards } = props;
 
   const router = useRouter();
 
   const params = useParams();
-
-  const [boards, setBoards] = useState(initialBoards);
 
   const [modalDeleteState, setModalDeleteState] = useState<{
     isOpen: boolean;
@@ -50,7 +49,8 @@ export default function SideBar(props: SideBarProps) {
   /**
    * Delete board handler
    */
-  const deleteBoardHandler = (board: BoardType) => (e: React.MouseEvent<HTMLButtonElement>) => {
+  const deleteBoardPrepare = (board: BoardType) => (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     e.preventDefault();
 
     setModalDeleteState((prev) => ({
@@ -64,22 +64,9 @@ export default function SideBar(props: SideBarProps) {
   /**
    * Delete board
    */
-  const deleteBoard = async () => {
+  const deleteBoardComplete = async () => {
     try {
-      const url = new URL(`${API_HOST}/api/board/delete`);
-      const res = await fetch(url.toString(), {
-        method: 'POST',
-        body: JSON.stringify({ boardId: modalDeleteState.board?.id }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      const json = await res.json();
-      if ('error' in json) {
-        throw json.error;
-      }
-
-      setBoards((prev) => prev.filter((item) => item.id !== modalDeleteState.board?.id));
+      await deleteBoard(modalDeleteState.board?.id as string);
 
       if (modalDeleteState.board?.id === params.boardId) {
         const index = boards.findIndex((item) => item.id === modalDeleteState.board?.id);
@@ -95,7 +82,7 @@ export default function SideBar(props: SideBarProps) {
       setModalDeleteState((prev) => ({
         ...prev,
         isOpen: false,
-        boardId: '',
+        board: null,
         description: 'Delete board',
       }));
     }
@@ -131,7 +118,7 @@ export default function SideBar(props: SideBarProps) {
                   src="/delete.svg"
                   width={16}
                   height={16}
-                  onClick={deleteBoardHandler(item) as VoidFunction}
+                  onClick={deleteBoardPrepare(item) as VoidFunction}
                 />
               </div>
             )}
@@ -145,7 +132,7 @@ export default function SideBar(props: SideBarProps) {
           closeModal={setModalDeleteVisibility(false)}
           title={modalDeleteState.title}
           description={modalDeleteState.description}
-          onDelete={deleteBoard}
+          onDelete={deleteBoardComplete}
         />
       )}
     </div>

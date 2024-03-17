@@ -34,7 +34,7 @@ export default async function RootLayout({
         <div className="container">
           <Header />
           <ContentWrapper>
-            <SideBar initialBoards={boards} />
+            <SideBar boards={boards} />
             {children}
           </ContentWrapper>
           <Footer />

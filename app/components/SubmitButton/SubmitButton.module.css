@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  justify-content: center;
+  min-width: 200px;
+  max-width: 200px;
+  background-color: #3f65dd;
+  padding: 10px 20px;
+  color: var(--textColor);
+  outline: none;
+  border: 1px solid #696e73;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.container:active, .container:disabled {
+  opacity: 0.5;
+}
+
+.container:disabled {
+  cursor: not-allowed;
+}
