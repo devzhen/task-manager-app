@@ -1,7 +1,7 @@
 import { PrismaClient, Status } from '@prisma/client';
 import * as R from 'ramda';
 
-import { STATUSES, TAGS } from '../app/constants';
+import { STATUSES, STATUSES_OBJ, TAGS } from '../app/constants';
 
 const prisma = new PrismaClient({ log: ['query', 'info', 'warn', 'error'] });
 
@@ -21,10 +21,30 @@ async function main() {
     // Init statuses
     await prisma.status.createMany({
       data: [
-        { name: STATUSES.backlog, boardId: board.id, position: 1 },
-        { name: STATUSES.inReview, boardId: board.id, position: 2 },
-        { name: STATUSES.inProgress, boardId: board.id, position: 3 },
-        { name: STATUSES.completed, boardId: board.id, position: 4 },
+        {
+          name: STATUSES.backlog,
+          boardId: board.id,
+          position: 1,
+          color: STATUSES_OBJ[STATUSES.backlog].color,
+        },
+        {
+          name: STATUSES.inReview,
+          boardId: board.id,
+          position: 2,
+          color: STATUSES_OBJ[STATUSES.inReview].color,
+        },
+        {
+          name: STATUSES.inProgress,
+          boardId: board.id,
+          position: 3,
+          color: STATUSES_OBJ[STATUSES.inProgress].color,
+        },
+        {
+          name: STATUSES.completed,
+          boardId: board.id,
+          position: 4,
+          color: STATUSES_OBJ[STATUSES.completed].color,
+        },
       ],
     });
 

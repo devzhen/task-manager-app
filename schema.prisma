@@ -47,6 +47,7 @@ model Card {
 model Status {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name      String
+  color     String
   createdAt DateTime @default(now())
   position  Int
   boardId   String   @db.Uuid

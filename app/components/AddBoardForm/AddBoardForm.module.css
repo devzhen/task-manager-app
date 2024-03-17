@@ -1,0 +1,27 @@
+.column label {
+  color: #f5f4f1;
+}
+
+.inputWrapper {
+  margin-top: 10px;
+}
+
+.inputWrapper input {
+  height: 40px;
+  width: 400px;
+  max-width: 400px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border: 1px solid #696e73;
+  border-radius: 8px;
+  background-color: inherit;
+  outline: none;
+  caret-color: var(--textColor);
+  color: var(--textColor);
+}
+
+.error {
+  padding-top: 2px;
+  color: #d85045;
+  font-size: 12px;
+}

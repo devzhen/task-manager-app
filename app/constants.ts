@@ -17,10 +17,10 @@ export const ROUTES = {
 export const BOARD_NAME_MIN_LENGTH = 3;
 
 export const STATUSES = {
-  backlog: 'backlog',
-  inProgress: 'inProgress',
-  inReview: 'inReview',
-  completed: 'completed',
+  backlog: 'Backlog',
+  inProgress: 'In Progress',
+  inReview: 'In Review',
+  completed: 'Completed',
 } as const;
 
 export const STATUSES_OBJ = {

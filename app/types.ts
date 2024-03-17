@@ -12,6 +12,7 @@ export type BoardType = {
 export type StatusType = {
   id: string;
   name: keyof typeof STATUSES;
+  color: string;
   createdAt: string;
   position: number;
 };

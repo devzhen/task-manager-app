@@ -1,0 +1,31 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.button {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 110px;
+  padding: 6px;
+  border: none;
+  outline: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.footer button:nth-child(2) {
+  display: flex;
+  justify-content: center;
+  margin-left: 20px;
+  background-color: #3f65dd;
+  color: var(--textColor);
+}
