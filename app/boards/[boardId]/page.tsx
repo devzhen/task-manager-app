@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import fetchBoard from '@/app/api/board/fetchBoard';
 import fetchCards from '@/app/api/card/fetchCards';
 import Statuses from '@/app/components/Statuses';
-import type { StatusesCardType } from '@/app/types';
+import type { CardType } from '@/app/types';
 
 type BoardPageProps = {
   params: {
@@ -21,7 +21,7 @@ export default async function BoardPage(props: BoardPageProps) {
   }
 
   const { cards, total } = cardsObj as {
-    cards: StatusesCardType;
+    cards: Record<string, CardType[]>;
     total: number;
   };
 

@@ -1,7 +1,7 @@
 'use server';
 
 import { API_HOST, NEXT_REVALIDATE_TAGS } from '@/app/constants';
-import type { StatusesCardType } from '@/app/types';
+import type { CardType } from '@/app/types';
 
 /**
  * Fetch cards
@@ -9,7 +9,7 @@ import type { StatusesCardType } from '@/app/types';
 const fetchCards = async (
   boardId: string,
 ): Promise<{
-  cards: StatusesCardType;
+  cards: Record<string, CardType[]>;
   total: number;
 } | null> => {
   try {
@@ -20,8 +20,8 @@ const fetchCards = async (
     const res = await fetch(url.toString(), { next: { tags: [NEXT_REVALIDATE_TAGS.cards] } });
 
     const json = await res.json();
-    if ('error' in json) {
-      throw json.error;
+    if (json && 'error' in json && 'message' in json) {
+      throw new Error(json.message);
     }
 
     return json;
@@ -29,7 +29,7 @@ const fetchCards = async (
     // eslint-disable-next-line no-console
     console.log('fetchCards error - ', err);
 
-    return null;
+    throw err;
   }
 };
 

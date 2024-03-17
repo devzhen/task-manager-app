@@ -2,7 +2,7 @@
 
 import { revalidateTag } from 'next/cache';
 
-import { AddBoardFormInputs } from '@/app/components/AddBoardForm/types';
+import type { AddBoardFormInputs } from '@/app/components/AddBoardForm/types';
 import { API_HOST, NEXT_REVALIDATE_TAGS } from '@/app/constants';
 
 /**

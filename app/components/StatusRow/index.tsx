@@ -1,22 +1,25 @@
 import { useEffect, useRef } from 'react';
 
 import { FAKE_CARD_ID } from '@/app/constants';
-import type { CardLayoutType, CardType, StateType, StatusType } from '@/app/types';
+import type { CardType, StatusType } from '@/app/types';
 
+import ButtonAddCard from '../ButtonAddCard';
 import Card from '../Card';
 import FakeCard from '../FakeCard';
+import type { CardLayoutType, StatusesStateType } from '../Statuses/types';
 
 import styles from './StatusRow.module.css';
 
 type StatusRowProps = {
   boardId: string;
   cards: CardType[];
-  currentHoveredState: StateType['hoveredCard'];
+  currentHoveredState: StatusesStateType['hoveredCard'];
   onCardClick: (id: string) => void;
   onDragEnd: (e: DragEvent) => void;
   onDragOver: (e: DragEvent, container: HTMLDivElement | null, layouts: CardLayoutType[]) => void;
   onDragStart: (card: CardType, index: number) => (e: DragEvent) => void;
   onDrop: (e: DragEvent) => void;
+  shouldShowAddCardButton: boolean;
   status: StatusType;
   totalCards: number;
 };
@@ -30,6 +33,7 @@ export default function StatusRow(props: StatusRowProps) {
     onDragOver,
     onDragStart,
     onDrop,
+    shouldShowAddCardButton,
     status,
     onCardClick,
     totalCards,
@@ -74,8 +78,8 @@ export default function StatusRow(props: StatusRowProps) {
           onDragOver={onDragOverHandler as VoidFunction}
           onDrop={onDrop as VoidFunction}
         >
+          {shouldShowAddCardButton && <ButtonAddCard stickyPosition boardId={boardId} />}
           {cards.map((card, index) => {
-            // {index === 0 && <ButtonAddCard stickyPosition boardId={boardId} />}
             return (
               <Card
                 key={card.id}

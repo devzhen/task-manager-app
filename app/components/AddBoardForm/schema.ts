@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Resolver } from 'react-hook-form';
+import type { Resolver } from 'react-hook-form';
 import * as yup from 'yup';
 import '@/app/validators';
 

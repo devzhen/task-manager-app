@@ -3,8 +3,9 @@ import Image from 'next/image';
 import { useRef } from 'react';
 
 import useCardLayout from '@/app/hooks/useCardLayout';
-import type { AttachmentType, CardLayoutType, StatusType, TagType } from '@/app/types';
+import type { AttachmentType, TagType } from '@/app/types';
 
+import type { CardLayoutType, StatusesStateType } from '../Statuses/types';
 import Tags from '../Tags';
 
 import styles from './Card.module.css';
@@ -20,7 +21,7 @@ type CardProps = {
   onDragStart: (e: DragEvent) => void;
   onLayout: (layout: CardLayoutType) => void;
   parentScrollTop: number;
-  status: StatusType;
+  status: StatusesStateType['currentDraggable']['status'];
   tags: TagType[];
   title: string;
 };

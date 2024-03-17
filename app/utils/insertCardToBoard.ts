@@ -1,8 +1,9 @@
 import ramdaClone from 'ramda/es/clone';
 import insert from 'ramda/es/insert';
 
+import type { StatusesStateType } from '../components/Statuses/types';
 import { FAKE_CARD_ID } from '../constants';
-import type { CardType, StatusType, StatusesCardType } from '../types';
+import type { CardType } from '../types';
 
 /**
  * Insert a cart to a board.
@@ -13,11 +14,11 @@ const insertCardToBoard = ({
   insertBeforeId,
   card,
 }: {
-  cardsObj: StatusesCardType;
-  status: StatusType;
+  cardsObj: Record<string, CardType[]>;
+  status: StatusesStateType['currentDraggable']['status'];
   insertBeforeId: string;
   card: CardType;
-}): StatusesCardType => {
+}): Record<string, CardType[]> => {
   const clone = ramdaClone(cardsObj);
 
   const isInsertBeforeFakeCard = insertBeforeId.indexOf(FAKE_CARD_ID);

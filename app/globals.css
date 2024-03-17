@@ -89,11 +89,13 @@ body {
   padding: 10px;
 }
 
-#card-status, #card-tags {
+#card-status,
+#card-tags {
   margin-bottom: 20px;
 }
 
-#card-status .card-select__control, #card-tags .card-select__control {
+#card-status .card-select__control,
+#card-tags .card-select__control {
   min-height: 40px;
   margin-top: 10px;
   background-color: #2a2d43;
@@ -101,43 +103,52 @@ body {
   border-radius: 8px;
 }
 
-#card-status .card-select__single-value, #card-tags .card-select__single-value {
+#card-status .card-select__single-value,
+#card-tags .card-select__single-value {
   color: var(--textColor);
 }
 
-#card-status .card-select__control--is-focused, #card-tags .card-select__control--is-focused {
+#card-status .card-select__control--is-focused,
+#card-tags .card-select__control--is-focused {
   border-color: #696e73;
   box-shadow: none;
 }
 
-#card-status .card-select__value-container, #card-tags .card-select__value-container {
+#card-status .card-select__value-container,
+#card-tags .card-select__value-container {
   padding: 8px;
 }
 
-#card-status .card-select__placeholder, #card-tags .card-select__placeholder {
+#card-status .card-select__placeholder,
+#card-tags .card-select__placeholder {
   display: none;
 }
 
-#card-status .card-select__menu, #card-tags .card-select__menu {
+#card-status .card-select__menu,
+#card-tags .card-select__menu {
   background-color: #2a2d43;
   border: 1px solid #696e73;
   border-radius: 8px;
   overflow: hidden;
 }
 
-#card-status .card-select__menu-list, #card-tags .card-select__menu-list {
+#card-status .card-select__menu-list,
+#card-tags .card-select__menu-list {
   padding: 0;
 }
 
-#card-status .card-select__option, #card-tags .card-select__option {
+#card-status .card-select__option,
+#card-tags .card-select__option {
   color: var(--textColor);
   cursor: pointer;
 }
 
-#card-status .card-select__option--is-focused, #card-tags .card-select__option--is-focused {
+#card-status .card-select__option--is-focused,
+#card-tags .card-select__option--is-focused {
   background: none;
 }
 
-#card-status .card-select__option--is-selected, #card-tags .card-select__option--is-selected {
+#card-status .card-select__option--is-selected,
+#card-tags .card-select__option--is-selected {
   background-color: #545668;
 }

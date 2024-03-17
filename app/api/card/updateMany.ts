@@ -3,32 +3,33 @@
 import { revalidateTag } from 'next/cache';
 
 import { API_HOST, NEXT_REVALIDATE_TAGS } from '@/app/constants';
+import type { UpdateCardMultipleBodyType } from '@/app/types';
 
 /**
  * Add card
  */
-const addCard = async (formData: FormData) => {
+const updateMany = async (data: UpdateCardMultipleBodyType) => {
   try {
-    const url = new URL(`${API_HOST}/api/card/add`);
+    // Make fetch request
+    const url = new URL(`${API_HOST}/api/card/update-many`);
     const res = await fetch(url.toString(), {
-      method: 'POST',
-      body: formData,
+      method: 'PUT',
+      body: JSON.stringify(data),
     });
 
     const json = await res.json();
     if (json && 'error' in json && 'message' in json) {
       throw new Error(json.message);
     }
-
-    revalidateTag(NEXT_REVALIDATE_TAGS.cards);
+    revalidateTag(NEXT_REVALIDATE_TAGS.boards);
 
     return json;
   } catch (err) {
     // eslint-disable-next-line no-console
-    console.log('addCard error - ', err);
+    console.log('updateMany error - ', err);
 
     throw err;
   }
 };
 
-export default addCard;
+export default updateMany;

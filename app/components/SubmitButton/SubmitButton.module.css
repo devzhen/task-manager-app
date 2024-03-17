@@ -12,7 +12,8 @@
   cursor: pointer;
 }
 
-.container:active, .container:disabled {
+.container:active,
+.container:disabled {
   opacity: 0.5;
 }
 

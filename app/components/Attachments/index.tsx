@@ -1,16 +1,19 @@
 import Image from 'next/image';
 import { indexBy, prop, remove } from 'ramda';
 import { useEffect, useRef, useState } from 'react';
-import { FileRejection, useDropzone } from 'react-dropzone';
-import { UseControllerProps, useController, UseFormSetValue } from 'react-hook-form';
+import type { FileRejection } from 'react-dropzone';
+import { useDropzone } from 'react-dropzone';
+import type { UseControllerProps, UseFormSetValue } from 'react-hook-form';
+import { useController } from 'react-hook-form';
 import Modal from 'react-modal';
 import Sortable from 'sortablejs';
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 
 import { TASK_ATTACHMENT_MAX_SIZE } from '@/app/constants';
-import type { AddCardFormInputs, FormAttachment } from '@/app/types';
+import type { FormAttachment } from '@/app/types';
 
+import type { AddCardFormInputs } from '../AddCardForm/types';
 import ModalInfo from '../ModalInfo';
 
 import styles from './Attachments.module.css';

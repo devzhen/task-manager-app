@@ -1,7 +1,8 @@
 import { PrismaClient } from '@prisma/client';
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
-import { AddBoardFormInputs } from '@/app/components/AddBoardForm/types';
+import type { AddBoardFormInputs } from '@/app/components/AddBoardForm/types';
 
 export const POST = async (req: NextRequest) => {
   const prisma = new PrismaClient();

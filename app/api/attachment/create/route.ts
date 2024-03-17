@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const currentBoard = await prisma.cards.findUnique({
+    const currentBoard = await prisma.card.findUnique({
       where: {
         id: cardId,
       },
@@ -47,11 +47,12 @@ export async function POST(request: Request) {
     });
     fileUrl = blob.url;
 
-    const attachment = await prisma.attachments.create({
+    const attachment = await prisma.attachment.create({
       data: {
         name: file.name,
         url: blob.url,
         cardId: cardId,
+        position: 0,
       },
     });
 

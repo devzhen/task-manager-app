@@ -19,8 +19,8 @@ const deleteCard = async ({ boardId, cardId }: { boardId: string; cardId: string
     });
 
     const json = await res.json();
-    if ('error' in json) {
-      throw json.error;
+    if (json && 'error' in json && 'message' in json) {
+      throw new Error(json.message);
     }
 
     revalidateTag(NEXT_REVALIDATE_TAGS.cards);
@@ -29,6 +29,8 @@ const deleteCard = async ({ boardId, cardId }: { boardId: string; cardId: string
   } catch (err) {
     // eslint-disable-next-line no-console
     console.log('deleteCard error - ', err);
+
+    throw err;
   }
 };
 

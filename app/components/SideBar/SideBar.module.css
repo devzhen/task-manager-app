@@ -2,7 +2,7 @@
   width: 300px;
   display: flex;
   flex-direction: column;
-  background-color:#191b1f;
+  background-color: #191b1f;
   padding: 10px;
   overflow-y: auto;
 }

@@ -3,12 +3,13 @@
 import { ErrorMessage } from '@hookform/error-message';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useForm, SubmitHandler, FormProvider } from 'react-hook-form';
+import type { SubmitHandler } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 
 import addBoard from '@/app/api/board/addBoard';
 import fetchBoards from '@/app/api/board/fetchBoards';
 import { ROUTES } from '@/app/constants';
-import { BoardType } from '@/app/types';
+import type { BoardType } from '@/app/types';
 
 import SubmitButton from '../SubmitButton';
 
@@ -17,7 +18,7 @@ import { initialFormValues } from './constants';
 import { createSchema } from './schema';
 import BoardStatuses from './Statuses';
 import BoardTags from './Tags';
-import { AddBoardFormInputs } from './types';
+import type { AddBoardFormInputs } from './types';
 
 type AddBoardFormProps = {
   boards: BoardType[];

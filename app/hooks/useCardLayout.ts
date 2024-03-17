@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import type { CardLayoutType, StatusType } from '../types';
+import type { CardLayoutType, StatusesStateType } from '../components/Statuses/types';
 import getCoords from '../utils/getCoords';
 
 type UseCardLayoutProps = {
@@ -9,7 +9,7 @@ type UseCardLayoutProps = {
   onLayout: (layout: CardLayoutType) => void;
   id: string;
   index: number;
-  status: StatusType;
+  status: StatusesStateType['currentDraggable']['status'];
 };
 
 export default function useCardLayout(props: UseCardLayoutProps) {

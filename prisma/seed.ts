@@ -1,4 +1,5 @@
-import { PrismaClient, Status } from '@prisma/client';
+import type { Status } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import * as R from 'ramda';
 
 import { STATUSES, STATUSES_OBJ, TAGS } from '../app/constants';

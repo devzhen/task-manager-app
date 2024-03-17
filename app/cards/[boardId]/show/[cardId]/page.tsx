@@ -21,7 +21,7 @@ export default async function ShowPage(props: ShowPageProps) {
     <div className={styles.container}>
       <div className={styles.wrapper}>
         <h2>Task Details</h2>
-        <ButtonDeleteCard cardId={cardId} boardId={boardId} />
+        <ButtonDeleteCard cardId={card?.id} boardId={boardId} />
       </div>
     </div>
   );

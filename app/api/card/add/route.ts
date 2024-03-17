@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { T, assoc, cond, equals } from 'ramda';
 
 type CardInputType = {
@@ -64,7 +65,7 @@ export const POST = async (req: NextRequest) => {
       });
 
       // Create card
-      const card = await prisma.card.create({
+      const card = await tx.card.create({
         data,
       });
 
@@ -96,7 +97,7 @@ export const POST = async (req: NextRequest) => {
       });
 
       // Get new card
-      const created = await prisma.card.findUnique({
+      const created = await tx.card.findUnique({
         where: {
           id: card.id,
         },

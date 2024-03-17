@@ -5,7 +5,8 @@
   margin-top: 30px;
 }
 
-.container p, .container span {
+.container p,
+.container span {
   color: var(--textColor);
 }
 
@@ -22,7 +23,6 @@
   margin-left: 10px;
   margin-right: 10px;
 }
-
 
 .column span {
   font-size: 10px;

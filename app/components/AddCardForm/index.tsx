@@ -1,32 +1,24 @@
 'use client';
 
 import { ErrorMessage } from '@hookform/error-message';
-import { yupResolver } from '@hookform/resolvers/yup';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { propOr } from 'ramda';
 import { useEffect, useState } from 'react';
-import { useForm, Controller, Resolver, SubmitHandler } from 'react-hook-form';
+import type { SubmitHandler } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import Select from 'react-select';
-import * as yup from 'yup';
 
 import addCard from '@/app/api/card/addCard';
-import { TASK_TITLE_MIN_LENGTH } from '@/app/constants';
-import { AddCardFormInputs, BoardType } from '@/app/types';
+import type { BoardType } from '@/app/types';
 
 import Attachments from '../Attachments';
 import SubmitButton from '../SubmitButton';
 
 import styles from './AddCardForm.module.css';
-
-const schema = yup
-  .object({
-    title: yup
-      .string()
-      .min(TASK_TITLE_MIN_LENGTH, `The minimum length is ${TASK_TITLE_MIN_LENGTH}`)
-      .required('A task title is required'),
-    description: yup.string(),
-  })
-  .required();
+import { createInitialFormValues } from './constants';
+import resolver from './schema';
+import type { AddCardFormInputs } from './types';
 
 type AddCardFormProps = {
   board: BoardType;
@@ -54,15 +46,9 @@ export default function AddCardForm(props: AddCardFormProps) {
   // Form
   const { formState, handleSubmit, control, register, setValue, getValues } =
     useForm<AddCardFormInputs>({
-      resolver: yupResolver(schema) as unknown as Resolver<AddCardFormInputs>,
+      resolver,
       mode: 'onBlur',
-      values: {
-        title: '',
-        description: '',
-        status: '',
-        tags: [],
-        attachments: [],
-      },
+      values: createInitialFormValues(board),
     });
 
   /**
@@ -145,6 +131,23 @@ export default function AddCardForm(props: AddCardFormProps) {
                 id="card-status"
                 classNamePrefix="card-select"
                 isSearchable={false}
+                components={{
+                  Option: ({ data, selectOption }) => {
+                    return (
+                      <div
+                        className={styles.option}
+                        onClick={() => selectOption(data)}
+                        role="presentation"
+                      >
+                        <div
+                          className={styles.optionCircle}
+                          style={{ backgroundColor: data.color }}
+                        />
+                        <span>{propOr('', 'label', data)}</span>
+                      </div>
+                    );
+                  },
+                }}
                 {...field}
               />
             );

@@ -2,7 +2,9 @@ import classNames from 'classnames';
 import { useRef } from 'react';
 
 import useCardLayout from '@/app/hooks/useCardLayout';
-import type { CardLayoutType, StatusType } from '@/app/types';
+import type { StatusType } from '@/app/types';
+
+import type { CardLayoutType } from '../Statuses/types';
 
 import style from './FakeCard.module.css';
 

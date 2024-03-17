@@ -1,7 +1,8 @@
 import assocPath from 'ramda/es/assocPath';
 import ramdaClone from 'ramda/es/clone';
 
-import type { StatusType, StatusesCardType } from '../types';
+import type { StatusesStateType } from '../components/Statuses/types';
+import type { CardType } from '../types';
 
 /**
  * Mark as will be removed
@@ -11,10 +12,10 @@ const markCardAsWillBeRemoved = ({
   status,
   id,
 }: {
-  cardsObj: StatusesCardType;
-  status: StatusType;
+  cardsObj: Record<string, CardType[]>;
+  status: StatusesStateType['currentDraggable']['status'];
   id: string;
-}): StatusesCardType => {
+}): Record<string, CardType[]> => {
   let clone = ramdaClone(cardsObj);
 
   const index = clone[status.name].findIndex((item) => item.id === id);

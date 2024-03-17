@@ -1,14 +1,15 @@
 import { ErrorMessage } from '@hookform/error-message';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
-import { Control, useFieldArray, useFormContext } from 'react-hook-form';
+import type { Control } from 'react-hook-form';
+import { useFieldArray, useFormContext } from 'react-hook-form';
 import Modal from 'react-modal';
 import { v4 as uuid } from 'uuid';
 
 import ModalColor from '@/app/components/ModalColor';
 import usePrevious from '@/app/hooks/usePrevious';
 
-import { AddBoardFormInputs } from '../types';
+import type { AddBoardFormInputs } from '../types';
 
 import styles from './Statuses.module.css';
 

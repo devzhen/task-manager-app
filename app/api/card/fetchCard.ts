@@ -1,17 +1,12 @@
 'use server';
 
 import { API_HOST, NEXT_REVALIDATE_TAGS } from '@/app/constants';
-import type { StatusesCardType } from '@/app/types';
+import type { CardType } from '@/app/types';
 
 /**
  * Fetch card
  */
-const fetchCard = async (
-  cardIdId: string,
-): Promise<{
-  cards: StatusesCardType;
-  total: number;
-} | null> => {
+const fetchCard = async (cardIdId: string): Promise<CardType> => {
   try {
     const searchParams = new URLSearchParams();
     searchParams.set('card', cardIdId);
@@ -20,8 +15,8 @@ const fetchCard = async (
     const res = await fetch(url.toString(), { next: { tags: [NEXT_REVALIDATE_TAGS.cards] } });
 
     const json = await res.json();
-    if ('error' in json) {
-      throw json.error;
+    if (json && 'error' in json && 'message' in json) {
+      throw new Error(json.message);
     }
 
     return json;
@@ -29,7 +24,7 @@ const fetchCard = async (
     // eslint-disable-next-line no-console
     console.log('fetchCard error - ', err);
 
-    return null;
+    throw err;
   }
 };
 

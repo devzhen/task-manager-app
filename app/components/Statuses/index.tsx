@@ -8,16 +8,14 @@ import isEmpty from 'ramda/es/isEmpty';
 import path from 'ramda/es/path';
 import { useEffect, useRef, useState } from 'react';
 
-import { API_HOST, ROUTES, STATUSES } from '@/app/constants';
+import updateMany from '@/app/api/card/updateMany';
+import { ROUTES } from '@/app/constants';
 import usePrevious from '@/app/hooks/usePrevious';
 import type {
   BoardType,
-  CardLayoutType,
   CardType,
   NonEmptyArray,
-  StateType,
   StatusType,
-  StatusesCardType,
   UpdateCardBodyType,
   UpdateCardMultipleBodyType,
 } from '@/app/types';
@@ -29,36 +27,12 @@ import updateCardsPositionProperty from '@/app/utils/updateCardsPositionProperty
 import CardsEmptyState from '../CardsEmptyState';
 import StatusRow from '../StatusRow';
 
+import { initialState } from './constants';
 import styles from './Statuses.module.css';
-
-const initialState: StateType = {
-  isInitialized: false,
-  currentDraggable: {
-    id: '',
-    status: {
-      id: '',
-      name: STATUSES.backlog,
-      createdAt: '',
-      position: 0,
-    },
-    index: 0,
-  },
-  currentDroppable: {
-    status: {
-      id: '',
-      name: STATUSES.backlog,
-      createdAt: '',
-      position: 0,
-    },
-  },
-  hoveredCard: {
-    insertBeforeId: '',
-    insertBeforeIndex: 0,
-  },
-};
+import type { CardLayoutType, StatusesStateType } from './types';
 
 type StatusesProps = {
-  initialCards: StatusesCardType;
+  initialCards: Record<string, CardType[]>;
   total: number;
   board: BoardType;
 };
@@ -70,10 +44,10 @@ export default function Statuses(props: StatusesProps) {
 
   const updateCardsObj = useRef<Record<string, UpdateCardBodyType>>({});
 
-  const [cards, setCards] = useState<StatusesCardType>(initialCards);
+  const [cards, setCards] = useState<Record<string, CardType[]>>(initialCards);
   const cardsRef = useRef(cards);
 
-  const [state, setState] = useState<StateType>(initialState);
+  const [state, setState] = useState<StatusesStateType>(initialState);
   const stateRef = useRef(state);
 
   const currentDraggableIdPrev = usePrevious(state.currentDraggable.id);
@@ -109,7 +83,7 @@ export default function Statuses(props: StatusesProps) {
     const insertBeforeElement: {
       insertBeforeId: string | null;
       insertBeforeIndex: number;
-      insertBeforeStatus: StatusType | null;
+      insertBeforeStatus: StatusesStateType['currentDraggable']['status'] | null;
     } = {
       insertBeforeId: null,
       insertBeforeIndex: 0,
@@ -277,12 +251,7 @@ export default function Statuses(props: StatusesProps) {
         data.values.push(obj);
       }
 
-      // Make fetch request
-      const url = new URL(`${API_HOST}/api/card/update-many`);
-      fetch(url.toString(), {
-        method: 'PUT',
-        body: JSON.stringify(data),
-      });
+      updateMany(data);
 
       updateCardsObj.current = {};
     }
@@ -311,7 +280,7 @@ export default function Statuses(props: StatusesProps) {
 
   return (
     <div className={styles.container}>
-      {board.statuses.map((status) => {
+      {board.statuses.map((status, index) => {
         return (
           <StatusRow
             boardId={board.id}
@@ -323,6 +292,7 @@ export default function Statuses(props: StatusesProps) {
             onDragOver={onDragOverHandler(status)}
             onDragStart={onDragStartHandler}
             onDrop={onDropHandler(status)}
+            shouldShowAddCardButton={index === 0}
             status={status}
             totalCards={total}
           />

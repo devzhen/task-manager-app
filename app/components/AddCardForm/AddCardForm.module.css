@@ -5,7 +5,8 @@
   flex: 1;
 }
 
-.column label, .row label {
+.column label,
+.row label {
   color: #f5f4f1;
 }
 
@@ -36,14 +37,15 @@
   border-radius: 8px;
 }
 
-.inputWrapper input{
+.inputWrapper input {
   height: 40px;
   min-width: 100%;
   border: 1px solid #696e73;
   border-radius: 8px;
 }
 
-.inputWrapper, .textAreWrapper {
+.inputWrapper,
+.textAreWrapper {
   position: relative;
   margin-bottom: 20px;
   margin-top: 10px;

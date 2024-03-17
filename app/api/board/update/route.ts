@@ -14,7 +14,7 @@ export const PUT = async (req: Request) => {
       );
     }
 
-    const currentBoard = await prisma.boards.findUnique({
+    const currentBoard = await prisma.board.findUnique({
       where: {
         id,
       },
@@ -26,7 +26,7 @@ export const PUT = async (req: Request) => {
       );
     }
 
-    const board = await prisma.boards.update({
+    const board = await prisma.board.update({
       data: {
         name,
       },

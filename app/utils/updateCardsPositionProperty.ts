@@ -1,21 +1,20 @@
 import ramdaClone from 'ramda/es/clone';
 
-import { STATUSES } from '../constants';
-import type { StatusesCardType, UpdateCardBodyType } from '../types';
+import type { CardType, UpdateCardBodyType } from '../types';
 
 /**
  * Update cards position property
  */
 const updateCardsPositionProperty = (
-  cardsObj: StatusesCardType,
+  cardsObj: Record<string, CardType[]>,
   updateCardsObj: Record<string, UpdateCardBodyType>,
-): StatusesCardType => {
+): Record<string, CardType[]> => {
   const clone = ramdaClone(cardsObj);
 
   const keys = Object.keys(clone);
 
   for (let i = 0; i < keys.length; i++) {
-    const key = keys[i] as keyof typeof STATUSES;
+    const key = keys[i];
 
     const cardsArr = clone[key];
 

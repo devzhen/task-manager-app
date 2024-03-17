@@ -1,7 +1,8 @@
 import { PrismaClient } from '@prisma/client';
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
-import { STATUSES } from '@/app/constants';
+import type { STATUSES } from '@/app/constants';
 import type { CardType } from '@/app/types';
 
 export const GET = async (req: NextRequest) => {

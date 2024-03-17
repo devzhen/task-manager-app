@@ -1,5 +1,3 @@
-import { STATUSES } from './constants';
-
 export type BoardType = {
   id: string;
   name: string;
@@ -11,9 +9,9 @@ export type BoardType = {
 
 export type StatusType = {
   id: string;
-  name: keyof typeof STATUSES;
+  name: string;
   color: string;
-  createdAt: string;
+  createdAt: Date;
   position: number;
 };
 
@@ -35,38 +33,6 @@ export type CardType = {
   tags: TagType[];
   statusId: string;
   willBeRemoved?: boolean;
-};
-
-export type StatusesCardType = {
-  [STATUSES.backlog]: CardType[];
-  [STATUSES.inProgress]: CardType[];
-  [STATUSES.inReview]: CardType[];
-  [STATUSES.completed]: CardType[];
-};
-
-export type StateType = {
-  isInitialized: boolean;
-  currentDraggable: {
-    id: string;
-    status: StatusType;
-    index: number;
-  };
-  currentDroppable: {
-    status: StatusType;
-  };
-  hoveredCard: {
-    insertBeforeId: string;
-    insertBeforeIndex: number;
-  };
-};
-
-export type CardLayoutType = {
-  id: string;
-  top: number;
-  middle: number;
-  bottom: number;
-  index: number;
-  status: StatusType;
 };
 
 export type AttachmentType = {
@@ -101,11 +67,4 @@ export type FormAttachment = File & {
   url: string;
   position: number;
   willBeRemoved?: boolean;
-};
-export type AddCardFormInputs = {
-  title: string;
-  description: string;
-  status: StatusType;
-  tags: (TagType & { label: string })[];
-  attachments: FormAttachment[];
 };
