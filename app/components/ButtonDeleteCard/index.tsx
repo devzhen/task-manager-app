@@ -1,6 +1,5 @@
 'use client';
 
-import classNames from 'classnames';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
@@ -47,11 +46,9 @@ export default function ButtonDeleteCard(props: ButtonDeleteCardProps) {
 
   return (
     <>
-      <div className={classNames(styles.container)}>
-        <button className={styles.button} onClick={setModalDeleteVisibility(true)}>
-          <span>Delete Task</span>
-        </button>
-      </div>
+      <button className={styles.button} onClick={setModalDeleteVisibility(true)}>
+        <span>Delete Task</span>
+      </button>
       {modalDeleteState.isOpen && (
         <ModalDelete
           closeModal={setModalDeleteVisibility(false)}

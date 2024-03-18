@@ -1,7 +1,6 @@
 import fetchBoard from '@/app/api/board/fetchBoard';
 import fetchCard from '@/app/api/card/fetchCard';
 import AddCardForm from '@/app/components/AddCardForm';
-import ButtonDeleteCard from '@/app/components/ButtonDeleteCard';
 
 import styles from './page.module.css';
 
@@ -24,7 +23,6 @@ export default async function ShowPage(props: ShowPageProps) {
       <div className={styles.wrapper}>
         <h2>Task Details</h2>
         <AddCardForm board={board} card={card} />
-        <ButtonDeleteCard cardId={cardId} boardId={boardId} />
       </div>
     </div>
   );

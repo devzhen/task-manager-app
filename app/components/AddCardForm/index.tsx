@@ -11,6 +11,7 @@ import addCard from '@/app/api/card/addCard';
 import updateCard from '@/app/api/card/updateCard';
 import type { BoardType, CardType } from '@/app/types';
 
+import ButtonDeleteCard from '../ButtonDeleteCard';
 import SubmitButton from '../SubmitButton';
 
 import styles from './AddCardForm.module.css';
@@ -206,11 +207,14 @@ export default function AddCardForm(props: AddCardFormProps) {
         <Attachments />
       </div>
       <div className={styles.row}>
-        <SubmitButton
-          isLoading={isLoading}
-          onClick={handleSubmit(onSubmitHandler)}
-          disabled={!formState.isDirty || !formState.isValid}
-        />
+        <div className={styles.buttonsWrapper}>
+          <SubmitButton
+            isLoading={isLoading}
+            onClick={handleSubmit(onSubmitHandler)}
+            disabled={!formState.isDirty || !formState.isValid}
+          />
+          {card?.id && <ButtonDeleteCard cardId={card?.id} boardId={board.id} />}
+        </div>
       </div>
     </FormProvider>
   );

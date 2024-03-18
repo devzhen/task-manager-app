@@ -75,3 +75,10 @@
   color: #d85045;
   font-size: 12px;
 }
+
+.buttonsWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 50px;
+}

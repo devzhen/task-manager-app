@@ -1,16 +1,11 @@
-.container {
-  display: flex;
-  margin-bottom: 20px;
-  background-color: #2a2d43;
-}
-
 .button {
   display: flex;
   flex: 1;
+  max-width: 200px;
+  min-width: 200px;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 10px 20px;
-  margin-top: 10px;
   border: none;
   outline: none;
   border-radius: 10px;
@@ -23,7 +18,7 @@
   opacity: 0.7;
 }
 
-.container span {
+.button span {
   font-size: 16px;
   font-weight: 600;
   margin-right: 10px;
