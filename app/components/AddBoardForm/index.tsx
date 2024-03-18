@@ -111,11 +111,16 @@ export default function AddBoardForm(props: AddBoardFormProps) {
     try {
       setIsLoading(true);
 
+      for (let i = 0; i < data.statuses.length; i++) {
+        const status = data.statuses[i];
+        status.position = i + 1;
+      }
+
       const method = board ? updateBoard : addBoard;
 
-      const addedBoard = await method(data);
+      const newBoard = await method(data);
 
-      router.push(ROUTES.showBoard.replace('[boardId]', addedBoard.id));
+      router.push(ROUTES.showBoard.replace('[boardId]', newBoard.id));
     } catch (err) {
       // eslint-disable-next-line no-console
       console.log(err);

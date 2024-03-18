@@ -55,16 +55,14 @@
   cursor: pointer;
 }
 
-/* delete */
-.contentWrapper {
+.statusRow [data-role='handle'] {
+  margin-top: 27px;
+  margin-left: 12px;
+}
+
+.statusesWrapper {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 400px;
-  padding: 5px 11px;
-  margin-right: 8px;
-  border: 1px solid #696e73;
-  border-radius: 8px;
+  flex-direction: column;
 }
 
 .colorBox {

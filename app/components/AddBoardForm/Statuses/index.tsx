@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { Control } from 'react-hook-form';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import Modal from 'react-modal';
+import Sortable from 'sortablejs';
 import { v4 as uuid } from 'uuid';
 
 import ModalColor from '@/app/components/ModalColor';
@@ -25,9 +26,11 @@ type StatusesProps = {
 export default function Statuses(props: StatusesProps) {
   const { name, board, boardMeta } = props;
 
+  const statusesContainerRef = useRef<HTMLDivElement | null>(null);
+
   const buttonRef = useRef<HTMLButtonElement | null>(null);
 
-  const { register, trigger, getValues, formState, control } = useFormContext();
+  const { register, trigger, getValues, formState, control, setValue } = useFormContext();
 
   const [modalColorState, setModalColorState] = useState<{
     isOpened: boolean;
@@ -169,6 +172,32 @@ export default function Statuses(props: StatusesProps) {
    */
   useEffect(() => {
     Modal.setAppElement('.container');
+
+    Sortable.create(statusesContainerRef.current as HTMLDivElement, {
+      handle: '.handle',
+      onChange: () => {
+        const elements = statusesContainerRef.current?.querySelectorAll('[data-role="status"]');
+        if (elements) {
+          const newStatuses = [...getValues().statuses];
+
+          for (let i = 0; i < elements.length; i++) {
+            const element = elements[i];
+            const id = element.getAttribute('data-id');
+
+            const index = newStatuses.findIndex((item) => item.id === id);
+            if (index !== -1) {
+              newStatuses[index].position = i + 1;
+            }
+          }
+
+          setValue(
+            'statuses',
+            newStatuses.sort((a, b) => a.position - b.position),
+          );
+        }
+      },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**
@@ -194,45 +223,65 @@ export default function Statuses(props: StatusesProps) {
           render={({ message }) => <span className={styles.error}>{message}</span>}
         />
       </div>
-      {fields.map((status, index) => {
-        return (
-          <div className={styles.statusRow} key={status.id} data-is-new={status.isNew}>
-            <div className={styles.column}>
-              <span>Name</span>
-              <input
-                type="text"
-                readOnly={status.isNew !== true}
-                {...register(`statuses.${index}.name` as const)}
-              />
-              <ErrorMessage
-                errors={formState.errors}
-                name={`statuses.${index}.name`}
-                render={({ message }) => <span className={styles.error}>{message}</span>}
-              />
-            </div>
+      <div className={styles.statusesWrapper} ref={statusesContainerRef}>
+        {fields.map((status, index) => {
+          return (
             <div
-              className={styles.column}
-              role="presentation"
-              onClick={setModalColorVisibility({ isOpened: true, index, color: status.color })}
+              className={styles.statusRow}
+              key={status.id}
+              data-id={status.id}
+              data-position={status.position}
+              data-index={index}
+              data-is-new={status.isNew}
+              data-role="status"
             >
-              <span>Color</span>
-              <div className={styles.colorBox} style={{ backgroundColor: status.color }} />
-              <ErrorMessage
-                errors={formState.errors}
-                name={`statuses.${index}.color`}
-                render={({ message }) => <span className={styles.error}>{message}</span>}
+              <div className={styles.column}>
+                <span>Name</span>
+                <input
+                  type="text"
+                  readOnly={status.isNew !== true}
+                  {...register(`statuses.${index}.name` as const)}
+                />
+                <ErrorMessage
+                  errors={formState.errors}
+                  name={`statuses.${index}.name`}
+                  render={({ message }) => <span className={styles.error}>{message}</span>}
+                />
+              </div>
+              <div
+                className={styles.column}
+                role="presentation"
+                onClick={setModalColorVisibility({ isOpened: true, index, color: status.color })}
+              >
+                <span>Color</span>
+                <div className={styles.colorBox} style={{ backgroundColor: status.color }} />
+                <ErrorMessage
+                  errors={formState.errors}
+                  name={`statuses.${index}.color`}
+                  render={({ message }) => <span className={styles.error}>{message}</span>}
+                />
+              </div>
+              <Image
+                alt="Img"
+                src="/delete.svg"
+                width={24}
+                height={24}
+                onClick={deleteStatus(index, status)}
               />
+              {!path(['errors', 'statuses', index], formState) && (
+                <Image
+                  alt="Img"
+                  src="/drag-cursor.svg"
+                  width={24}
+                  height={24}
+                  className="handle"
+                  data-role="handle"
+                />
+              )}
             </div>
-            <Image
-              alt="Img"
-              src="/delete.svg"
-              width={24}
-              height={24}
-              onClick={deleteStatus(index, status)}
-            />
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
       <button className={styles.button} onClick={addNewStatus} ref={buttonRef}>
         <span>Add a new status</span>
         <Image alt="Img" src="/plus.svg" width={20} height={20} priority />
