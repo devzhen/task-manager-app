@@ -11,8 +11,8 @@ async function main() {
   await prisma.board.createMany({
     data: [
       { name: 'Home board', protected: true },
-      { name: 'Design board', protected: false },
-      { name: 'Learning board', protected: false },
+      // { name: 'Design board', protected: false },
+      // { name: 'Learning board', protected: false },
     ],
   });
 

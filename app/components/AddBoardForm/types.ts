@@ -1,4 +1,5 @@
 export type AddBoardFormInputs = {
+  boardId: string | null;
   name: string;
   tags: {
     id: string;
@@ -14,4 +15,6 @@ export type AddBoardFormInputs = {
     position: number;
     isNew: boolean;
   }[];
+  deletedStatuses: { id: string }[];
+  deletedTags: { id: string }[];
 };

@@ -38,7 +38,7 @@ export default function ButtonDeleteCard(props: ButtonDeleteCardProps) {
   const deleteCardHandler = async () => {
     await deleteCard({ cardId, boardId });
 
-    router.replace(ROUTES.showBoard.replace('[id]', boardId));
+    router.replace(ROUTES.showBoard.replace('[boardId]', boardId));
   };
 
   useEffect(() => {
@@ -54,7 +54,6 @@ export default function ButtonDeleteCard(props: ButtonDeleteCardProps) {
       </div>
       {modalDeleteState.isOpen && (
         <ModalDelete
-          isOpen={modalDeleteState.isOpen}
           closeModal={setModalDeleteVisibility(false)}
           title={modalDeleteState.title}
           description={modalDeleteState.description}

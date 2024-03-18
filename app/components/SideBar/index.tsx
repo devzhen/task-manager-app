@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
+import { pathOr } from 'ramda';
 import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 
@@ -53,12 +54,28 @@ export default function SideBar(props: SideBarProps) {
     e.stopPropagation();
     e.preventDefault();
 
+    let description = `Are you sure you want to delete '${board.name}' board?`;
+    const countCards = pathOr(0, ['_count', 'cards'], board);
+    if (countCards > 0) {
+      description = `${description} There are ${countCards} cards. All data will be removed.`;
+    }
+
     setModalDeleteState((prev) => ({
       ...prev,
       isOpen: true,
       board,
-      description: `Are you sure you want to delete '${board.name}' board?`,
+      description,
     }));
+  };
+
+  /**
+   * Edit board handler
+   */
+  const editBoardHandler = (board: BoardType) => (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    router.push(ROUTES.editBoard.replace('[boardId]', board.id));
   };
 
   /**
@@ -97,38 +114,35 @@ export default function SideBar(props: SideBarProps) {
       {boards.map((item) => {
         return (
           <Link
-            href={ROUTES.showBoard.replace('[id]', item.id)}
+            href={ROUTES.showBoard.replace('[boardId]', item.id)}
             key={item.id}
             className={classNames(styles.board, {
               [styles.boardActive]: params.boardId === item.id,
             })}
           >
             <span>{item.name}</span>
-            {!item.protected && (
-              <div className={styles.boardActions}>
-                <Image
-                  alt="Img"
-                  src="/edit.svg"
-                  width={18}
-                  height={18}
-                  onClick={() => router.push(ROUTES.editBoard)}
-                />
-                <Image
-                  alt="Img"
-                  src="/delete.svg"
-                  width={16}
-                  height={16}
+            <div className={styles.boardActions}>
+              <button
+                className={styles.boardActionWrapper}
+                onClick={editBoardHandler(item) as VoidFunction}
+              >
+                <Image alt="Img" src="/edit.svg" width={18} height={18} />
+              </button>
+              {!item.protected && (
+                <button
+                  className={styles.boardActionWrapper}
                   onClick={deleteBoardPrepare(item) as VoidFunction}
-                />
-              </div>
-            )}
+                >
+                  <Image alt="Img" src="/delete.svg" width={16} height={16} />
+                </button>
+              )}
+            </div>
           </Link>
         );
       })}
       <ButtonAddBoard />
       {modalDeleteState.isOpen && (
         <ModalDelete
-          isOpen={modalDeleteState.isOpen}
           closeModal={setModalDeleteVisibility(false)}
           title={modalDeleteState.title}
           description={modalDeleteState.description}

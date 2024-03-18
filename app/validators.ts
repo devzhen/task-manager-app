@@ -68,8 +68,6 @@ yup.addMethod(yup.array, 'uniqueItemProperty', function (path: string, message: 
 
 yup.addMethod(yup.string, 'restrictedValues', function (values: string[], message: string) {
   return this.test('restrictedValues', message, (value, ctx) => {
-    const errors: yup.ValidationError[] = [];
-
     for (let i = 0; i < values.length; i++) {
       const item = values[i];
 

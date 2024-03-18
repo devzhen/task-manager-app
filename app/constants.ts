@@ -8,8 +8,8 @@ export const NEXT_REVALIDATE_TAGS = {
 
 export const ROUTES = {
   addBoard: '/boards/add',
-  editBoard: '/boards/edit',
-  showBoard: '/boards/[id]',
+  editBoard: '/boards/[boardId]/edit',
+  showBoard: '/boards/[boardId]',
   addCard: '/cards/[boardId]/add',
   showCard: '/cards/[boardId]/show/[cardId]',
 };

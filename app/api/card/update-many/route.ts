@@ -15,7 +15,7 @@ import type { FilteredValues, UpdateCardMultipleBodyType } from '@/app/types';
       (uuid('cf8d69c3-4b7f-4f41-90b3-2733f70a3d1c'), 'test', 100),
       (uuid('fbf317bc-10df-4caa-8859-c5ed0a80a11c'), 'test', 100)
   ) AS Temp(id, description, position)
-  WHERE Cards.id::text = Temp.id::text;
+  WHERE Cards.id::text = Temp.id;
 
 
 

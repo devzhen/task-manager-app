@@ -4,17 +4,16 @@ import Modal from 'react-modal';
 import styles from './ModalInfo.module.css';
 
 type ModalInfoProps = {
-  isOpen: boolean;
   closeModal: () => void;
   title: string;
   description?: string;
 };
 
 export default function ModalInfo(props: ModalInfoProps) {
-  const { isOpen, closeModal, title, description } = props;
+  const { closeModal, title, description } = props;
 
   return (
-    <Modal isOpen={isOpen}>
+    <Modal isOpen>
       <div className={styles.header}>
         <span>{title}</span>
         <Image

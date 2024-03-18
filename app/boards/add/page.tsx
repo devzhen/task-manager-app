@@ -1,11 +1,10 @@
-import fetchBoards from '@/app/api/board/fetchBoards';
+import fetchBoardNames from '@/app/api/board/fetchBoardNames';
 import AddBoardForm from '@/app/components/AddBoardForm';
-import type { BoardType } from '@/app/types';
 
 import styles from './page.module.css';
 
 export default async function AddBoardPage() {
-  const boards: BoardType[] = await fetchBoards();
+  const boards: { id: string; name: string }[] = await fetchBoardNames();
 
   return (
     <div className={styles.container}>

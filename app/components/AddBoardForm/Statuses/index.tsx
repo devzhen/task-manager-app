@@ -1,5 +1,6 @@
 import { ErrorMessage } from '@hookform/error-message';
 import Image from 'next/image';
+import { path } from 'ramda';
 import { useEffect, useRef, useState } from 'react';
 import type { Control } from 'react-hook-form';
 import { useFieldArray, useFormContext } from 'react-hook-form';
@@ -8,17 +9,21 @@ import { v4 as uuid } from 'uuid';
 
 import ModalColor from '@/app/components/ModalColor';
 import usePrevious from '@/app/hooks/usePrevious';
+import type { BoardMetaType, BoardType } from '@/app/types';
 
+import ModalInfo from '../../ModalInfo';
 import type { AddBoardFormInputs } from '../types';
 
 import styles from './Statuses.module.css';
 
 type StatusesProps = {
   name: string;
+  board?: BoardType | undefined;
+  boardMeta?: BoardMetaType | undefined;
 };
 
 export default function Statuses(props: StatusesProps) {
-  const { name } = props;
+  const { name, board, boardMeta } = props;
 
   const buttonRef = useRef<HTMLButtonElement | null>(null);
 
@@ -34,11 +39,36 @@ export default function Statuses(props: StatusesProps) {
     color: undefined,
   });
 
-  const { fields, append, update, remove } = useFieldArray<AddBoardFormInputs, 'statuses'>({
+  const [modalInfoState, setModalInfoState] = useState<{
+    isOpened: boolean;
+    title: string;
+    description: string;
+  }>({
+    isOpened: false,
+    title: 'Error',
+    description: '',
+  });
+
+  const { fields, append, update, remove } = useFieldArray<
+    AddBoardFormInputs,
+    'statuses',
+    'formFieldId'
+  >({
     control: control as unknown as Control<AddBoardFormInputs>,
     name: 'statuses',
+    keyName: 'formFieldId',
   });
   const fieldsLengthPrev = usePrevious(fields.length);
+
+  const { append: appendDeletedStatuses } = useFieldArray<
+    AddBoardFormInputs,
+    'deletedStatuses',
+    'formFieldId'
+  >({
+    control: control as unknown as Control<AddBoardFormInputs>,
+    name: 'deletedStatuses',
+    keyName: 'formFieldId',
+  });
 
   /**
    * Add a new status
@@ -80,6 +110,16 @@ export default function Statuses(props: StatusesProps) {
     };
 
   /**
+   * Set a modal visibility
+   */
+  const setModalInfoVisibility = (isOpened: boolean) => () => {
+    setModalInfoState((prev) => ({
+      ...prev,
+      isOpened,
+    }));
+  };
+
+  /**
    * Choose a color
    */
   const onChooseColor = (hex: string) => {
@@ -101,7 +141,25 @@ export default function Statuses(props: StatusesProps) {
   /**
    * Delete a status
    */
-  const deleteStatus = (index: number) => () => {
+  const deleteStatus = (index: number, status: AddBoardFormInputs['statuses']['0']) => () => {
+    if (board && boardMeta) {
+      const countCards = path(['statuses', status.name], boardMeta);
+
+      if (countCards && countCards !== 0) {
+        setModalInfoState((prev) => ({
+          ...prev,
+          isOpened: true,
+          description: `Can't delete the '${status.name}' status. There are ${countCards} cards in this status`,
+        }));
+
+        return;
+      }
+
+      if (!status.isNew) {
+        appendDeletedStatuses({ id: status.id });
+      }
+    }
+
     remove(index);
     trigger(name);
   };
@@ -138,7 +196,7 @@ export default function Statuses(props: StatusesProps) {
       </div>
       {fields.map((status, index) => {
         return (
-          <div className={styles.statusRow} key={status.id}>
+          <div className={styles.statusRow} key={status.id} data-is-new={status.isNew}>
             <div className={styles.column}>
               <span>Name</span>
               <input
@@ -170,7 +228,7 @@ export default function Statuses(props: StatusesProps) {
               src="/delete.svg"
               width={24}
               height={24}
-              onClick={deleteStatus(index)}
+              onClick={deleteStatus(index, status)}
             />
           </div>
         );
@@ -188,6 +246,13 @@ export default function Statuses(props: StatusesProps) {
             color: undefined,
           })}
           onSubmit={onChooseColor}
+        />
+      )}
+      {modalInfoState.isOpened && (
+        <ModalInfo
+          closeModal={setModalInfoVisibility(false)}
+          title={modalInfoState.title}
+          description={modalInfoState.description}
         />
       )}
     </div>

@@ -223,7 +223,6 @@ export default function Attachments(props: AttachmentsProps) {
       )}
       {modalState.isOpen && (
         <ModalInfo
-          isOpen={modalState.isOpen}
           closeModal={setModalAddVisibility(false)}
           title={modalState.title}
           description={modalState.description}

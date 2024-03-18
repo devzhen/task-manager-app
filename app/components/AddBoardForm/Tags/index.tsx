@@ -8,6 +8,7 @@ import { v4 as uuid } from 'uuid';
 
 import ModalColor from '@/app/components/ModalColor';
 import usePrevious from '@/app/hooks/usePrevious';
+import type { BoardType } from '@/app/types';
 
 import type { AddBoardFormInputs } from '../types';
 
@@ -15,10 +16,11 @@ import styles from './Tags.module.css';
 
 type TagsProps = {
   name: string;
+  board: BoardType | undefined;
 };
 
 export default function Tags(props: TagsProps) {
-  const { name } = props;
+  const { name, board } = props;
 
   const buttonRef = useRef<HTMLButtonElement | null>(null);
 
@@ -36,11 +38,26 @@ export default function Tags(props: TagsProps) {
     fieldValue: undefined,
   });
 
-  const { fields, append, update, remove } = useFieldArray<AddBoardFormInputs, 'tags'>({
+  const { fields, append, update, remove } = useFieldArray<
+    AddBoardFormInputs,
+    'tags',
+    'formFieldId'
+  >({
     control: control as unknown as Control<AddBoardFormInputs>,
     name: 'tags',
+    keyName: 'formFieldId',
   });
   const fieldsLengthPrev = usePrevious(fields.length);
+
+  const { append: appendDeletedTags } = useFieldArray<
+    AddBoardFormInputs,
+    'deletedTags',
+    'formFieldId'
+  >({
+    control: control as unknown as Control<AddBoardFormInputs>,
+    name: 'deletedTags',
+    keyName: 'formFieldId',
+  });
 
   /**
    * Add a new tag
@@ -99,7 +116,11 @@ export default function Tags(props: TagsProps) {
   /**
    * Delete a tag
    */
-  const deleteTag = (index: number) => () => {
+  const deleteTag = (index: number, tag: AddBoardFormInputs['tags']['0']) => () => {
+    if (board) {
+      appendDeletedTags({ id: tag.id });
+    }
+
     remove(index);
     trigger(name);
   };
@@ -191,7 +212,13 @@ export default function Tags(props: TagsProps) {
                 render={({ message }) => <span className={styles.error}>{message}</span>}
               />
             </div>
-            <Image alt="Img" src="/delete.svg" width={24} height={24} onClick={deleteTag(index)} />
+            <Image
+              alt="Img"
+              src="/delete.svg"
+              width={24}
+              height={24}
+              onClick={deleteTag(index, tag)}
+            />
           </div>
         );
       })}

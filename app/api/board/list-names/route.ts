@@ -11,14 +11,9 @@ export const GET = async () => {
           orderId: 'asc',
         },
       ],
-      include: {
-        _count: {
-          select: {
-            cards: true,
-            tags: true,
-            statuses: true,
-          },
-        },
+      select: {
+        id: true,
+        name: true,
       },
     });
 

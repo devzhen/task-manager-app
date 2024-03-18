@@ -1,13 +1,12 @@
 'use server';
 
 import { API_HOST, NEXT_REVALIDATE_TAGS } from '@/app/constants';
-import type { BoardType } from '@/app/types';
 
-// Fetch board
-const fetchBoards = async (boardId: string): Promise<BoardType> => {
+// Fetch available boards
+const fetchBoardNames = async (): Promise<{ id: string; name: string }[]> => {
   try {
-    const url = new URL(`${API_HOST}/api/board/show?boardId=${boardId}`);
-    const response = await fetch(url.toString(), { next: { tags: [NEXT_REVALIDATE_TAGS.board] } });
+    const url = new URL(`${API_HOST}/api/board/list-names`);
+    const response = await fetch(url.toString(), { next: { tags: [NEXT_REVALIDATE_TAGS.boards] } });
     const json = await response.json();
 
     if (json && 'error' in json && 'message' in json) {
@@ -23,4 +22,4 @@ const fetchBoards = async (boardId: string): Promise<BoardType> => {
   }
 };
 
-export default fetchBoards;
+export default fetchBoardNames;

@@ -1,8 +1,10 @@
 import { v4 as uuid } from 'uuid';
 
 import { STATUSES, STATUSES_OBJ } from '@/app/constants';
+import type { BoardType } from '@/app/types';
 
 export const initialFormValues = {
+  boardId: null,
   name: '',
   statuses: [
     {
@@ -64,4 +66,21 @@ export const initialFormValues = {
       isNew: false,
     },
   ],
+  deletedStatuses: [],
+  deletedTags: [],
+};
+
+export const createInitialValues = (board: BoardType | undefined) => {
+  if (!board) {
+    return initialFormValues;
+  }
+
+  return {
+    boardId: board.id,
+    name: board.name,
+    statuses: board.statuses.map((item) => ({ ...item, isNew: false })),
+    tags: board.tags.map((item) => ({ ...item, isNew: false })),
+    deletedStatuses: [],
+    deletedTags: [],
+  };
 };

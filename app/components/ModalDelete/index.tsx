@@ -5,7 +5,6 @@ import Modal from 'react-modal';
 import styles from './ModalDelete.module.css';
 
 type ModalDeleteProps = {
-  isOpen: boolean;
   closeModal: () => void;
   onDelete: () => void;
   title: string;
@@ -13,12 +12,12 @@ type ModalDeleteProps = {
 };
 
 export default function ModalDelete(props: ModalDeleteProps) {
-  const { isOpen, closeModal, title, description, onDelete } = props;
+  const { closeModal, title, description, onDelete } = props;
 
   const [isLoading, setIsLoading] = useState(false);
 
   return (
-    <Modal isOpen={isOpen} contentLabel="Example Modal">
+    <Modal isOpen contentLabel="Example Modal">
       <div className={styles.header}>
         <span>{title}</span>
         <Image

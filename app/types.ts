@@ -68,3 +68,12 @@ export type FormAttachment = File & {
   position: number;
   willBeRemoved?: boolean;
 };
+
+export type BoardMetaType = BoardType & {
+  count: {
+    cards: number;
+    tags: number;
+    statuses: number;
+  };
+  statuses: Record<string, number>;
+};

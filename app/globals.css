@@ -1,5 +1,6 @@
 :root {
   --max-width: 1100px;
+  --status-column-size: 260px;
   --attachment-size: 160px;
   --textColor: #f8f2fc;
   --textErrorColor: #d85045;
@@ -21,6 +22,11 @@ body {
   background: linear-gradient(#09071a, #140a1c, #2d162b, #050614);
   background-repeat: no-repeat;
   background-attachment: fixed;
+}
+
+button {
+  outline: none;
+  border: none;
 }
 
 .container {

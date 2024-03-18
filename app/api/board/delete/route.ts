@@ -20,6 +20,19 @@ export const DELETE = async (req: NextRequest) => {
       const board = await tx.board.findUnique({ where: { id } });
 
       await Promise.all([
+        tx.tagLinker.deleteMany({
+          where: {
+            boardId: id,
+          },
+        }),
+        tx.card.deleteMany({
+          where: {
+            boardId: id,
+          },
+        }),
+      ]);
+
+      await Promise.all([
         tx.tag.deleteMany({
           where: {
             boardId: id,
