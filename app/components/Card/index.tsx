@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { useRef } from 'react';
 
 import useCardLayout from '@/app/hooks/useCardLayout';
-import type { AttachmentType, TagType } from '@/app/types';
+import type { AttachmentType, TagLinkerType } from '@/app/types';
 
 import type { CardLayoutType, StatusesStateType } from '../Statuses/types';
 import Tags from '../Tags';
@@ -22,7 +22,7 @@ type CardProps = {
   onLayout: (layout: CardLayoutType) => void;
   parentScrollTop: number;
   status: StatusesStateType['currentDraggable']['status'];
-  tags: TagType[];
+  tags: TagLinkerType[];
   title: string;
 };
 
@@ -68,7 +68,7 @@ export default function Card(props: CardProps) {
       data-id={id}
       data-role="card"
       data-index={index}
-      data-status={status}
+      data-status={status.name}
       draggable
       onDragStart={onDragStart as VoidFunction}
       onDragEnd={onDragEnd as VoidFunction}

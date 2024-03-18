@@ -1,9 +1,9 @@
-import type { TagType } from '@/app/types';
+import type { TagLinkerType } from '@/app/types';
 
 import styles from './Tags.module.css';
 
 type TagsProps = {
-  tags: TagType[];
+  tags: TagLinkerType[];
 };
 
 export default function Tags(props: TagsProps) {

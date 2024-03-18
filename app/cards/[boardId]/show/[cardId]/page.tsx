@@ -1,4 +1,6 @@
+import fetchBoard from '@/app/api/board/fetchBoard';
 import fetchCard from '@/app/api/card/fetchCard';
+import AddCardForm from '@/app/components/AddCardForm';
 import ButtonDeleteCard from '@/app/components/ButtonDeleteCard';
 
 import styles from './page.module.css';
@@ -15,13 +17,14 @@ export default async function ShowPage(props: ShowPageProps) {
     params: { cardId, boardId },
   } = props;
 
-  const card = await fetchCard(cardId);
+  const [card, board] = await Promise.all([fetchCard(cardId), fetchBoard(boardId)]);
 
   return (
     <div className={styles.container}>
       <div className={styles.wrapper}>
         <h2>Task Details</h2>
-        <ButtonDeleteCard cardId={card?.id} boardId={boardId} />
+        <AddCardForm board={board} card={card} />
+        <ButtonDeleteCard cardId={cardId} boardId={boardId} />
       </div>
     </div>
   );

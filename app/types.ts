@@ -4,7 +4,7 @@ export type BoardType = {
   createdAt: string;
   protected: boolean;
   statuses: StatusType[];
-  tags: TagType[];
+  tags: TagLinkerType[];
 };
 
 export type StatusType = {
@@ -15,12 +15,19 @@ export type StatusType = {
   position: number;
 };
 
-export type TagType = {
+export type TagLinkerType = {
   id: string;
   name: string;
   color: string;
   fontColor: string;
   cardId: string;
+  tagId: string;
+  tag?: {
+    id: string;
+    name: string;
+    color: string;
+    fontColor: string;
+  };
 };
 
 export type CardType = {
@@ -30,7 +37,7 @@ export type CardType = {
   status: StatusType;
   attachments: AttachmentType[];
   position: number;
-  tags: TagType[];
+  tags: TagLinkerType[];
   statusId: string;
   willBeRemoved?: boolean;
 };
@@ -41,6 +48,7 @@ export type AttachmentType = {
   url: string;
   cardId: string;
   created: string;
+  position: number;
 };
 
 export type UpdateCardBodyType = {
@@ -66,7 +74,8 @@ export type FormAttachment = File & {
   id: string;
   url: string;
   position: number;
-  willBeRemoved?: boolean;
+  willBeRemoved: boolean;
+  fromDB: boolean;
 };
 
 export type BoardMetaType = BoardType & {

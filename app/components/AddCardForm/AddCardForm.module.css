@@ -51,32 +51,6 @@
   margin-top: 10px;
 }
 
-.tag {
-  position: relative;
-  display: flex;
-  align-items: center;
-  padding: 4px 22px 4px 4px;
-  border-radius: 4px;
-  margin-right: 8px;
-  overflow: hidden;
-}
-
-.tag span {
-  font-size: 12px;
-}
-
-.tagClear {
-  position: absolute;
-  right: 0;
-  height: 100%;
-  width: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #191b1f;
-  cursor: pointer;
-}
-
 .option {
   display: flex;
   align-items: center;

@@ -12,7 +12,7 @@ const fetchCard = async (cardIdId: string): Promise<CardType> => {
     searchParams.set('card', cardIdId);
     const url = new URL(`${API_HOST}/api/card/show?${searchParams.toString()}`);
 
-    const res = await fetch(url.toString(), { next: { tags: [NEXT_REVALIDATE_TAGS.cards] } });
+    const res = await fetch(url.toString(), { next: { tags: [NEXT_REVALIDATE_TAGS.card] } });
 
     const json = await res.json();
     if (json && 'error' in json && 'message' in json) {

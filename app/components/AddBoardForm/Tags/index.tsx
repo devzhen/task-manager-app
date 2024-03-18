@@ -1,7 +1,6 @@
 import { ErrorMessage } from '@hookform/error-message';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
-import type { Control } from 'react-hook-form';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import Modal from 'react-modal';
 import { v4 as uuid } from 'uuid';
@@ -24,7 +23,7 @@ export default function Tags(props: TagsProps) {
 
   const buttonRef = useRef<HTMLButtonElement | null>(null);
 
-  const { register, trigger, getValues, formState, control } = useFormContext();
+  const { register, trigger, getValues, formState } = useFormContext();
 
   const [modalColorState, setModalColorState] = useState<{
     isOpened: boolean;
@@ -43,7 +42,6 @@ export default function Tags(props: TagsProps) {
     'tags',
     'formFieldId'
   >({
-    control: control as unknown as Control<AddBoardFormInputs>,
     name: 'tags',
     keyName: 'formFieldId',
   });
@@ -54,7 +52,6 @@ export default function Tags(props: TagsProps) {
     'deletedTags',
     'formFieldId'
   >({
-    control: control as unknown as Control<AddBoardFormInputs>,
     name: 'deletedTags',
     keyName: 'formFieldId',
   });

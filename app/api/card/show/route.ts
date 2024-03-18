@@ -23,7 +23,11 @@ export const GET = async (req: NextRequest) => {
       },
       include: {
         attachments: true,
-        tags: true,
+        tags: {
+          include: {
+            tag: true,
+          },
+        },
         status: true,
       },
     });

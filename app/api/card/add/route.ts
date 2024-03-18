@@ -11,10 +11,6 @@ type CardInputType = {
   position: number;
 };
 
-type FileType = File & {
-  position: number;
-};
-
 export const POST = async (req: NextRequest) => {
   const prisma = new PrismaClient();
 
@@ -32,13 +28,13 @@ export const POST = async (req: NextRequest) => {
     }
 
     // Construct data
-    let data = { position: 0 } as CardInputType;
+    let data = {} as CardInputType;
     const tags: string[] = [];
     const attachments: File[] = [];
     const attachmentsPosition: string[] = [];
     for (const [key, value] of body.entries()) {
       cond([
-        [equals('attachments[]'), () => attachments.push(value as FileType)],
+        [equals('attachments[]'), () => attachments.push(value as File)],
         [equals('attachmentsPosition[]'), () => attachmentsPosition.push(value as string)],
         [equals('tags[]'), () => tags.push(value as string)],
         [

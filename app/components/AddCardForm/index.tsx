@@ -1,31 +1,33 @@
 'use client';
 
 import { ErrorMessage } from '@hookform/error-message';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { propOr } from 'ramda';
+import { compose, indexBy, pathOr } from 'ramda';
 import { useEffect, useState } from 'react';
 import type { SubmitHandler } from 'react-hook-form';
-import { useForm, Controller } from 'react-hook-form';
-import Select from 'react-select';
+import { useForm, FormProvider } from 'react-hook-form';
 
 import addCard from '@/app/api/card/addCard';
-import type { BoardType } from '@/app/types';
+import updateCard from '@/app/api/card/updateCard';
+import type { BoardType, CardType } from '@/app/types';
 
-import Attachments from '../Attachments';
 import SubmitButton from '../SubmitButton';
 
 import styles from './AddCardForm.module.css';
+import Attachments from './Attachments';
 import { createInitialFormValues } from './constants';
 import resolver from './schema';
+import StatusSelect from './StatusSelect';
+import TagsSelect from './TagsSelect';
 import type { AddCardFormInputs } from './types';
 
 type AddCardFormProps = {
   board: BoardType;
+  card?: CardType | undefined;
 };
 
 export default function AddCardForm(props: AddCardFormProps) {
-  const { board } = props;
+  const { board, card } = props;
 
   const router = useRouter();
 
@@ -44,12 +46,96 @@ export default function AddCardForm(props: AddCardFormProps) {
   });
 
   // Form
-  const { formState, handleSubmit, control, register, setValue, getValues } =
-    useForm<AddCardFormInputs>({
-      resolver,
-      mode: 'onBlur',
-      values: createInitialFormValues(board),
+  const methods = useForm<AddCardFormInputs>({
+    resolver,
+    mode: 'onBlur',
+    values: createInitialFormValues({ board, card }),
+  });
+
+  const { formState, handleSubmit, register, getValues } = methods;
+
+  /**
+   * Create POST body
+   */
+  const createAddFormData = (data: AddCardFormInputs) => {
+    const formData = new FormData();
+    formData.append('boardId', board.id);
+    formData.append('title', data.title);
+    formData.append('description', data.description);
+    formData.append('statusId', data.status.id);
+    data.tags.forEach((tag) => {
+      formData.append('tags[]', tag.id);
     });
+    data.attachments.forEach((attachment) => {
+      formData.append('attachments[]', attachment.file as File);
+      formData.append('attachmentsPosition[]', `${attachment.position}`);
+    });
+
+    return formData;
+  };
+
+  /**
+   * Create PUT body
+   */
+  const createUpdateFormData = (data: AddCardFormInputs) => {
+    const formData = new FormData();
+    formData.append('id', `${card?.id}`);
+    formData.append('boardId', board.id);
+    formData.append('title', data.title);
+    formData.append('description', data.description);
+    formData.append('statusId', data.status.id);
+
+    // Update tags
+    if (formState.dirtyFields.tags) {
+      const prevTags = compose(
+        indexBy((item) => (item as AddCardFormInputs['tags']['0']).id),
+        pathOr([], ['defaultValues', 'tags']),
+      )(formState);
+
+      const currentTags = compose(
+        indexBy((item) => (item as AddCardFormInputs['tags']['0']).id),
+        pathOr([], ['tags']),
+      )(data);
+
+      for (const prevTagId of Object.keys(prevTags)) {
+        if (!currentTags[prevTagId]) {
+          formData.append('deletedTags[]', prevTagId);
+        }
+      }
+
+      // Update tags
+      data.tags.forEach((tag) => {
+        formData.append('tags[]', tag.id);
+      });
+    }
+
+    // Update attachments
+    if (formState.dirtyFields.attachments) {
+      const prevAttachments = compose(
+        indexBy((item) => (item as AddCardFormInputs['attachments']['0']).id),
+        pathOr([], ['defaultValues', 'attachments']),
+      )(formState);
+
+      const currentAttachments = compose(
+        indexBy((item) => (item as AddCardFormInputs['attachments']['0']).id),
+        pathOr([], ['attachments']),
+      )(data);
+
+      for (const prevAttachmentId of Object.keys(prevAttachments)) {
+        if (!currentAttachments[prevAttachmentId]) {
+          formData.append('deletedAttachments[]', prevAttachmentId);
+        }
+      }
+      data.attachments.forEach((attachment) => {
+        if (attachment.file) {
+          formData.append('attachments[]', attachment.file as File);
+          formData.append('attachmentsPosition[]', `${attachment.position}`);
+        }
+      });
+    }
+
+    return formData;
+  };
 
   /**
    * Submit handler
@@ -58,20 +144,11 @@ export default function AddCardForm(props: AddCardFormProps) {
     try {
       setIsLoading(true);
 
-      const formData = new FormData();
-      formData.append('boardId', board.id);
-      formData.append('title', data.title);
-      formData.append('description', data.description);
-      formData.append('statusId', data.status.id);
-      data.tags.forEach((tag) => {
-        formData.append('tags[]', tag.id);
-      });
-      data.attachments.forEach((attachment) => {
-        formData.append('attachments[]', attachment);
-        formData.append('attachmentsPosition[]', `${attachment.position}`);
-      });
+      const formData = card ? createUpdateFormData(data) : createAddFormData(data);
 
-      await addCard(formData);
+      const method = card ? updateCard : addCard;
+
+      await method(formData);
 
       router.back();
     } catch (err) {
@@ -89,8 +166,10 @@ export default function AddCardForm(props: AddCardFormProps) {
     () => () => {
       const { attachments } = getValues();
 
-      for (const src of Object.keys(attachments)) {
-        URL.revokeObjectURL(src);
+      for (const attachment of attachments) {
+        if (attachment.file) {
+          URL.revokeObjectURL(attachment.url);
+        }
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -98,7 +177,7 @@ export default function AddCardForm(props: AddCardFormProps) {
   );
 
   return (
-    <>
+    <FormProvider {...methods}>
       <div className={styles.column}>
         <label htmlFor="card-name">Title:</label>
         <div className={styles.inputWrapper}>
@@ -120,100 +199,11 @@ export default function AddCardForm(props: AddCardFormProps) {
         </div>
       </div>
       <div className={styles.column}>
-        <label htmlFor="card-status">Status:</label>
-        <Controller
-          name="status"
-          control={control}
-          render={({ field }) => {
-            return (
-              <Select
-                options={statuses}
-                id="card-status"
-                classNamePrefix="card-select"
-                isSearchable={false}
-                components={{
-                  Option: ({ data, selectOption }) => {
-                    return (
-                      <div
-                        className={styles.option}
-                        onClick={() => selectOption(data)}
-                        role="presentation"
-                      >
-                        <div
-                          className={styles.optionCircle}
-                          style={{ backgroundColor: data.color }}
-                        />
-                        <span>{propOr('', 'label', data)}</span>
-                      </div>
-                    );
-                  },
-                }}
-                {...field}
-              />
-            );
-          }}
-        />
-        <label htmlFor="card-status">Tags:</label>
-        <Controller
-          name="tags"
-          control={control}
-          render={({ field }) => {
-            return (
-              <Select
-                options={tags}
-                id="card-tags"
-                classNamePrefix="card-select"
-                isSearchable={false}
-                isMulti
-                components={{
-                  MultiValue: ({ data, getValue, setValue: setMultipleValue }) => {
-                    return (
-                      <div className={styles.tag} style={{ backgroundColor: data.color }}>
-                        <span style={{ color: data.fontColor }}>{data.name}</span>
-                        <div
-                          className={styles.tagClear}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const filtered = getValue().filter((option) => option.id !== data.id);
-                            setMultipleValue(filtered, 'deselect-option');
-                          }}
-                          role="presentation"
-                        >
-                          <Image
-                            src="/close.svg"
-                            width={12}
-                            height={12}
-                            alt="Img"
-                            draggable={false}
-                          />
-                        </div>
-                      </div>
-                    );
-                  },
-                  Option: ({ data, selectOption }) => {
-                    return (
-                      <div
-                        className={styles.option}
-                        onClick={() => selectOption(data)}
-                        role="presentation"
-                      >
-                        <div
-                          className={styles.optionCircle}
-                          style={{ backgroundColor: data.color }}
-                        />
-                        <span>{data.label}</span>
-                      </div>
-                    );
-                  },
-                }}
-                {...field}
-              />
-            );
-          }}
-        />
+        <StatusSelect name="status" statuses={statuses} />
+        <TagsSelect name="tags" tags={tags} />
       </div>
       <div className={styles.row}>
-        <Attachments name="attachments" control={control} setValue={setValue} />
+        <Attachments />
       </div>
       <div className={styles.row}>
         <SubmitButton
@@ -222,6 +212,6 @@ export default function AddCardForm(props: AddCardFormProps) {
           disabled={!formState.isDirty || !formState.isValid}
         />
       </div>
-    </>
+    </FormProvider>
   );
 }

@@ -21,6 +21,7 @@ const addCard = async (formData: FormData) => {
     }
 
     revalidateTag(NEXT_REVALIDATE_TAGS.cards);
+    revalidateTag(NEXT_REVALIDATE_TAGS.board);
 
     return json;
   } catch (err) {

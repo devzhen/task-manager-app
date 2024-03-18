@@ -1,9 +1,15 @@
-import type { FormAttachment, StatusType, TagType } from '@/app/types';
+import type { StatusType, TagLinkerType } from '@/app/types';
 
 export type AddCardFormInputs = {
   title: string;
   description: string;
   status: StatusType;
-  tags: (TagType & { label: string })[];
-  attachments: FormAttachment[];
+  tags: (TagLinkerType & { label: string })[];
+  attachments: {
+    id: string;
+    url: string;
+    position: number;
+    fromDB: boolean;
+    file?: File;
+  }[];
 };

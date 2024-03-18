@@ -1,35 +1,41 @@
 import Image from 'next/image';
-import { indexBy, prop, remove } from 'ramda';
+import { indexBy, prop, update } from 'ramda';
+import type { MouseEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import type { FileRejection } from 'react-dropzone';
 import { useDropzone } from 'react-dropzone';
-import type { UseControllerProps, UseFormSetValue } from 'react-hook-form';
-import { useController } from 'react-hook-form';
+import { useController, useFieldArray, useFormContext } from 'react-hook-form';
 import Modal from 'react-modal';
 import Sortable from 'sortablejs';
+import { v4 as uuid } from 'uuid';
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 
 import { TASK_ATTACHMENT_MAX_SIZE } from '@/app/constants';
 import type { FormAttachment } from '@/app/types';
 
-import type { AddCardFormInputs } from '../AddCardForm/types';
-import ModalInfo from '../ModalInfo';
+import ModalInfo from '../../ModalInfo';
+import type { AddCardFormInputs } from '../types';
 
 import styles from './Attachments.module.css';
 
-type AttachmentsProps = UseControllerProps<AddCardFormInputs> & {
-  setValue: UseFormSetValue<AddCardFormInputs>;
-};
-
-export default function Attachments(props: AttachmentsProps) {
-  const { setValue } = props;
-
+export default function Attachments() {
   const attachmentsContainerRef = useRef<HTMLDivElement | null>(null);
 
-  const state = useController(props);
-  const attachments = state.field.value as AddCardFormInputs['attachments'];
-  const attachmentsRef = useRef(indexBy(prop('id'), attachments));
+  const { setValue, trigger, getValues } = useFormContext<AddCardFormInputs>();
+
+  const { field } = useController<AddCardFormInputs, 'attachments'>({
+    name: 'attachments',
+  });
+
+  const { fields, append, remove } = useFieldArray<AddCardFormInputs, 'attachments', 'formFieldId'>(
+    {
+      name: 'attachments',
+      keyName: 'formFieldId',
+    },
+  );
+
+  const attachmentsRef = useRef(indexBy(prop('id'), fields));
 
   const [modalState, setModalState] = useState({
     isOpen: false,
@@ -78,37 +84,55 @@ export default function Attachments(props: AttachmentsProps) {
 
     const files = acceptedFiles as FormAttachment[];
 
-    const newAttachments = [...attachments];
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
 
-    for (const file of files) {
-      const src = URL.createObjectURL(file);
-      file.id = src;
-      file.url = src;
-      file.position = attachments.length;
-      newAttachments.push(file);
+      append({
+        id: uuid(),
+        url: URL.createObjectURL(file),
+        position: fields.length + i + 1,
+        fromDB: false,
+        file,
+      });
     }
 
-    setValue('attachments', newAttachments);
+    trigger();
+
+    field.onChange({ target: { value: getValues().attachments } });
   };
 
   /**
    * On a attachment delete
    */
-  const onDelete = (id: string) => () => {
-    const index = attachments.findIndex((item) => item.id === id);
+  const onDelete = (id: string) => (e: MouseEvent) => {
+    e.stopPropagation();
+
+    const index = fields.findIndex((item) => item.id === id);
     if (index !== -1) {
-      const item = attachments[index];
+      const item = fields[index];
 
       URL.revokeObjectURL(item.url);
 
-      setValue('attachments', remove(index, 1, attachments));
+      remove(index);
+
+      const attachments = [...getValues().attachments];
+      for (let i = 0; i < attachments.length; i++) {
+        const attachment = attachments[i];
+        attachment.position = i + 1;
+
+        update(i, attachment);
+      }
+
+      trigger();
+
+      field.onChange({ target: { value: getValues().attachments } });
     }
   };
 
   /**
    * On attachment click
    */
-  const onAttachmentClick = (attachment: FormAttachment) => () => {
+  const onAttachmentClick = (attachment: AddCardFormInputs['attachments']['0']) => () => {
     setLightBoxState({
       src: attachment.url,
       isOpen: true,
@@ -126,8 +150,8 @@ export default function Attachments(props: AttachmentsProps) {
   });
 
   useEffect(() => {
-    attachmentsRef.current = indexBy(prop('id'), attachments);
-  }, [attachments]);
+    attachmentsRef.current = indexBy(prop('id'), fields);
+  }, [fields]);
 
   useEffect(() => {
     Modal.setAppElement('.container');
@@ -154,6 +178,7 @@ export default function Attachments(props: AttachmentsProps) {
         );
 
         setValue('attachments', newAttachments);
+        field.onChange({ target: { value: getValues().attachments } });
       },
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -170,11 +195,11 @@ export default function Attachments(props: AttachmentsProps) {
           <input {...getInputProps()} />
           <span>{`Drag 'n' drop some files here, or click to select files`}</span>
         </div>
-        {attachments.map((attachment, index) => {
+        {fields.map((attachment, index) => {
           return (
             <div
               className={styles.fileContainer}
-              key={attachment.url}
+              key={attachment.id}
               data-id={attachment.id}
               data-role="attachment"
               data-position={index + 1}
@@ -197,14 +222,12 @@ export default function Attachments(props: AttachmentsProps) {
                   draggable={false}
                 />
               </div>
-              <div className={styles.deleteWrapper}>
-                <Image
-                  alt="Img"
-                  src="/delete.svg"
-                  width={18}
-                  height={18}
-                  onClick={onDelete(attachment.id)}
-                />
+              <div
+                className={styles.deleteWrapper}
+                onClick={onDelete(attachment.id)}
+                role="presentation"
+              >
+                <Image alt="Img" src="/delete.svg" width={18} height={18} />
               </div>
             </div>
           );
