@@ -1,4 +1,4 @@
-import type json from '../dictionaries/en.json';
+import type json from '../dictionaries/en';
 
 export type DictionaryType = typeof json;
 

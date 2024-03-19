@@ -16,8 +16,3 @@
   border-bottom-right-radius: 10px;
   overflow-y: auto;
 }
-
-.wrapper h2 {
-  grid-column: span 2;
-  color: var(--textColor);
-}

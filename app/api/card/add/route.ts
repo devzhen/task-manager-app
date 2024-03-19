@@ -28,7 +28,7 @@ export const POST = async (req: NextRequest) => {
     }
 
     // Construct data
-    let data = {} as CardInputType;
+    let data = { position: 0 } as CardInputType;
     const tags: string[] = [];
     const attachments: File[] = [];
     const attachmentsPosition: string[] = [];

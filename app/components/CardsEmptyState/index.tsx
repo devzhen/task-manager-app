@@ -1,3 +1,5 @@
+import { FormattedMessage } from 'react-intl';
+
 import ButtonAddCard from '../ButtonAddCard';
 
 import styles from './CardsEmptyState.module.css';
@@ -11,7 +13,9 @@ export default function CardsEmptyState(props: CardsEmptyStateProps) {
 
   return (
     <div className={styles.container}>
-      <h4>There are no cards for this board</h4>
+      <h4>
+        <FormattedMessage id="board.noCards" />
+      </h4>
       <ButtonAddCard boardId={boardId} />
     </div>
   );

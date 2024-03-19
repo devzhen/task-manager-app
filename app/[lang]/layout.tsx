@@ -7,6 +7,7 @@ import '../globals.css';
 import type { ReactNode } from 'react';
 
 import fetchBoards from '../api/board/fetchBoards';
+import AppIntlProvider from '../components/AppIntlProvider';
 import ContentWrapper from '../components/ContentWrapper';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
@@ -48,7 +49,9 @@ export default async function RootLayout(props: RootLayoutProps) {
         <div className="container">
           <Header />
           <ContentWrapper>
-            <SideBar boards={boards} dictionary={dictionary} />
+            <AppIntlProvider dictionary={dictionary} locale={lang}>
+              <SideBar boards={boards} />
+            </AppIntlProvider>
             {children}
           </ContentWrapper>
           <Footer />

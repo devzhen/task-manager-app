@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { useState } from 'react';
+import { FormattedMessage } from 'react-intl';
 import Modal from 'react-modal';
 
 import styles from './ModalDelete.module.css';
@@ -39,10 +40,16 @@ export default function ModalDelete(props: ModalDeleteProps) {
             onDelete();
           }}
         >
-          {!isLoading && <span>Delete</span>}
+          {!isLoading && (
+            <span>
+              <FormattedMessage id="delete" />
+            </span>
+          )}
           {isLoading && <div className="loader" />}
         </button>
-        <button onClick={closeModal}>Cancel</button>
+        <button onClick={closeModal}>
+          <FormattedMessage id="cancel" />
+        </button>
       </div>
     </Modal>
   );

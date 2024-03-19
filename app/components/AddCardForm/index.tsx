@@ -6,6 +6,7 @@ import { compose, indexBy, pathOr } from 'ramda';
 import { useEffect, useState } from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { useForm, FormProvider } from 'react-hook-form';
+import { FormattedMessage } from 'react-intl';
 
 import addCard from '@/app/api/card/addCard';
 import updateCard from '@/app/api/card/updateCard';
@@ -178,8 +179,13 @@ export default function AddCardForm(props: AddCardFormProps) {
 
   return (
     <FormProvider {...methods}>
+      <h2 className={styles.header}>
+        <FormattedMessage id="card.add" />
+      </h2>
       <div className={styles.column}>
-        <label htmlFor="card-name">Title:</label>
+        <label htmlFor="card-name">
+          <FormattedMessage id="title" />:
+        </label>
         <div className={styles.inputWrapper}>
           <input type="text" id="card-name" className={styles.input} {...register('title')} />
           <ErrorMessage
@@ -188,7 +194,9 @@ export default function AddCardForm(props: AddCardFormProps) {
             render={({ message }) => <div className={styles.error}>{message}</div>}
           />
         </div>
-        <label htmlFor="card-description">Description:</label>
+        <label htmlFor="card-description">
+          <FormattedMessage id="description" />:
+        </label>
         <div className={styles.textAreWrapper}>
           <textarea
             id="card-description"

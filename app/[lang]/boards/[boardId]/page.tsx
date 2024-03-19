@@ -2,8 +2,10 @@ import { notFound } from 'next/navigation';
 
 import fetchBoard from '@/app/api/board/fetchBoard';
 import fetchCards from '@/app/api/card/fetchCards';
+import AppIntlProvider from '@/app/components/AppIntlProvider';
 import CardsWrapper from '@/app/components/CardsWrapper';
 import Statuses from '@/app/components/Statuses';
+import { getDictionary } from '@/app/dictionaries';
 import type { CardType } from '@/app/types';
 
 type BoardPageProps = {
@@ -14,9 +16,13 @@ type BoardPageProps = {
 };
 
 export default async function BoardPage(props: BoardPageProps) {
-  const { boardId } = props.params;
+  const { boardId, lang } = props.params;
 
-  const [cardsObj, board] = await Promise.all([fetchCards(boardId), fetchBoard(boardId)]);
+  const [cardsObj, board, dictionary] = await Promise.all([
+    fetchCards(boardId),
+    fetchBoard(boardId),
+    getDictionary(lang),
+  ]);
 
   if (cardsObj === null) {
     notFound();
@@ -29,7 +35,9 @@ export default async function BoardPage(props: BoardPageProps) {
 
   return (
     <CardsWrapper>
-      <Statuses initialCards={cards} total={total} board={board} />
+      <AppIntlProvider dictionary={dictionary} locale={lang}>
+        <Statuses initialCards={cards} total={total} board={board} />
+      </AppIntlProvider>
     </CardsWrapper>
   );
 }

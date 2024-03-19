@@ -6,12 +6,12 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { pathOr } from 'ramda';
 import { useEffect, useState } from 'react';
+import { useIntl } from 'react-intl';
 import Modal from 'react-modal';
 
 import deleteBoard from '@/app/api/board/deleteBoard';
 import { ROUTES } from '@/app/constants';
-import type { BoardType, DictionaryType } from '@/app/types';
-import DictionaryProvider from '@/dictionaries/DictionaryProvider';
+import type { BoardType } from '@/app/types';
 
 import ButtonAddBoard from '../ButtonAddBoard';
 import ModalDelete from '../ModalDelete';
@@ -20,11 +20,12 @@ import styles from './SideBar.module.css';
 
 type SideBarProps = {
   boards: BoardType[];
-  dictionary: DictionaryType;
 };
 
 export default function SideBar(props: SideBarProps) {
-  const { boards, dictionary } = props;
+  const { boards } = props;
+
+  const { formatMessage } = useIntl();
 
   const router = useRouter();
 
@@ -38,8 +39,8 @@ export default function SideBar(props: SideBarProps) {
   }>({
     isOpen: false,
     board: null,
-    title: 'Delete board',
-    description: 'Delete board',
+    title: formatMessage({ id: 'board.delete' }),
+    description: formatMessage({ id: 'board.delete' }),
   });
 
   /**
@@ -56,17 +57,16 @@ export default function SideBar(props: SideBarProps) {
     e.stopPropagation();
     e.preventDefault();
 
-    let description = `Are you sure you want to delete '${board.name}' board?`;
     const countCards = pathOr(0, ['_count', 'cards'], board);
-    if (countCards > 0) {
-      description = `${description} There are ${countCards} cards. All data will be removed.`;
-    }
 
     setModalDeleteState((prev) => ({
       ...prev,
       isOpen: true,
       board,
-      description,
+      description: formatMessage(
+        { id: 'board.delete.question' },
+        { boardName: board.name, countCards },
+      ),
     }));
   };
 
@@ -102,7 +102,7 @@ export default function SideBar(props: SideBarProps) {
         ...prev,
         isOpen: false,
         board: null,
-        description: 'Delete board',
+        description: formatMessage({ id: 'board.delete' }),
       }));
     }
   };
@@ -112,47 +112,45 @@ export default function SideBar(props: SideBarProps) {
   }, []);
 
   return (
-    <DictionaryProvider dictionary={dictionary}>
-      <div className={styles.container}>
-        {boards.map((item) => {
-          return (
-            <Link
-              href={ROUTES.showBoard.replace('[boardId]', item.id)}
-              key={item.id}
-              className={classNames(styles.board, {
-                [styles.boardActive]: params.boardId === item.id,
-              })}
-            >
-              <span>{item.name}</span>
-              <div className={styles.boardActions}>
+    <div className={styles.container}>
+      {boards.map((item) => {
+        return (
+          <Link
+            href={ROUTES.showBoard.replace('[boardId]', item.id)}
+            key={item.id}
+            className={classNames(styles.board, {
+              [styles.boardActive]: params.boardId === item.id,
+            })}
+          >
+            <span>{item.name}</span>
+            <div className={styles.boardActions}>
+              <button
+                className={styles.boardActionWrapper}
+                onClick={editBoardHandler(item) as VoidFunction}
+              >
+                <Image alt="Img" src="/edit.svg" width={18} height={18} />
+              </button>
+              {!item.protected && (
                 <button
                   className={styles.boardActionWrapper}
-                  onClick={editBoardHandler(item) as VoidFunction}
+                  onClick={deleteBoardPrepare(item) as VoidFunction}
                 >
-                  <Image alt="Img" src="/edit.svg" width={18} height={18} />
+                  <Image alt="Img" src="/delete.svg" width={16} height={16} />
                 </button>
-                {!item.protected && (
-                  <button
-                    className={styles.boardActionWrapper}
-                    onClick={deleteBoardPrepare(item) as VoidFunction}
-                  >
-                    <Image alt="Img" src="/delete.svg" width={16} height={16} />
-                  </button>
-                )}
-              </div>
-            </Link>
-          );
-        })}
-        <ButtonAddBoard />
-        {modalDeleteState.isOpen && (
-          <ModalDelete
-            closeModal={setModalDeleteVisibility(false)}
-            title={modalDeleteState.title}
-            description={modalDeleteState.description}
-            onDelete={deleteBoardComplete}
-          />
-        )}
-      </div>
-    </DictionaryProvider>
+              )}
+            </div>
+          </Link>
+        );
+      })}
+      <ButtonAddBoard />
+      {modalDeleteState.isOpen && (
+        <ModalDelete
+          closeModal={setModalDeleteVisibility(false)}
+          title={modalDeleteState.title}
+          description={modalDeleteState.description}
+          onDelete={deleteBoardComplete}
+        />
+      )}
+    </div>
   );
 }
