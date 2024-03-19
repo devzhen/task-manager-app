@@ -1,0 +1,31 @@
+.container {
+  position: relative;
+  width: calc(100dvw - var(--sidebar-width) - var(--content-wrapper-padding) * 2 - 14px);
+  height: 100%;
+  padding: 10px;
+}
+
+.leftShadow,
+.rightShadow {
+  position: absolute;
+  top: 14px;
+  height: calc(100% - 28px);
+  z-index: 100;
+  display: none;
+}
+
+.leftShadow {
+  left: 22px;
+  box-shadow: -9px 0px 8px 1px #f8f2fc;
+}
+
+.rightShadow {
+  right: 22px;
+  box-shadow: 10px 0px 8px 1px #f8f2fc;
+}
+
+.shadowVisible {
+  display: block;
+}
+
+/* var(--textColor */

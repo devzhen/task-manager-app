@@ -279,7 +279,7 @@ export default function Statuses(props: StatusesProps) {
   }, [currentDraggableIdPrev, state.currentDraggable.id]);
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} id="board-statuses">
       {board.statuses.map((status, index) => {
         return (
           <StatusRow

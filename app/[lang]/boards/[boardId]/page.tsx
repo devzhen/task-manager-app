@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 
 import fetchBoard from '@/app/api/board/fetchBoard';
 import fetchCards from '@/app/api/card/fetchCards';
+import CardsWrapper from '@/app/components/CardsWrapper';
 import Statuses from '@/app/components/Statuses';
 import type { CardType } from '@/app/types';
 
@@ -27,8 +28,8 @@ export default async function BoardPage(props: BoardPageProps) {
   };
 
   return (
-    <div className="cards-wrapper">
+    <CardsWrapper>
       <Statuses initialCards={cards} total={total} board={board} />
-    </div>
+    </CardsWrapper>
   );
 }
