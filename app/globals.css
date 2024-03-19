@@ -1,9 +1,14 @@
 :root {
-  --max-width: 1100px;
+  --max-container-width: 1790px;
   --status-column-size: 260px;
   --attachment-size: 160px;
   --textColor: #f8f2fc;
   --textErrorColor: #d85045;
+  --sidebar-width: 300px;
+  --content-wrapper-border-width: 8px;
+  --content-wrapper-padding: 20px;
+  --header-height: 70px;
+  --footer-height: 34px;
 }
 
 * {
@@ -90,8 +95,8 @@ button {
 }
 
 .cards-wrapper {
-  display: flex;
-  flex: 1;
+  width: calc(100dvw - var(--sidebar-width) - var(--content-wrapper-padding) * 2);
+  height: 100%;
   padding: 10px;
 }
 

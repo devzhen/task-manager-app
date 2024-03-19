@@ -10,7 +10,8 @@ import Modal from 'react-modal';
 
 import deleteBoard from '@/app/api/board/deleteBoard';
 import { ROUTES } from '@/app/constants';
-import type { BoardType } from '@/app/types';
+import type { BoardType, DictionaryType } from '@/app/types';
+import DictionaryProvider from '@/dictionaries/DictionaryProvider';
 
 import ButtonAddBoard from '../ButtonAddBoard';
 import ModalDelete from '../ModalDelete';
@@ -19,10 +20,11 @@ import styles from './SideBar.module.css';
 
 type SideBarProps = {
   boards: BoardType[];
+  dictionary: DictionaryType;
 };
 
 export default function SideBar(props: SideBarProps) {
-  const { boards } = props;
+  const { boards, dictionary } = props;
 
   const router = useRouter();
 
@@ -110,45 +112,47 @@ export default function SideBar(props: SideBarProps) {
   }, []);
 
   return (
-    <div className={styles.container}>
-      {boards.map((item) => {
-        return (
-          <Link
-            href={ROUTES.showBoard.replace('[boardId]', item.id)}
-            key={item.id}
-            className={classNames(styles.board, {
-              [styles.boardActive]: params.boardId === item.id,
-            })}
-          >
-            <span>{item.name}</span>
-            <div className={styles.boardActions}>
-              <button
-                className={styles.boardActionWrapper}
-                onClick={editBoardHandler(item) as VoidFunction}
-              >
-                <Image alt="Img" src="/edit.svg" width={18} height={18} />
-              </button>
-              {!item.protected && (
+    <DictionaryProvider dictionary={dictionary}>
+      <div className={styles.container}>
+        {boards.map((item) => {
+          return (
+            <Link
+              href={ROUTES.showBoard.replace('[boardId]', item.id)}
+              key={item.id}
+              className={classNames(styles.board, {
+                [styles.boardActive]: params.boardId === item.id,
+              })}
+            >
+              <span>{item.name}</span>
+              <div className={styles.boardActions}>
                 <button
                   className={styles.boardActionWrapper}
-                  onClick={deleteBoardPrepare(item) as VoidFunction}
+                  onClick={editBoardHandler(item) as VoidFunction}
                 >
-                  <Image alt="Img" src="/delete.svg" width={16} height={16} />
+                  <Image alt="Img" src="/edit.svg" width={18} height={18} />
                 </button>
-              )}
-            </div>
-          </Link>
-        );
-      })}
-      <ButtonAddBoard />
-      {modalDeleteState.isOpen && (
-        <ModalDelete
-          closeModal={setModalDeleteVisibility(false)}
-          title={modalDeleteState.title}
-          description={modalDeleteState.description}
-          onDelete={deleteBoardComplete}
-        />
-      )}
-    </div>
+                {!item.protected && (
+                  <button
+                    className={styles.boardActionWrapper}
+                    onClick={deleteBoardPrepare(item) as VoidFunction}
+                  >
+                    <Image alt="Img" src="/delete.svg" width={16} height={16} />
+                  </button>
+                )}
+              </div>
+            </Link>
+          );
+        })}
+        <ButtonAddBoard />
+        {modalDeleteState.isOpen && (
+          <ModalDelete
+            closeModal={setModalDeleteVisibility(false)}
+            title={modalDeleteState.title}
+            description={modalDeleteState.description}
+            onDelete={deleteBoardComplete}
+          />
+        )}
+      </div>
+    </DictionaryProvider>
   );
 }

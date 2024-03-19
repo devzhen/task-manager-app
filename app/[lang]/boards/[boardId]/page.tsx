@@ -8,6 +8,7 @@ import type { CardType } from '@/app/types';
 type BoardPageProps = {
   params: {
     boardId: string;
+    lang: string;
   };
 };
 

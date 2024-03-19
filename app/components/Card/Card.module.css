@@ -45,6 +45,10 @@
   overflow: hidden;
 }
 
+.imageWrapper img {
+  clip-path: inset(0.6px);
+}
+
 .imageLoaderWrapper {
   position: absolute;
   top: 0;

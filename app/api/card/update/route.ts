@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { T as ramdaTrue, assoc, cond, equals } from 'ramda';
+import { T as ramdaTrue, assoc, cond, equals, isEmpty } from 'ramda';
 
 type CardInputType = {
   id: string;
@@ -51,9 +51,12 @@ export const PUT = async (req: NextRequest) => {
       ])(key);
     }
 
-    const currentCard = prisma.card.findUnique({
+    const currentCard = await prisma.card.findUnique({
       where: {
         id: data.id,
+      },
+      include: {
+        tags: true,
       },
     });
     if (!currentCard) {
@@ -78,9 +81,7 @@ export const PUT = async (req: NextRequest) => {
       for (const tag of deletedTags) {
         await tx.tagLinker.deleteMany({
           where: {
-            tagId: tag,
-            cardId: card.id,
-            boardId: data.boardId,
+            AND: [{ tagId: tag }, { cardId: card.id }, { boardId: data.boardId }],
           },
         });
       }
@@ -88,11 +89,16 @@ export const PUT = async (req: NextRequest) => {
       // Create tags
       const tagData = [];
       for (const tag of tags) {
-        tagData.push({ cardId: card.id, boardId: data.boardId, tagId: tag });
+        const index = currentCard.tags.findIndex((item) => item.tagId === tag);
+        if (index === -1) {
+          tagData.push({ cardId: card.id, boardId: data.boardId, tagId: tag });
+        }
       }
-      await tx.tagLinker.createMany({
-        data: tagData,
-      });
+      if (!isEmpty(tagData)) {
+        await tx.tagLinker.createMany({
+          data: tagData,
+        });
+      }
 
       // Delete attachments
       for (const id of deletedAttachments) {

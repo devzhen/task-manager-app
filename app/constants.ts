@@ -7,6 +7,13 @@ export const NEXT_REVALIDATE_TAGS = {
   board: 'board',
 };
 
+export const LOCALE = {
+  enUS: 'en-US',
+  frFr: 'fr-FR',
+};
+
+export const DEFAULT_LOCALE = LOCALE.enUS;
+
 export const ROUTES = {
   addBoard: '/boards/add',
   editBoard: '/boards/[boardId]/edit',

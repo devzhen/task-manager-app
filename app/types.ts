@@ -1,3 +1,7 @@
+import type json from '../dictionaries/en.json';
+
+export type DictionaryType = typeof json;
+
 export type BoardType = {
   id: string;
   name: string;
