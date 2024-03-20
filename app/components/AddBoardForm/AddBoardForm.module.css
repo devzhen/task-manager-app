@@ -37,3 +37,40 @@
   margin-top: 60px;
   margin-bottom: 40px;
 }
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  margin-top: 26px;
+}
+
+.loadingContainer p,
+.loadingContainer span {
+  color: var(--textColor);
+}
+
+.loadingColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.loadingColumn:nth-child(2) {
+  margin-top: 20px;
+}
+
+.loadingColumn span {
+  font-size: 10px;
+  margin-bottom: 8px;
+}
+
+.loadingInput {
+  width: 400px;
+}
+
+.loadingStatus {
+  width: 540px;
+}
+
+.loadingTag {
+  width: 388px;
+}

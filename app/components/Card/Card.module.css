@@ -80,7 +80,7 @@
   border-radius: 10px;
   
   animation-name: running;
-  animation-duration: 0.3s;
+  animation-duration: 2s;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
   clip-path: inset(0px 75% 50% 0px round 10px);
