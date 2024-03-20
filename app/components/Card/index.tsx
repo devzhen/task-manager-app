@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import Image from 'next/image';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 import useCardLayout from '@/app/hooks/useCardLayout';
 import type { AttachmentType, TagLinkerType } from '@/app/types';
@@ -42,9 +42,12 @@ export default function Card(props: CardProps) {
     title,
   } = props;
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const ref = useRef<HTMLDivElement | null>(null);
 
   const onClickHandler = () => {
+    setIsLoading(true);
     onClick(id);
   };
 
@@ -64,6 +67,7 @@ export default function Card(props: CardProps) {
       ref={ref}
       className={classNames(styles.container, {
         [styles.containerActive]: hovered,
+        [styles.containerLoading]: isLoading,
       })}
       data-id={id}
       data-role="card"
@@ -97,6 +101,7 @@ export default function Card(props: CardProps) {
         <span className={styles.title}>{title}</span>
         <Tags tags={tags} />
       </div>
+      {isLoading && <div className={styles.animationBlock}></div>}
     </div>
   );
 }
