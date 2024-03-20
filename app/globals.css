@@ -181,15 +181,16 @@ button {
   bottom: 0;
   left: 0;
   transform: translateX(-100%);
-  background: linear-gradient(to right, 
+  background: linear-gradient(
+    to right,
     rgba(105, 110, 115, 0.01),
     rgba(105, 110, 115, 0.05),
-    rgba(105, 110, 115, 0.2), 
-    rgba(105, 110, 115, 0.4), 
-    rgba(105, 110, 115, 0.2), 
+    rgba(105, 110, 115, 0.2),
+    rgba(105, 110, 115, 0.4),
+    rgba(105, 110, 115, 0.2),
     rgba(105, 110, 115, 0.05),
     rgba(105, 110, 115, 0.01)
-    );
+  );
   animation: shimmer 2s infinite;
   animation-timing-function: linear;
   content: '';

@@ -7,11 +7,10 @@ import styles from './NotFoundMessage.module.css';
 type NotFoundMessageProps = {
   message: { id: string };
   header?: { id: string };
-  loading?: boolean;
 };
 
 export default function NotFoundMessage(props: NotFoundMessageProps) {
-  const { message, header, loading } = props;
+  const { message, header } = props;
 
   return (
     <div className={styles.container}>
@@ -21,12 +20,9 @@ export default function NotFoundMessage(props: NotFoundMessageProps) {
         </h2>
       )}
       <div className={styles.flexContainer}>
-        {!loading && (
-          <h3>
-            <FormattedMessage {...message} />
-          </h3>
-        )}
-        {loading && <div className={styles.loader} />}
+        <h3>
+          <FormattedMessage {...message} />
+        </h3>
       </div>
     </div>
   );

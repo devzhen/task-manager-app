@@ -10,7 +10,7 @@ export default async function Loading() {
   return (
     <div className={styles.container}>
       <AppIntlProvider dictionary={dictionary} locale={locale}>
-        <NotFoundMessage message={{ id: 'board.notExist' }} loading />
+        <NotFoundMessage message={{ id: 'board.notExist' }} />
       </AppIntlProvider>
     </div>
   );

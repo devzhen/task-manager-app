@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { FileRejection } from 'react-dropzone';
 import { useDropzone } from 'react-dropzone';
 import { useController, useFieldArray, useFormContext } from 'react-hook-form';
+import { FormattedMessage, useIntl } from 'react-intl';
 import Modal from 'react-modal';
 import Sortable from 'sortablejs';
 import { v4 as uuid } from 'uuid';
@@ -21,6 +22,8 @@ import styles from './Attachments.module.css';
 
 export default function Attachments() {
   const attachmentsContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const { formatMessage } = useIntl();
 
   const { setValue, trigger, getValues } = useFormContext<AddCardFormInputs>();
 
@@ -78,7 +81,10 @@ export default function Attachments() {
       setModalState((prev) => ({
         ...prev,
         isOpen: true,
-        description: `${fileRejections.length > 1 ? `${fileRejections.length} files` : 'The file'} failed to upload due to format or size restrictions.`,
+        description: formatMessage(
+          { id: 'attachments.uploadError' },
+          { count: fileRejections.length },
+        ),
       }));
     }
 
@@ -187,13 +193,19 @@ export default function Attachments() {
   return (
     <div className={styles.container}>
       <div className={styles.title}>
-        <p>Attachments:</p>
-        <p>Only PNG and JPG image formats are permitted, and file sizes must not exceed 4.5 MB.</p>
+        <p>
+          <FormattedMessage id="attachments" />:
+        </p>
+        <p>
+          <FormattedMessage id="attachments.restriction" />
+        </p>
       </div>
       <div className={styles.attachments} ref={attachmentsContainerRef}>
         <div {...getRootProps({ className: styles.dropZone })}>
           <input {...getInputProps()} />
-          <span>{`Drag 'n' drop some files here, or click to select files`}</span>
+          <span>
+            <FormattedMessage id="attachments.message" />
+          </span>
         </div>
         {fields.map((attachment, index) => {
           return (

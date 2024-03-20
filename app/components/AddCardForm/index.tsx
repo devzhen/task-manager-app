@@ -179,9 +179,11 @@ export default function AddCardForm(props: AddCardFormProps) {
 
   return (
     <FormProvider {...methods}>
-      <h2 className={styles.header}>
-        <FormattedMessage id="card.add" />
-      </h2>
+      {!card && (
+        <h2 className={styles.header}>
+          <FormattedMessage id="card.add" />
+        </h2>
+      )}
       <div className={styles.column}>
         <label htmlFor="card-name">
           <FormattedMessage id="title" />:

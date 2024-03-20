@@ -1,5 +1,5 @@
+import AddCardFormLoading from '@/app/components/AddCardForm/loading';
 import AppIntlProvider from '@/app/components/AppIntlProvider';
-import NotFoundMessage from '@/app/components/NotFoundMessage';
 import getLangAndDictionaryFromHeaders from '@/app/utils/getLangAndDictionaryFromHeaders';
 
 import styles from './page.module.css';
@@ -9,13 +9,11 @@ export default async function Loading() {
 
   return (
     <div className={styles.container}>
-      <AppIntlProvider dictionary={dictionary} locale={locale}>
-        <NotFoundMessage
-          message={{ id: 'card.notExist' }}
-          header={{ id: 'card.details' }}
-          loading
-        />
-      </AppIntlProvider>
+      <div className={styles.wrapper}>
+        <AppIntlProvider dictionary={dictionary} locale={locale}>
+          <AddCardFormLoading />
+        </AppIntlProvider>
+      </div>
     </div>
   );
 }

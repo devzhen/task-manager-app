@@ -1,4 +1,13 @@
 const messages = {
+  'attachments.message': `Drag 'n' drop some files here, or click to select files`,
+  'attachments.restriction':
+    'Only PNG and JPG image formats are permitted, and file sizes must not exceed 4.5 MB.',
+  'attachments.uploadError': `
+    {count, plural, 
+      =0 {} 
+      one {The file} 
+      other {# files}
+  } failed to upload due to the format or size restrictions.`,
   'board.delete.question': `
     Are you sure you want to delete the ''{boardName}'' board? {countCards, plural, 
       =0 {} 
@@ -23,18 +32,19 @@ const messages = {
   'card.notExist': 'This card does not exist.',
   'card.delete': 'Delete Task',
   'card.deleteQuestion': 'Are you sure you want to delete this task?',
-  chooseColor: 'Choose a color',
+  attachments: 'Attachments',
   cancel: 'Cancel',
+  chooseColor: 'Choose a color',
+  color: 'Color',
   delete: 'Delete',
   description: 'Description',
-  title: 'Title',
+  fontColor: 'Font Color',
+  name: 'Name',
   status: 'Status',
   statuses: 'Statuses',
   submit: 'Submit',
   tags: 'Tags',
-  name: 'Name',
-  color: 'Color',
-  fontColor: 'Font Color',
+  title: 'Title',
 };
 
 export default messages;
