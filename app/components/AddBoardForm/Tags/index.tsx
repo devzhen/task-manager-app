@@ -2,6 +2,7 @@ import { ErrorMessage } from '@hookform/error-message';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
+import { FormattedMessage } from 'react-intl';
 import Modal from 'react-modal';
 import { v4 as uuid } from 'uuid';
 
@@ -156,7 +157,9 @@ export default function Tags(props: TagsProps) {
         return (
           <div className={styles.statusRow} key={tag.id}>
             <div className={styles.column}>
-              <span>Name</span>
+              <span>
+                <FormattedMessage id="name" />
+              </span>
               <input
                 type="text"
                 readOnly={tag.isNew !== true}
@@ -183,7 +186,9 @@ export default function Tags(props: TagsProps) {
                 fieldValue: tag.color,
               })}
             >
-              <span>Color</span>
+              <span>
+                <FormattedMessage id="color" />
+              </span>
               <div className={styles.colorBox} style={{ backgroundColor: tag.color }} />
               <ErrorMessage
                 errors={formState.errors}
@@ -201,7 +206,9 @@ export default function Tags(props: TagsProps) {
                 fieldValue: tag.fontColor,
               })}
             >
-              <span>Font Color</span>
+              <span>
+                <FormattedMessage id="fontColor" />
+              </span>
               <div className={styles.colorBox} style={{ backgroundColor: tag.fontColor }} />
               <ErrorMessage
                 errors={formState.errors}
@@ -220,7 +227,9 @@ export default function Tags(props: TagsProps) {
         );
       })}
       <button className={styles.button} onClick={addNewTag} ref={buttonRef}>
-        <span>Add a new tag</span>
+        <span>
+          <FormattedMessage id="card.addNewTag" />
+        </span>
         <Image alt="Img" src="/plus.svg" width={20} height={20} priority />
       </button>
       {modalColorState.isOpened && (

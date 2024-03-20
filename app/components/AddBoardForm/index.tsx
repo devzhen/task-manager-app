@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { useForm, FormProvider } from 'react-hook-form';
+import { FormattedMessage } from 'react-intl';
 
 import addBoard from '@/app/api/board/addBoard';
 import updateBoard from '@/app/api/board/updateBoard';
@@ -44,66 +45,6 @@ export default function AddBoardForm(props: AddBoardFormProps) {
   });
   const { formState, handleSubmit, register } = methods;
 
-  // const schema = yup
-  //   .object({
-  //     boardId: yup.string().nullable(),
-  //     name: yup
-  //       .string()
-  //       .min(TASK_TITLE_MIN_LENGTH, `The minimum length is ${TASK_TITLE_MIN_LENGTH}`)
-  //       .required('A board name is required')
-  //       .restrictedValues(
-  //         boards.filter((item) => item.name !== board?.name).map((item) => item.name),
-  //         'The current name already exists',
-  //       ),
-  //     statuses: yup
-  //       .array()
-  //       .of(
-  //         yup.object({
-  //           name: yup
-  //             .string()
-  //             .min(TASK_TITLE_MIN_LENGTH, `must be >= ${TASK_TITLE_MIN_LENGTH}`)
-  //             .required(),
-  //           color: yup.string().required('required'),
-  //         }),
-  //       )
-  //       .uniqueItemProperty('name', 'The status name must be unique')
-  //       .min(1, 'The statuses are required field')
-  //       .required(),
-  //     tags: yup
-  //       .array()
-  //       .of(
-  //         yup.object({
-  //           name: yup
-  //             .string()
-  //             .min(TASK_TITLE_MIN_LENGTH, `must be >= ${TASK_TITLE_MIN_LENGTH}`)
-  //             .required(),
-  //           color: yup.string().required('required'),
-  //           fontColor: yup.string().required('required'),
-  //         }),
-  //       )
-  //       .uniqueItemProperty('name', 'The tag name must be unique'),
-  //     deletedStatuses: yup.array().of(
-  //       yup.object({
-  //         id: yup.string(),
-  //       }),
-  //     ),
-  //     deletedTags: yup.array().of(
-  //       yup.object({
-  //         id: yup.string(),
-  //       }),
-  //     ),
-  //   })
-  //   .required();
-
-  // schema
-  //   .validate(getValues())
-  //   .then((values) => {
-  //     console.log('then', values);
-  //   })
-  //   .catch((error) => {
-  //     console.log('catch', error);
-  //   });
-
   /**
    * Submit handler
    */
@@ -133,8 +74,13 @@ export default function AddBoardForm(props: AddBoardFormProps) {
 
   return (
     <FormProvider {...methods}>
+      <h2 className={styles.header}>
+        {board ? <FormattedMessage id="board.edit" /> : <FormattedMessage id="board.addNew" />}
+      </h2>
       <div className={styles.column}>
-        <label htmlFor="board-name">Name:</label>
+        <label htmlFor="board-name">
+          <FormattedMessage id="name" />:
+        </label>
         <div className={styles.inputWrapper}>
           <input type="text" id="board-name" className={styles.input} {...register('name')} />
           <ErrorMessage

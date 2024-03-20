@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useRef } from 'react';
 import { useController, type UseControllerProps } from 'react-hook-form';
+import { FormattedMessage } from 'react-intl';
 import Select from 'react-select';
 
 import type { AddCardFormInputs } from '../types';
@@ -25,7 +26,9 @@ export default function TagsSelect(props: TagsSelectProps) {
 
   return (
     <>
-      <label htmlFor="card-status">Tags:</label>
+      <label htmlFor="card-status">
+        <FormattedMessage id="tags" />:
+      </label>
       <Select
         {...field}
         ref={selectRef as unknown as VoidFunction}

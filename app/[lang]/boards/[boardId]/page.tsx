@@ -24,7 +24,7 @@ export default async function BoardPage(props: BoardPageProps) {
     getDictionary(lang),
   ]);
 
-  if (cardsObj === null) {
+  if (board === null) {
     notFound();
   }
 

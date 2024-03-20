@@ -1,14 +1,17 @@
+import AppIntlProvider from '@/app/components/AppIntlProvider';
+import NotFoundMessage from '@/app/components/NotFoundMessage';
+import getLangAndDictionaryFromHeaders from '@/app/utils/getLangAndDictionaryFromHeaders';
+
 import styles from './page.module.css';
 
-export default function NotFound() {
+export default async function NotFound() {
+  const { locale, dictionary } = await getLangAndDictionaryFromHeaders();
+
   return (
     <div className={styles.container}>
-      <div className={styles.wrapper}>
-        <h2>Edit board</h2>
-        <div className={styles.messageContainer}>
-          <h3 className={styles.notFoundMessage}>This board is not existed</h3>
-        </div>
-      </div>
+      <AppIntlProvider dictionary={dictionary} locale={locale}>
+        <NotFoundMessage message={{ id: 'board.notExist' }} header={{ id: 'board.edit' }} />
+      </AppIntlProvider>
     </div>
   );
 }

@@ -25,6 +25,7 @@ const updateMany = async (data: UpdateCardMultipleBodyType) => {
     revalidateTag(NEXT_REVALIDATE_TAGS.boards);
     revalidateTag(NEXT_REVALIDATE_TAGS.cards);
     revalidateTag(NEXT_REVALIDATE_TAGS.card);
+    revalidateTag(NEXT_REVALIDATE_TAGS.boardMeta);
 
     return json;
   } catch (err) {

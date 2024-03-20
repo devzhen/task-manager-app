@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { FormattedMessage } from 'react-intl';
 import Modal from 'react-modal';
 
 import styles from './ModalInfo.module.css';
@@ -29,7 +30,9 @@ export default function ModalInfo(props: ModalInfoProps) {
         <span>{description}</span>
       </div>
       <div className={styles.footer}>
-        <button onClick={closeModal}>Cancel</button>
+        <button onClick={closeModal}>
+          <FormattedMessage id="cancel" />
+        </button>
       </div>
     </Modal>
   );

@@ -4,22 +4,26 @@ import fetchBoard from '@/app/api/board/fetchBoard';
 import fetchBoardMeta from '@/app/api/board/fetchBoardMeta';
 import fetchBoardNames from '@/app/api/board/fetchBoardNames';
 import AddBoardForm from '@/app/components/AddBoardForm';
+import AppIntlProvider from '@/app/components/AppIntlProvider';
+import { getDictionary } from '@/app/dictionaries';
 
 import styles from './page.module.css';
 
 type BoardEditPageProps = {
   params: {
     boardId: string;
+    lang: string;
   };
 };
 
 export default async function BoardEditPage(props: BoardEditPageProps) {
-  const { boardId } = props.params;
+  const { boardId, lang } = props.params;
 
-  const [boardNames, board, boardMeta] = await Promise.all([
+  const [boardNames, board, boardMeta, dictionary] = await Promise.all([
     fetchBoardNames(),
     fetchBoard(boardId),
     fetchBoardMeta(boardId),
+    getDictionary(lang),
   ]);
 
   if (board === null) {
@@ -29,8 +33,9 @@ export default async function BoardEditPage(props: BoardEditPageProps) {
   return (
     <div className={styles.container}>
       <div className={styles.wrapper}>
-        <h2>Edit board</h2>
-        <AddBoardForm boards={boardNames} board={board} boardMeta={boardMeta} />
+        <AppIntlProvider dictionary={dictionary} locale={lang}>
+          <AddBoardForm boards={boardNames} board={board} boardMeta={boardMeta} />
+        </AppIntlProvider>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import { propOr } from 'ramda';
 import { useController, type UseControllerProps } from 'react-hook-form';
+import { FormattedMessage } from 'react-intl';
 import Select from 'react-select';
 
 import type { StatusType } from '@/app/types';
@@ -22,7 +23,9 @@ export default function StatusSelect(props: StatusSelectProps) {
 
   return (
     <>
-      <label htmlFor="card-status">Status:</label>
+      <label htmlFor="card-status">
+        <FormattedMessage id="status" />:
+      </label>
       <Select
         options={statuses}
         id="card-status"

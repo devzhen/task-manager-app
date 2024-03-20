@@ -5,6 +5,7 @@ export const NEXT_REVALIDATE_TAGS = {
   cards: 'cards',
   boards: 'boards',
   board: 'board',
+  boardMeta: 'boardMeta',
 };
 
 export const LOCALE = {

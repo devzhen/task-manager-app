@@ -1,0 +1,43 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+  width: 100%;
+  padding: 20px 12px 12px 20px;
+  background-color: #2a2d43;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.container h2,
+.container h3 {
+  color: var(--textColor);
+}
+
+.flexContainer {
+  display: flex;
+  flex: 1;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  background-color: #2a2d43;
+}
+
+.loader {
+  border: 10px solid #f9fafb;
+  border-top: 10px solid #5578d4;
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { path } from 'ramda';
 import { useEffect, useRef, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
+import { FormattedMessage, useIntl } from 'react-intl';
 import Modal from 'react-modal';
 import Sortable from 'sortablejs';
 import { v4 as uuid } from 'uuid';
@@ -24,6 +25,8 @@ type StatusesProps = {
 
 export default function Statuses(props: StatusesProps) {
   const { name, board, boardMeta } = props;
+
+  const { formatMessage } = useIntl();
 
   const statusesContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -149,7 +152,13 @@ export default function Statuses(props: StatusesProps) {
         setModalInfoState((prev) => ({
           ...prev,
           isOpened: true,
-          description: `Can't delete the '${status.name}' status. There are ${countCards} cards in this status`,
+          description: formatMessage(
+            { id: 'board.cantDeleteStatus' },
+            {
+              statusName: status.name,
+              countCards,
+            },
+          ),
         }));
 
         return;
@@ -212,7 +221,9 @@ export default function Statuses(props: StatusesProps) {
 
   return (
     <div className={styles.container}>
-      <p>Statuses:</p>
+      <p>
+        <FormattedMessage id="statuses" />:
+      </p>
       <div className={styles.errorWrapper}>
         <ErrorMessage
           errors={formState.errors}
@@ -233,7 +244,9 @@ export default function Statuses(props: StatusesProps) {
               data-role="status"
             >
               <div className={styles.column}>
-                <span>Name</span>
+                <span>
+                  <FormattedMessage id="name" />
+                </span>
                 <input
                   type="text"
                   readOnly={status.isNew !== true}
@@ -250,7 +263,9 @@ export default function Statuses(props: StatusesProps) {
                 role="presentation"
                 onClick={setModalColorVisibility({ isOpened: true, index, color: status.color })}
               >
-                <span>Color</span>
+                <span>
+                  <FormattedMessage id="color" />
+                </span>
                 <div className={styles.colorBox} style={{ backgroundColor: status.color }} />
                 <ErrorMessage
                   errors={formState.errors}
@@ -280,7 +295,9 @@ export default function Statuses(props: StatusesProps) {
         })}
       </div>
       <button className={styles.button} onClick={addNewStatus} ref={buttonRef}>
-        <span>Add a new status</span>
+        <span>
+          <FormattedMessage id="card.addNewStatus" />
+        </span>
         <Image alt="Img" src="/plus.svg" width={20} height={20} priority />
       </button>
       {modalColorState.isOpened && (

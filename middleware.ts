@@ -5,7 +5,6 @@ import { NextResponse } from 'next/server';
 
 import { LOCALE, DEFAULT_LOCALE } from './app/constants';
 
-// Get the preferred locale, similar to the above or using a library
 function getLocale(request: NextRequest) {
   const headers: Record<string, string> = {};
   request.headers.forEach((value, key) => {

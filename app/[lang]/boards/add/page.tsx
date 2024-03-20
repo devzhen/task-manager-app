@@ -1,16 +1,27 @@
 import fetchBoardNames from '@/app/api/board/fetchBoardNames';
 import AddBoardForm from '@/app/components/AddBoardForm';
+import AppIntlProvider from '@/app/components/AppIntlProvider';
+import { getDictionary } from '@/app/dictionaries';
 
 import styles from './page.module.css';
 
-export default async function AddBoardPage() {
-  const boards: { id: string; name: string }[] = await fetchBoardNames();
+type BoardAddPageProps = {
+  params: {
+    lang: string;
+  };
+};
+
+export default async function AddBoardPage(props: BoardAddPageProps) {
+  const { lang } = props.params;
+
+  const [boards, dictionary] = await Promise.all([fetchBoardNames(), getDictionary(lang)]);
 
   return (
     <div className={styles.container}>
       <div className={styles.wrapper}>
-        <h2>Add new board</h2>
-        <AddBoardForm boards={boards} />
+        <AppIntlProvider dictionary={dictionary} locale={lang}>
+          <AddBoardForm boards={boards} />
+        </AppIntlProvider>
       </div>
     </div>
   );

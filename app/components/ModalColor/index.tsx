@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { SketchPicker } from 'react-color';
+import { FormattedMessage } from 'react-intl';
 import Modal from 'react-modal';
 
 import styles from './ModalColor.module.css';
@@ -46,10 +47,12 @@ export default function ModalColor(props: ModalColorProps) {
             disabled={!color}
             onClick={onClickHandler}
           >
-            <span style={{ color: getContrast(color) }}>{color ? 'Submit' : 'Choose a color'}</span>
+            <span style={{ color: getContrast(color) }}>
+              {color ? <FormattedMessage id="submit" /> : <FormattedMessage id="chooseColor" />}
+            </span>
           </button>
           <button className={styles.button} onClick={closeModal}>
-            Cancel
+            <FormattedMessage id="cancel" />
           </button>
         </div>
       </div>
