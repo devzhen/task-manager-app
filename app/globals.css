@@ -201,3 +201,49 @@ button {
     transform: translateX(100%);
   }
 }
+
+.animationBlock {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  border: 1px solid var(--textColor);
+  border-radius: 10px;
+
+  animation-name: running;
+  animation-duration: 2s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  clip-path: inset(0px 75% 50% 0px round 10px);
+}
+
+@keyframes running {
+  0% {
+    clip-path: inset(0px 75% 50% 0px round 10px);
+  }
+  12% {
+    clip-path: inset(0px 25% 99% 25%);
+  }
+  25% {
+    clip-path: inset(0px 0px 50% 75% round 10px);
+  }
+  37% {
+    clip-path: inset(25% 0px 25% 99%);
+  }
+  50% {
+    clip-path: inset(50% 0px 0px 75% round 10px);
+  }
+  62% {
+    clip-path: inset(99% 25% 0px 25%);
+  }
+  75% {
+    clip-path: inset(50% 75% 0px 0px round 10px);
+  }
+  87% {
+    clip-path: inset(25% 99% 25% 0px);
+  }
+  100% {
+    clip-path: inset(0px 75% 50% 0px round 10px);
+  }
+}

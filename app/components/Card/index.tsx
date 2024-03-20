@@ -101,7 +101,7 @@ export default function Card(props: CardProps) {
         <span className={styles.title}>{title}</span>
         <Tags tags={tags} />
       </div>
-      {isLoading && <div className={styles.animationBlock}></div>}
+      {isLoading && <div className="animationBlock" />}
     </div>
   );
 }
