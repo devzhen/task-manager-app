@@ -38,6 +38,7 @@
     "react-intl": "^6.6.2",
     "react-modal": "^3.16.1",
     "react-select": "^5.8.0",
+    "rgb-hex": "^4.1.0",
     "sortablejs": "^1.15.2",
     "uuid": "^9.0.1",
     "yet-another-react-lightbox": "^3.17.1",

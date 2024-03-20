@@ -41,7 +41,10 @@ export default async function RootLayout(props: RootLayoutProps) {
 
   const dictionary = await getDictionary(lang);
 
-  const boards: BoardType[] = await fetchBoards();
+  let boards: BoardType[] = await fetchBoards();
+  if (boards && 'error' in boards) {
+    boards = [];
+  }
 
   return (
     <html lang="en">

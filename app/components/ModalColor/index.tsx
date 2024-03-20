@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { SketchPicker } from 'react-color';
 import { FormattedMessage } from 'react-intl';
 import Modal from 'react-modal';
+import rgbHex from 'rgb-hex';
 
 import styles from './ModalColor.module.css';
 
@@ -39,7 +40,12 @@ export default function ModalColor(props: ModalColorProps) {
   return (
     <Modal isOpen>
       <div className={styles.container}>
-        <SketchPicker color={color} onChange={({ hex }) => setColor(hex)} />
+        <SketchPicker
+          color={color}
+          onChange={({ rgb }) => {
+            setColor(`#${rgbHex(rgb.r, rgb.g, rgb.b, rgb.a)}`);
+          }}
+        />
         <div className={styles.footer}>
           <button
             className={styles.button}

@@ -1,3 +1,5 @@
+import { useIntl } from 'react-intl';
+
 import styles from './SubmitButton.module.css';
 
 type SubmitButtonProps = {
@@ -8,7 +10,9 @@ type SubmitButtonProps = {
 };
 
 export default function SubmitButton(props: SubmitButtonProps) {
-  const { onClick, disabled, isLoading, text = 'Submit' } = props;
+  const { formatMessage } = useIntl();
+
+  const { onClick, disabled, isLoading, text = formatMessage({ id: 'submit' }) } = props;
 
   return (
     <button className={styles.container} onClick={onClick} disabled={disabled}>

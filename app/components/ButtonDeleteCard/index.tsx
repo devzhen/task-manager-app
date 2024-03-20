@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
 import Modal from 'react-modal';
 
 import deleteCard from '@/app/api/card/deleteCard';
@@ -19,12 +20,14 @@ type ButtonDeleteCardProps = {
 export default function ButtonDeleteCard(props: ButtonDeleteCardProps) {
   const { cardId, boardId } = props;
 
+  const { formatMessage } = useIntl();
+
   const router = useRouter();
 
   const [modalDeleteState, setModalDeleteState] = useState({
     isOpen: false,
-    title: 'Delete Task',
-    description: 'Are you sure you want to delete this task?',
+    title: formatMessage({ id: 'card.delete' }),
+    description: formatMessage({ id: 'card.deleteQuestion' }),
   });
 
   const setModalDeleteVisibility = (isOpen: boolean) => () => {
@@ -47,7 +50,9 @@ export default function ButtonDeleteCard(props: ButtonDeleteCardProps) {
   return (
     <>
       <button className={styles.button} onClick={setModalDeleteVisibility(true)}>
-        <span>Delete Task</span>
+        <span>
+          <FormattedMessage id="card.delete" />
+        </span>
       </button>
       {modalDeleteState.isOpen && (
         <ModalDelete

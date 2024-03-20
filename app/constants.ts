@@ -17,7 +17,7 @@ export const DEFAULT_LOCALE = LOCALE.enUS;
 
 export const ROUTES = {
   addBoard: '/boards/add',
-  editBoard: '/boards/[boardId]/edit',
+  editBoard: '/boards/edit/[boardId]',
   showBoard: '/boards/[boardId]',
   addCard: '/cards/[boardId]/add',
   showCard: '/cards/[boardId]/show/[cardId]',
@@ -60,23 +60,23 @@ export const FAKE_CARD_ID = 'fake-card-id';
 export const TAGS = {
   technical: {
     name: 'Technical',
-    color: '#dfe5f8',
+    color: '#1810ec40',
     fontColor: '#6881c9',
   },
   frontEnd: {
     name: 'Front end',
-    color: '#e6fce9',
+    color: '#0bf12b33',
     fontColor: '#00b300',
   },
   concept: {
     name: 'Concept',
-    color: '#ff9999',
+    color: '#f5160936',
     fontColor: '#ff1919',
   },
   design: {
     name: 'Design',
-    color: '#ffdc73',
-    fontColor: '#a67c00',
+    color: '#f8e71c61',
+    fontColor: '#ebb20cff',
   },
 };
 
