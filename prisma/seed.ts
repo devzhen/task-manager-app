@@ -1,5 +1,7 @@
 import type { Status } from '@prisma/client';
 import { PrismaClient } from '@prisma/client';
+import fs from 'fs';
+import path from 'path';
 import * as R from 'ramda';
 
 import { STATUSES, STATUSES_OBJ, TAGS } from '../app/constants';
@@ -7,6 +9,26 @@ import { STATUSES, STATUSES_OBJ, TAGS } from '../app/constants';
 const prisma = new PrismaClient({ log: ['query', 'info', 'warn', 'error'] });
 
 async function main() {
+  // Functions
+  const getCardsCountByStatusIdSql = fs
+    .readFileSync(
+      path.join(process.cwd(), '/app/utils/db/functions/get_cards_count_by_status_id.sql'),
+    )
+    .toString();
+  await prisma.$queryRawUnsafe(getCardsCountByStatusIdSql);
+
+  const getHasMoreCardsByStatusId = fs
+    .readFileSync(
+      path.join(process.cwd(), '/app/utils/db/functions/get_has_more_cards_by_status_id.sql'),
+    )
+    .toString();
+  await prisma.$queryRawUnsafe(getHasMoreCardsByStatusId);
+
+  const getCardsByStatusId = fs
+    .readFileSync(path.join(process.cwd(), '/app/utils/db/functions/get_cards_by_status_id.sql'))
+    .toString();
+  await prisma.$queryRawUnsafe(getCardsByStatusId);
+
   // Init boards
   await prisma.board.createMany({
     data: [

@@ -90,3 +90,38 @@ export type BoardMetaType = BoardType & {
   };
   statuses: Record<string, number>;
 };
+
+export type CardsByStatusReturnType = {
+  boardId: string;
+  statusId: string;
+  perPage: number;
+  page: number;
+  cards: CardType[] | null;
+};
+
+export type ApiResponseType<expectedT> =
+  | expectedT
+  | null
+  | { error: { name: string }; message: string };
+
+export interface T {
+  [key: string]: {
+    cards: CardType[];
+    total: number;
+    hasMore: boolean;
+  };
+}
+
+export type BoardCardsByStatusResponseType = {
+  total: number;
+  cardsPerStatus: number;
+  boardId: string;
+  statuses: Record<
+    string,
+    {
+      cards: CardType[];
+      total: number;
+      hasMore: boolean;
+    }
+  >;
+};

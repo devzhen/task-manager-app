@@ -23,6 +23,10 @@ export const ROUTES = {
   showCard: '/cards/[boardId]/show/[cardId]',
 };
 
+export const PAGINATION = {
+  perPage: 10,
+};
+
 export const BOARD_NAME_MIN_LENGTH = 3;
 
 export const STATUSES = {

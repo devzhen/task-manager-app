@@ -3,33 +3,33 @@ import insert from 'ramda/es/insert';
 
 import type { StatusesStateType } from '../components/Statuses/types';
 import { FAKE_CARD_ID } from '../constants';
-import type { CardType } from '../types';
+import type { BoardCardsByStatusResponseType, CardType } from '../types';
 
 /**
  * Insert a cart to a board.
  */
 const insertCardToBoard = ({
-  cardsObj,
+  statusesObj,
   status,
   insertBeforeId,
   card,
 }: {
-  cardsObj: Record<string, CardType[]>;
+  statusesObj: BoardCardsByStatusResponseType['statuses'];
   status: StatusesStateType['currentDraggable']['status'];
   insertBeforeId: string;
   card: CardType;
-}): Record<string, CardType[]> => {
-  const clone = ramdaClone(cardsObj);
+}): BoardCardsByStatusResponseType['statuses'] => {
+  const clone = ramdaClone(statusesObj);
 
   const isInsertBeforeFakeCard = insertBeforeId.indexOf(FAKE_CARD_ID);
 
   const insertionIndex =
     isInsertBeforeFakeCard === -1
-      ? clone[status.name].findIndex((item) => item.id === insertBeforeId)
-      : (clone[status.name] || []).length;
+      ? clone[status.name].cards.findIndex((item) => item.id === insertBeforeId)
+      : (clone[status.name].cards || []).length;
 
   if (insertionIndex !== -1) {
-    clone[status.name] = insert(insertionIndex, card, clone[status.name] || []);
+    clone[status.name].cards = insert(insertionIndex, card, clone[status.name].cards || []);
   }
 
   return clone;

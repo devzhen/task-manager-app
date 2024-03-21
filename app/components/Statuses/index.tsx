@@ -12,6 +12,7 @@ import updateMany from '@/app/api/card/updateMany';
 import { ROUTES } from '@/app/constants';
 import usePrevious from '@/app/hooks/usePrevious';
 import type {
+  BoardCardsByStatusResponseType,
   BoardType,
   CardType,
   NonEmptyArray,
@@ -32,20 +33,21 @@ import styles from './Statuses.module.css';
 import type { CardLayoutType, StatusesStateType } from './types';
 
 type StatusesProps = {
-  initialCards: Record<string, CardType[]>;
+  initialStatuses: BoardCardsByStatusResponseType['statuses'];
   total: number;
   board: BoardType;
 };
 
 export default function Statuses(props: StatusesProps) {
-  const { initialCards, total, board } = props;
+  const { initialStatuses, total, board } = props;
 
   const router = useRouter();
 
   const updateCardsObj = useRef<Record<string, UpdateCardBodyType>>({});
 
-  const [cards, setCards] = useState<Record<string, CardType[]>>(initialCards);
-  const cardsRef = useRef(cards);
+  const [statuses, setStatuses] =
+    useState<BoardCardsByStatusResponseType['statuses']>(initialStatuses);
+  const statusesRef = useRef(statuses);
 
   const [state, setState] = useState<StatusesStateType>(initialState);
   const stateRef = useRef(state);
@@ -163,7 +165,7 @@ export default function Statuses(props: StatusesProps) {
       return;
     }
 
-    let clone = ramdaClone(cardsRef.current);
+    let clone = ramdaClone(statusesRef.current);
 
     const oldStatus = stateRef.current.currentDraggable.status;
     const oldIndex = stateRef.current.currentDraggable.index;
@@ -180,14 +182,14 @@ export default function Statuses(props: StatusesProps) {
 
     // Mark an old card as will be removed.
     clone = markCardAsWillBeRemoved({
-      cardsObj: clone,
+      statusesObj: clone,
       status: oldStatus,
       id: stateRef.current.currentDraggable.id,
     });
 
     // Insert to a new board
     clone = insertCardToBoard({
-      cardsObj: clone,
+      statusesObj: clone,
       status: newStatus,
       insertBeforeId: state.hoveredCard.insertBeforeId,
       card,
@@ -195,7 +197,7 @@ export default function Statuses(props: StatusesProps) {
 
     // Delete from a previous board
     clone = deleteCardFromBoard({
-      cardsObj: clone,
+      statusesObj: clone,
       status: oldStatus,
     });
 
@@ -205,7 +207,7 @@ export default function Statuses(props: StatusesProps) {
     // TODO: remove
     // console.log('next', clone, '\n\n');
 
-    setCards(clone);
+    setStatuses(clone);
     setState(initialState);
   };
 
@@ -258,13 +260,13 @@ export default function Statuses(props: StatusesProps) {
   };
 
   useEffect(() => {
-    cardsRef.current = cards;
+    statusesRef.current = statuses;
     stateRef.current = state;
-  }, [cards, state]);
+  }, [statuses, state]);
 
   useEffect(() => {
     updateCardsPositions();
-  }, [cards]);
+  }, [statuses]);
 
   useEffect(() => {
     if (currentDraggableIdPrev && !state.currentDraggable.id) {
@@ -284,7 +286,7 @@ export default function Statuses(props: StatusesProps) {
         return (
           <StatusRow
             boardId={board.id}
-            cards={cards?.[status.name] || []}
+            cards={statuses?.[status.name].cards || []}
             currentHoveredState={state.hoveredCard}
             key={status.name}
             onCardClick={onCardClick}

@@ -1,9 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import { assocPath, compose, path as ramdaPath } from 'ramda';
 
-import type { STATUSES } from '@/app/constants';
-import type { CardType } from '@/app/types';
+import { PAGINATION } from '@/app/constants';
 
 export const GET = async (req: NextRequest) => {
   const searchParams = req.nextUrl.searchParams;
@@ -23,7 +23,11 @@ export const GET = async (req: NextRequest) => {
       where: {
         id: board,
       },
+      include: {
+        statuses: true,
+      },
     });
+
     if (!currentBoard) {
       return NextResponse.json(
         { error: `The board with the id - '${board}' was not found` },
@@ -31,84 +35,49 @@ export const GET = async (req: NextRequest) => {
       );
     }
 
-    /*
-      !!!!!! 1.5 times slower
-    */
-    // const cardsRes = await prisma.card.findMany({
-    //   where: {
-    //     boardId: board,
-    //   },
-    //   orderBy: [{ position: 'asc' }],
-    //   include: {
-    //     attachments: true,
-    //     tags: {
-    //       include: {
-    //         tag: true,
-    //       },
-    //     },
-    //     status: true,
-    //   },
-    // });
-    const cardsRes: CardType[] = await prisma.$queryRaw`
+    const statusQuery = currentBoard.statuses.map((item) => {
+      return `
       SELECT
-        "Card".*,
-        ARRAY(
-          SELECT json_build_object(
-            'id', "TagLinker".id,
-            'createdAt', "TagLinker"."createdAt",
-            'name', "Tag".name,
-            'color', "Tag".color,
-            'fontColor', "Tag"."fontColor",
-            'tagId', "Tag"."id"
-          )
-          FROM "TagLinker"
-          JOIN "Tag" On "Tag".id = "TagLinker"."tagId"
-          WHERE "Card".id = "TagLinker"."cardId"
-      ) AS tags,
-      ARRAY(
-        SELECT json_build_object(
-          'id', "Attachment".id,
-          'name', "Attachment".name,
-          'url', "Attachment".url,
-          'cardId', "Attachment"."cardId",
-          'createdAt', "Attachment"."createdAt"
-        )
-        FROM "Attachment"
-        WHERE "Card".id = "Attachment"."cardId"
-      ) AS attachments,
-      (SELECT json_build_object(
-          'id', "Status".id,
-          'name', "Status".name,
-          'boardId', "Status"."boardId",
-          'createdAt', "Status"."createdAt"
-        )
-        FROM "Status"
-        WHERE "Card"."statusId" = "Status"."id"
-      ) AS status
+        '${item.name}' AS status,
+        COALESCE(json_agg(cards), '[]') AS cards,
+        get_has_more_cards_by_status_id('${currentBoard.id}', '${item.id}', ${PAGINATION.perPage}, 0) AS has_more,
+        (SELECT * FROM get_cards_count_by_status_id('${currentBoard.id}', '${item.id}')) AS total
       FROM
-        "Card"
-      WHERE
-        "Card"."boardId"::text = ${board}
-      ORDER BY
-        "Card".position;
+        get_cards_by_status_id('${currentBoard.id}', '${item.id}', ${PAGINATION.perPage}, 0) AS cards`;
+    }).join(`
+      UNION ALL`);
+
+    const sql = `
+      WITH status_data AS (
+        ${statusQuery}
+      )
+      SELECT
+        jsonb_object_agg(
+          status,
+          jsonb_build_object(
+            'cards', cards,
+            'hasMore', has_more,
+            'total', total
+          )
+        ) AS statuses,
+        (SELECT SUM(total) FROM status_data) AS total
+      FROM
+        status_data;
     `;
 
-    let total = 0;
+    const result = await prisma.$queryRawUnsafe(sql);
 
-    const cards = {} as Record<keyof typeof STATUSES, CardType[]>;
+    (BigInt.prototype as any).toJSON = function () {
+      return this.toString();
+    };
 
-    for (let i = 0; i < cardsRes.length; i++) {
-      const card = cardsRes[i] as unknown as CardType;
-      const cardStatus = card.status.name as keyof typeof STATUSES;
-
-      const prev = cards[cardStatus] || [];
-
-      cards[cardStatus] = [...prev, card];
-
-      total = total + 1;
-    }
-
-    return NextResponse.json({ cards, total });
+    return NextResponse.json(
+      compose(
+        assocPath(['boardId'], currentBoard.id),
+        assocPath(['cardsPerStatus'], PAGINATION.perPage),
+        ramdaPath(['0']),
+      )(result),
+    );
   } catch (error) {
     return NextResponse.json({ error, message: (error as Error).message }, { status: 500 });
   } finally {

@@ -1,0 +1,34 @@
+.statusContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin-top: 30px;
+}
+
+.statusContainer p,
+.statusContainer span {
+  color: var(--textColor);
+}
+
+.statusContainer span {
+  font-size: 14px;
+}
+
+.inputReplacer {
+  width: 400px;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+}
+
+.column:nth-child(2) {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.column span {
+  font-size: 10px;
+  margin-bottom: 8px;
+}

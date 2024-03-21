@@ -6,7 +6,6 @@ import AppIntlProvider from '@/app/components/AppIntlProvider';
 import CardsWrapper from '@/app/components/CardsWrapper';
 import Statuses from '@/app/components/Statuses';
 import { getDictionary } from '@/app/dictionaries';
-import type { CardType } from '@/app/types';
 
 type BoardPageProps = {
   params: {
@@ -28,15 +27,12 @@ export default async function BoardPage(props: BoardPageProps) {
     notFound();
   }
 
-  const { cards, total } = cardsObj as {
-    cards: Record<string, CardType[]>;
-    total: number;
-  };
+  const { statuses, total } = cardsObj;
 
   return (
     <CardsWrapper>
       <AppIntlProvider dictionary={dictionary} locale={lang}>
-        <Statuses initialCards={cards} total={total} board={board} />
+        <Statuses initialStatuses={statuses} total={total} board={board} />
       </AppIntlProvider>
     </CardsWrapper>
   );

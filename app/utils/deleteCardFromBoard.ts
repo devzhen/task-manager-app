@@ -1,21 +1,21 @@
 import ramdaClone from 'ramda/es/clone';
 
 import type { StatusesStateType } from '../components/Statuses/types';
-import type { CardType } from '../types';
+import type { BoardCardsByStatusResponseType } from '../types';
 
 /**
  * Delete a cart from a board.
  */
 const deleteCardFromBoard = ({
-  cardsObj,
+  statusesObj,
   status,
 }: {
-  cardsObj: Record<string, CardType[]>;
+  statusesObj: BoardCardsByStatusResponseType['statuses'];
   status: StatusesStateType['currentDraggable']['status'];
-}): Record<string, CardType[]> => {
-  const clone = ramdaClone(cardsObj);
+}): BoardCardsByStatusResponseType['statuses'] => {
+  const clone = ramdaClone(statusesObj);
 
-  clone[status.name] = clone[status.name].filter((item) => item.willBeRemoved !== true);
+  clone[status.name].cards = clone[status.name].cards.filter((item) => item.willBeRemoved !== true);
 
   return clone;
 };
