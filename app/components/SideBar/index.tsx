@@ -3,7 +3,7 @@
 import classNames from 'classnames';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, usePathname, useRouter } from 'next/navigation';
 import { pathOr } from 'ramda';
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -11,6 +11,7 @@ import Modal from 'react-modal';
 
 import deleteBoard from '@/app/api/board/deleteBoard';
 import { ROUTES } from '@/app/constants';
+import usePrevious from '@/app/hooks/usePrevious';
 import type { BoardType } from '@/app/types';
 
 import ButtonAddBoard from '../ButtonAddBoard';
@@ -30,6 +31,11 @@ export default function SideBar(props: SideBarProps) {
   const router = useRouter();
 
   const params = useParams();
+
+  const pathname = usePathname();
+  const pathnamePrev = usePrevious(pathname);
+
+  const [isEditBtnLoading, setIsEditBtnLoading] = useState(false);
 
   const [modalDeleteState, setModalDeleteState] = useState<{
     isOpen: boolean;
@@ -77,6 +83,8 @@ export default function SideBar(props: SideBarProps) {
     e.stopPropagation();
     e.preventDefault();
 
+    setIsEditBtnLoading(true);
+
     router.push(ROUTES.editBoard.replace('[boardId]', board.id));
   };
 
@@ -111,6 +119,12 @@ export default function SideBar(props: SideBarProps) {
     Modal.setAppElement('.container');
   }, []);
 
+  useEffect(() => {
+    if (pathnamePrev && pathnamePrev !== pathname && isEditBtnLoading) {
+      setIsEditBtnLoading(false);
+    }
+  }, [isEditBtnLoading, pathnamePrev, pathname]);
+
   return (
     <div className={styles.container}>
       {boards.map((item) => {
@@ -129,6 +143,7 @@ export default function SideBar(props: SideBarProps) {
                 onClick={editBoardHandler(item) as VoidFunction}
               >
                 <Image alt="Img" src="/edit.svg" width={18} height={18} />
+                {isEditBtnLoading && <div className="animationBlock" />}
               </button>
               {!item.protected && (
                 <button

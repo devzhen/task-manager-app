@@ -11,7 +11,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 12px 0 27px;
+  padding: 12px 12px 12px 27px;
   margin-bottom: 4px;
   background-color: #2a2d43;
   border-radius: 10px;
@@ -39,7 +39,7 @@
 }
 
 .boardActionWrapper {
-  height: 52px;
+  position: relative;
   background-color: inherit;
   cursor: pointer;
 }

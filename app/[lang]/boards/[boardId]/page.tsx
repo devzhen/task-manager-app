@@ -23,7 +23,7 @@ export default async function BoardPage(props: BoardPageProps) {
     getDictionary(lang),
   ]);
 
-  if (board === null) {
+  if (board === null || 'error' in board) {
     notFound();
   }
 

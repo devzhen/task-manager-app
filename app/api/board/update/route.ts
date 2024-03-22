@@ -22,6 +22,12 @@ export const PUT = async (req: NextRequest) => {
       );
     }
 
+    const statusNames = body.statuses.map((item) => item.name);
+    const duplicates = statusNames.filter((item, index) => statusNames.indexOf(item) !== index);
+    if (duplicates.length > 0) {
+      return NextResponse.json({ error: `The statuses are not unique` }, { status: 422 });
+    }
+
     const statusObj = reduceByIsNewProperty(body.statuses, 'isNew');
     const tagObj = reduceByIsNewProperty(body.tags, 'isNew');
 

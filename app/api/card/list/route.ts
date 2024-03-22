@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { assocPath, compose, path as ramdaPath } from 'ramda';
+import { validate } from 'uuid';
 
 import { PAGINATION } from '@/app/constants';
 
@@ -12,7 +13,7 @@ export const GET = async (req: NextRequest) => {
   const prisma = new PrismaClient();
 
   try {
-    if (!board) {
+    if (!board || !validate(board)) {
       return NextResponse.json(
         { error: `The required query param 'board' was not provided` },
         { status: 422 },

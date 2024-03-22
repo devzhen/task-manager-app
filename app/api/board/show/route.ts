@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import { validate } from 'uuid';
 
 export const GET = async (request: NextRequest) => {
   const boardId = request.nextUrl.searchParams.get('boardId');
@@ -8,7 +9,7 @@ export const GET = async (request: NextRequest) => {
   const prisma = new PrismaClient();
 
   try {
-    if (!boardId) {
+    if (!boardId || !validate(boardId)) {
       return NextResponse.json(
         { error: `The required query param 'boardId' was not provided` },
         { status: 422 },
