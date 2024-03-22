@@ -1,7 +1,8 @@
 'use client';
 
 import classNames from 'classnames';
-import { useState, type ReactNode, useEffect, useRef } from 'react';
+import debounce from 'debounce';
+import { useState, type ReactNode, useEffect, useRef, useCallback } from 'react';
 
 import styles from './CardsWrapper.module.css';
 
@@ -19,8 +20,9 @@ const CardsWrapper = (props: CardsWrapperProps) => {
     left: false,
     right: false,
   });
+  const shadowsRef = useRef(shadows);
 
-  const detectShadows = () => {
+  const detectShadows = useCallback(() => {
     if (!scrollContainerRef.current) {
       return;
     }
@@ -33,7 +35,16 @@ const CardsWrapper = (props: CardsWrapperProps) => {
     const hasScroll =
       scrollContainerRef.current.scrollWidth > scrollContainerRef.current.offsetWidth;
 
-    if (!hasScroll) {
+    if (!hasScroll && !shadowsRef.current.left && !shadowsRef.current.right) {
+      return;
+    }
+
+    if (!hasScroll && (shadowsRef.current.left || shadowsRef.current.right)) {
+      setShadows({
+        left: false,
+        right: false,
+      });
+
       return;
     }
 
@@ -55,24 +66,38 @@ const CardsWrapper = (props: CardsWrapperProps) => {
     }
 
     setShadows(newShadows);
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scrollContainerRef.current, shadows]);
 
   useEffect(() => {
-    const onScrollHandler = () => {
+    shadowsRef.current = shadows;
+  }, [shadows]);
+
+  useEffect(() => {
+    const DEBOUNCE = 200;
+
+    const onScrollHandler = debounce(() => {
       detectShadows();
-    };
+    }, DEBOUNCE);
+
+    const resizeHandler = debounce(() => {
+      detectShadows();
+    }, DEBOUNCE);
 
     const boardStatuses = document.getElementById('board-statuses');
 
     if (boardStatuses) {
       scrollContainerRef.current = boardStatuses as HTMLDivElement;
 
-      detectShadows();
       boardStatuses.addEventListener('scroll', onScrollHandler);
     }
 
+    window.addEventListener('resize', resizeHandler);
+    detectShadows();
+
     return () => {
       boardStatuses?.removeEventListener('scroll', onScrollHandler);
+      window.removeEventListener('resize', resizeHandler);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

@@ -42,7 +42,7 @@ export default function ButtonAddBoard() {
       <span>
         <FormattedMessage id="board.addNew" />
       </span>
-      {isLoading && <div className="animationBlock" />}
+      {isLoading && <div className="animationBlock animationBlueBlock" />}
     </button>
   );
 }

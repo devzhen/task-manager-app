@@ -89,7 +89,7 @@
 
 .button span {
   margin-right: 10px;
-  color: #5578d4;
+  color: var(--textBlueColor);
 }
 
 .button:active,

@@ -1,13 +1,14 @@
 :root {
   --max-container-width: 1790px;
+  --header-height: 44px;
   --status-column-size: 260px;
   --attachment-size: 160px;
   --textColor: #f8f2fc;
+  --textBlueColor: #5578d4;
   --textErrorColor: #d85045;
-  --sidebar-width: 300px;
+  --sidebar-width: 280px;
   --content-wrapper-border-width: 8px;
-  --content-wrapper-padding: 20px;
-  --header-height: 70px;
+  --content-wrapper-padding: 18px;
   --footer-height: 34px;
 }
 
@@ -34,10 +35,19 @@ button {
   border: none;
 }
 
+span,
+p,
+h1,
+h2,
+h3,
+h4 {
+  color: var(--textColor);
+}
+
 .container {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 70px 1fr 34px;
+  grid-template-rows: var(--header-height) 1fr var(--footer-height);
   min-height: 100vh;
 }
 
@@ -216,6 +226,11 @@ button {
   animation-timing-function: linear;
   animation-iteration-count: infinite;
   clip-path: inset(0px 75% 50% 0px round 10px);
+}
+
+.animationBlueBlock {
+  border-color: var(--textBlueColor) !important;
+  border-width: 3px !important;
 }
 
 @keyframes running {

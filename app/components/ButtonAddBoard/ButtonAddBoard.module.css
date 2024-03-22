@@ -4,10 +4,10 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  padding: 16px 12px 16px 27px;
+  padding: 11px 12px 11px 27px;
   margin-bottom: 4px;
   margin-top: auto;
-  background-color: #545668;
+  background: linear-gradient(to right, #c7d9f8, #c8d8f7);
   border-radius: 10px;
   outline: none;
   border: none;
@@ -20,8 +20,9 @@
 }
 
 .container span {
+  font-weight: 600;
   font-size: 16px;
-  color: var(--textColor);
+  color: var(--textBlueColor);
 }
 
 .containerLoading {

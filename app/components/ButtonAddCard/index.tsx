@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { ROUTES } from '@/app/constants';
@@ -18,7 +19,10 @@ export default function ButtonAddCard(props: ButtonAddCardProps) {
 
   const router = useRouter();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const addCard = () => {
+    setIsLoading(true);
     router.push(ROUTES.addCard.replace('[boardId]', boardId));
   };
 
@@ -29,6 +33,7 @@ export default function ButtonAddCard(props: ButtonAddCardProps) {
           <FormattedMessage id="card.addNew" />
         </span>
         <Image alt="Img" src="/plus.svg" width={16} height={16} priority />
+        {isLoading && <div className="animationBlock animationBlueBlock" />}
       </button>
     </div>
   );

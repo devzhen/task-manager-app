@@ -23,7 +23,6 @@ const updateBoard = async (data: AddBoardFormInputs) => {
     revalidateTag(NEXT_REVALIDATE_TAGS.boards);
     revalidateTag(NEXT_REVALIDATE_TAGS.board);
     revalidateTag(NEXT_REVALIDATE_TAGS.cards);
-    revalidateTag(NEXT_REVALIDATE_TAGS.cards);
 
     return json;
   } catch (err) {

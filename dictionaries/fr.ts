@@ -13,10 +13,10 @@ const messages = {
       =0 {} 
       one {It contains # card} 
       other {It contains # cards}
-  }. All data will be removed.`,
+  } All data will be removed.`,
   'board.delete': '[Fr]: Delete Board',
   'board.noCards': '[Fr]: There are no cards for this board',
-  'board.addNew': '[Fr]: Add new Board',
+  'board.addNew': '[Fr]: Create New Board',
   'board.edit': '[Fr]: Edit Board',
   'board.cantDeleteStatus': `[Fr]: Can't delete the ''{statusName}'' status. {countCards, plural,
     =0 {} 
@@ -24,7 +24,7 @@ const messages = {
     other {There are # cards in this status}
   }.`,
   'board.notExist': '[Fr]: This board does not exist.',
-  'card.addNew': '[Fr]: Add new Task',
+  'card.addNew': '[Fr]: Create New Task',
   'card.add': '[Fr]: Add task',
   'card.addNewStatus': '[Fr]: Add a new status',
   'card.addNewTag': '[Fr]: Add a new tag',

@@ -26,7 +26,7 @@
 
 .loader {
   border: 10px solid #f9fafb;
-  border-top: 10px solid #5578d4;
+  border-top: 10px solid var(--textBlueColor);
   border-radius: 50%;
   width: 70px;
   height: 70px;

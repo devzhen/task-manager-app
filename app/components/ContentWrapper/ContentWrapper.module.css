@@ -13,7 +13,6 @@
   display: flex;
   flex: 1;
   padding: var(--content-wrapper-padding);
-  border: var(--content-wrapper-border-width) solid transparent;
   border-radius: 22px;
   background: inherit;
 }
@@ -35,5 +34,6 @@
   display: flex;
   flex: 1;
   border-radius: 20px;
+  overflow: hidden;
   background-color: #191b1e;
 }
