@@ -173,7 +173,7 @@ export default function Statuses(props: StatusesProps) {
     const card = compose(
       assocPath(['status'], newStatus),
       assocPath(['oldStatus'], oldStatus),
-      path([oldStatus.name, oldIndex]),
+      path([oldStatus.name, 'cards', oldIndex]),
     )(clone) as CardType;
 
     // TODO: remove

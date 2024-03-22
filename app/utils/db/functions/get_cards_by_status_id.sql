@@ -21,6 +21,14 @@ BEGIN
       'color', t.color,
       'fontColor', t."fontColor"
     )),
+    'status', jsonb_build_object(
+      'id', s.id,
+      'name', s.name,
+      'color', s.color,
+      'createdAt', s."createdAt",
+      'position', s.position,
+      'boardId', s."boardId"
+     ),
     'attachments', ARRAY(
       SELECT json_build_object(
         'id', "Attachment".id,
@@ -31,27 +39,17 @@ BEGIN
       )
       FROM "Attachment"
       WHERE c.id = "Attachment"."cardId"
-    ),
-    'status',
-    SELECT json_build_object(
-      'id', "Status".id,
-      'name', "Status".name,
-      'color', "Status".color,
-      'createdAt', "Status"."createdAt",
-      'position', "Status"."position",
-      'boardId', "Status"."boardId",
     )
-    FROM "Status"
-    WHERE c."statusId" = "Status"."id"
   )
   FROM "Card" c
   LEFT JOIN "TagLinker" tL ON c.id = tL."cardId"
   LEFT JOIN "Tag" t ON tL."tagId" = t."id"
+  LEFT JOIN "Status" s ON c."statusId" = s.id
   WHERE 
     c."statusId"::text = status_id
     AND
     c."boardId"::text = board_id
-  GROUP BY c.id, c.title, c.description, c.position, c."boardId", c."createdAt", c."statusId"
+  GROUP BY c.id, c.title, c.description, c.position, c."boardId", c."createdAt", c."statusId", s.id
   ORDER BY c.position
   OFFSET offsetN
   LIMIT limitN;
