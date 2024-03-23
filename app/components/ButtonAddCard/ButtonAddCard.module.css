@@ -23,6 +23,7 @@
   border-radius: 10px;
   cursor: pointer;
   background: linear-gradient(to right, #c7d9f8, #c8d8f7);
+  box-shadow: 0px 8px 14px -9px var(--textBlueColor);
 }
 
 .button:active,
