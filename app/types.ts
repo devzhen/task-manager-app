@@ -96,21 +96,13 @@ export type CardsByStatusReturnType = {
   statusId: string;
   perPage: number;
   page: number;
-  cards: CardType[] | null;
+  cards: CardType[];
 };
 
 export type ApiResponseType<expectedT> =
   | expectedT
   | null
   | { error: { name: string }; message: string };
-
-export interface T {
-  [key: string]: {
-    cards: CardType[];
-    total: number;
-    hasMore: boolean;
-  };
-}
 
 export type BoardCardsByStatusResponseType = {
   total: number;
@@ -122,6 +114,7 @@ export type BoardCardsByStatusResponseType = {
       cards: CardType[];
       total: number;
       hasMore: boolean;
+      page: number;
     }
   >;
 };

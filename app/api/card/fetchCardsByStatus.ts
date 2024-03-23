@@ -25,7 +25,7 @@ const fetchCardsByStatus = async ({
     if (perPage) {
       searchParams.set('perPage', `${perPage}`);
     }
-    const url = new URL(`${API_HOST}/api/list-by-status/?${searchParams.toString()}`);
+    const url = new URL(`${API_HOST}/api/card/list-by-status/?${searchParams.toString()}`);
 
     const res = await fetch(url.toString(), { next: { tags: [NEXT_REVALIDATE_TAGS.cards] } });
 

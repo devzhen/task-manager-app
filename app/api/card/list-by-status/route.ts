@@ -36,7 +36,6 @@ export const GET = async (req: NextRequest) => {
         { status: 422 },
       );
     }
-
     if (!statusId) {
       return NextResponse.json(
         { error: `The required query param 'statusId' was not provided` },
@@ -69,6 +68,7 @@ export const GET = async (req: NextRequest) => {
 
     const result: [QueryResult] = await prisma.$queryRaw`
       SELECT json_agg(json_build_object(
+        'page', ${page},
         'total', count_of_records, 
         'cards', cards,
         'hasMore', get_has_more_cards_by_status_id(${boardId}, ${statusId}, ${perPage}, ${offset})

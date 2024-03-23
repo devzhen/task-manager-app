@@ -1,11 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import assocPath from 'ramda/es/assocPath';
-import ramdaClone from 'ramda/es/clone';
-import compose from 'ramda/es/compose';
-import isEmpty from 'ramda/es/isEmpty';
-import path from 'ramda/es/path';
+import { assocPath, compose, concat, isEmpty, path, pathOr, clone as ramdaClone } from 'ramda';
 import { useEffect, useRef, useState } from 'react';
 
 import updateMany from '@/app/api/card/updateMany';
@@ -36,10 +32,21 @@ type StatusesProps = {
   initialStatuses: BoardCardsByStatusResponseType['statuses'];
   total: number;
   board: BoardType;
+  fetchCardsByStatus: ({
+    boardId,
+    statusId,
+    page,
+    perPage,
+  }: {
+    boardId: string;
+    statusId: string;
+    page: number;
+    perPage?: number;
+  }) => BoardCardsByStatusResponseType['statuses'];
 };
 
 export default function Statuses(props: StatusesProps) {
-  const { initialStatuses, total, board } = props;
+  const { initialStatuses, total, board, fetchCardsByStatus } = props;
 
   const router = useRouter();
 
@@ -259,6 +266,44 @@ export default function Statuses(props: StatusesProps) {
     }
   };
 
+  /**
+   * Fetch more cards
+   */
+  const fetchMoreCards = (statusId: string, statusName: string, page: number) => async () => {
+    try {
+      const res = await fetchCardsByStatus({
+        boardId: board.id,
+        statusId,
+        page: page + 1,
+      });
+
+      const existedCards = pathOr([], [statusName, 'cards'], statuses);
+      const additionalCards = pathOr([], ['cards'], res);
+      const cards = concat(existedCards, additionalCards) as CardType[];
+
+      const newStatusColumn = compose(
+        assocPath(['cards'], cards),
+        assocPath(['total'], res.total),
+        assocPath(['page'], res.page),
+        assocPath(['hasMore'], res.hasMore),
+        path<{
+          cards: CardType[];
+          total: number;
+          hasMore: boolean;
+          page: number;
+        }>([statusName]),
+      )(statuses);
+
+      const newState = assocPath([statusName], newStatusColumn, statuses);
+
+      setStatuses(newState);
+      setState(initialState);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log('fetchMoreCards error', err);
+    }
+  };
+
   useEffect(() => {
     statusesRef.current = statuses;
     stateRef.current = state;
@@ -287,6 +332,7 @@ export default function Statuses(props: StatusesProps) {
           <StatusRow
             boardId={board.id}
             cards={statuses?.[status.name].cards || []}
+            hasMore={statuses?.[status.name].hasMore || false}
             currentHoveredState={state.hoveredCard}
             key={status.name}
             onCardClick={onCardClick}
@@ -297,6 +343,7 @@ export default function Statuses(props: StatusesProps) {
             shouldShowAddCardButton={index === 0}
             status={status}
             totalCards={total}
+            fetchMoreCards={fetchMoreCards(status.id, status.name, statuses?.[status.name].page)}
           />
         );
       })}

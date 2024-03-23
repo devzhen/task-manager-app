@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 import { FAKE_CARD_ID } from '@/app/constants';
+import usePrevious from '@/app/hooks/usePrevious';
 import type { CardType, StatusType } from '@/app/types';
 
 import ButtonAddCard from '../ButtonAddCard';
@@ -22,6 +23,8 @@ type StatusRowProps = {
   shouldShowAddCardButton: boolean;
   status: StatusType;
   totalCards: number;
+  hasMore: boolean;
+  fetchMoreCards: () => void;
 };
 
 export default function StatusRow(props: StatusRowProps) {
@@ -37,7 +40,11 @@ export default function StatusRow(props: StatusRowProps) {
     status,
     onCardClick,
     totalCards,
+    hasMore,
+    fetchMoreCards,
   } = props;
+
+  const cardsLengthPrev = usePrevious(cards.length);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -53,10 +60,38 @@ export default function StatusRow(props: StatusRowProps) {
     onDragOver(e, containerRef.current, layoutsArr.current);
   };
 
+  const fetchMore = () => {
+    if (!containerRef.current) {
+      return;
+    }
+
+    const hasScroll = containerRef.current.scrollHeight > containerRef.current.offsetHeight;
+
+    // Fetch more cards
+    if (!hasScroll && hasMore) {
+      fetchMoreCards();
+    }
+  };
+
   useEffect(() => {
     layoutsObj.current = {};
     layoutsArr.current = [];
   }, [cards.length]);
+
+  useEffect(() => {
+    if (!containerRef.current) {
+      return;
+    }
+
+    if (!cardsLengthPrev && cards.length) {
+      fetchMore();
+    }
+
+    if (cardsLengthPrev && cardsLengthPrev < cards.length) {
+      fetchMore();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cardsLengthPrev, cards.length]);
 
   const scrollTop = containerRef.current?.scrollTop || 0;
 

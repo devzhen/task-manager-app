@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 
 import fetchBoard from '@/app/api/board/fetchBoard';
 import fetchCards from '@/app/api/card/fetchCards';
+import fetchCardsByStatus from '@/app/api/card/fetchCardsByStatus';
 import AppIntlProvider from '@/app/components/AppIntlProvider';
 import CardsWrapper from '@/app/components/CardsWrapper';
 import Statuses from '@/app/components/Statuses';
@@ -32,7 +33,12 @@ export default async function BoardPage(props: BoardPageProps) {
   return (
     <CardsWrapper>
       <AppIntlProvider dictionary={dictionary} locale={lang}>
-        <Statuses initialStatuses={statuses} total={total} board={board} />
+        <Statuses
+          initialStatuses={statuses}
+          total={total}
+          board={board}
+          fetchCardsByStatus={fetchCardsByStatus}
+        />
       </AppIntlProvider>
     </CardsWrapper>
   );

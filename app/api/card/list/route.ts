@@ -56,6 +56,7 @@ export const GET = async (req: NextRequest) => {
         jsonb_object_agg(
           status,
           jsonb_build_object(
+            'page', 1,
             'cards', cards,
             'hasMore', has_more,
             'total', total
