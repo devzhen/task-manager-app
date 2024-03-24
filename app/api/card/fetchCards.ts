@@ -6,7 +6,7 @@ import type { ApiResponseType, BoardCardsByStatusResponseType } from '@/app/type
 /**
  * Fetch cards
  */
-const fetchCards = async (boardId: string) => {
+const fetchCards = async (boardId: string): Promise<BoardCardsByStatusResponseType> => {
   try {
     const searchParams = new URLSearchParams();
     searchParams.set('board', boardId);

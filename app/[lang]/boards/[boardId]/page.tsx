@@ -5,8 +5,10 @@ import fetchCards from '@/app/api/card/fetchCards';
 import fetchCardsByStatus from '@/app/api/card/fetchCardsByStatus';
 import AppIntlProvider from '@/app/components/AppIntlProvider';
 import CardsWrapper from '@/app/components/CardsWrapper';
-import Statuses from '@/app/components/Statuses';
+import StatusColumn from '@/app/components/StatusColumn';
+import StatusWrapper from '@/app/components/StatusWrapper';
 import { getDictionary } from '@/app/dictionaries';
+import type { StatusData } from '@/app/types';
 
 type BoardPageProps = {
   params: {
@@ -18,7 +20,7 @@ type BoardPageProps = {
 export default async function BoardPage(props: BoardPageProps) {
   const { boardId, lang } = props.params;
 
-  const [cardsObj, board, dictionary] = await Promise.all([
+  const [cardsRes, board, dictionary] = await Promise.all([
     fetchCards(boardId),
     fetchBoard(boardId),
     getDictionary(lang),
@@ -28,17 +30,28 @@ export default async function BoardPage(props: BoardPageProps) {
     notFound();
   }
 
-  const { statuses, total } = cardsObj;
+  const { statuses } = cardsRes;
 
   return (
     <CardsWrapper>
       <AppIntlProvider dictionary={dictionary} locale={lang}>
-        <Statuses
-          initialStatuses={statuses}
-          total={total}
-          board={board}
-          fetchCardsByStatus={fetchCardsByStatus}
-        />
+        <StatusWrapper>
+          {board.statuses.map((status, index) => {
+            const data = statuses[status.name] as StatusData;
+
+            return (
+              <StatusColumn
+                key={status.id}
+                fetchCardsByStatus={fetchCardsByStatus}
+                total={data.total}
+                shouldShowAddCardButton={index === 0}
+                boardId={board.id}
+                initialData={data}
+                status={status}
+              />
+            );
+          })}
+        </StatusWrapper>
       </AppIntlProvider>
     </CardsWrapper>
   );

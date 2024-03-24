@@ -43,7 +43,16 @@ export type CardType = {
   position: number;
   tags: TagLinkerType[];
   statusId: string;
-  willBeRemoved?: boolean;
+  inserted?: boolean;
+};
+
+export type CardLayoutType = {
+  id: string;
+  top: number;
+  middle: number;
+  bottom: number;
+  index: number;
+  status: StatusType;
 };
 
 export type AttachmentType = {
@@ -91,12 +100,10 @@ export type BoardMetaType = BoardType & {
   statuses: Record<string, number>;
 };
 
-export type CardsByStatusReturnType = {
+export type CardsByStatusReturnType = StatusData & {
   boardId: string;
   statusId: string;
   perPage: number;
-  page: number;
-  cards: CardType[];
 };
 
 export type ApiResponseType<expectedT> =
@@ -104,17 +111,16 @@ export type ApiResponseType<expectedT> =
   | null
   | { error: { name: string }; message: string };
 
+export type StatusData = {
+  cards: CardType[];
+  total: number;
+  hasMore: boolean;
+  page: number;
+};
+
 export type BoardCardsByStatusResponseType = {
   total: number;
   cardsPerStatus: number;
   boardId: string;
-  statuses: Record<
-    string,
-    {
-      cards: CardType[];
-      total: number;
-      hasMore: boolean;
-      page: number;
-    }
-  >;
+  statuses: Record<string, StatusData>;
 };

@@ -3,9 +3,8 @@ import Image from 'next/image';
 import { useRef, useState } from 'react';
 
 import useCardLayout from '@/app/hooks/useCardLayout';
-import type { AttachmentType, TagLinkerType } from '@/app/types';
+import type { AttachmentType, CardLayoutType, StatusType, TagLinkerType } from '@/app/types';
 
-import type { CardLayoutType, StatusesStateType } from '../Statuses/types';
 import Tags from '../Tags';
 
 import styles from './Card.module.css';
@@ -13,7 +12,7 @@ import styles from './Card.module.css';
 type CardProps = {
   attachments: AttachmentType[];
   description?: string;
-  hovered: boolean;
+  highlighted: boolean;
   id: string;
   index: number;
   onClick: (id: string) => void;
@@ -21,7 +20,7 @@ type CardProps = {
   onDragStart: (e: DragEvent) => void;
   onLayout: (layout: CardLayoutType) => void;
   parentScrollTop: number;
-  status: StatusesStateType['currentDraggable']['status'];
+  status: StatusType;
   tags: TagLinkerType[];
   title: string;
 };
@@ -29,7 +28,7 @@ type CardProps = {
 export default function Card(props: CardProps) {
   const {
     attachments,
-    hovered,
+    highlighted,
     id,
     index,
     onClick,
@@ -52,7 +51,7 @@ export default function Card(props: CardProps) {
   };
 
   useCardLayout({
-    cardElement: ref.current,
+    cardElement: ref,
     parentScrollTop,
     index,
     id,
@@ -66,7 +65,7 @@ export default function Card(props: CardProps) {
     <div
       ref={ref}
       className={classNames(styles.container, {
-        [styles.containerActive]: hovered,
+        [styles.containerActive]: highlighted,
         [styles.containerLoading]: isLoading,
       })}
       data-id={id}

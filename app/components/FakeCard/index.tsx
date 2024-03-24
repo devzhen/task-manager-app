@@ -2,28 +2,26 @@ import classNames from 'classnames';
 import { useRef } from 'react';
 
 import useCardLayout from '@/app/hooks/useCardLayout';
-import type { StatusType } from '@/app/types';
-
-import type { CardLayoutType } from '../Statuses/types';
+import type { CardLayoutType, StatusType } from '@/app/types';
 
 import style from './FakeCard.module.css';
 
 type FakeCardProps = {
   id: string;
   index: number;
-  hovered: boolean;
+  highlighted: boolean;
   onLayout: (layout: CardLayoutType) => void;
   status: StatusType;
   parentScrollTop: number;
 };
 
 export default function FakeCard(props: FakeCardProps) {
-  const { index, hovered, onLayout, id, status, parentScrollTop } = props;
+  const { index, highlighted, onLayout, id, status, parentScrollTop } = props;
 
   const ref = useRef<HTMLDivElement | null>(null);
 
   useCardLayout({
-    cardElement: ref.current,
+    cardElement: ref,
     parentScrollTop,
     index,
     id,
@@ -35,7 +33,7 @@ export default function FakeCard(props: FakeCardProps) {
     <div
       ref={ref}
       className={classNames(style.container, {
-        [style.containerActive]: hovered,
+        [style.containerActive]: highlighted,
         [style.containerMargin]: index === 0,
       })}
       data-id={id}

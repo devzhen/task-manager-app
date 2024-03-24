@@ -39,6 +39,7 @@ const messages = {
   delete: 'Delete',
   description: 'Description',
   fontColor: 'Font Color',
+  loading: 'Loading ...',
   name: 'Name',
   status: 'Status',
   statuses: 'Statuses',

@@ -1,23 +1,24 @@
+import type { MutableRefObject } from 'react';
 import { useEffect } from 'react';
 
-import type { CardLayoutType, StatusesStateType } from '../components/Statuses/types';
+import type { CardLayoutType, StatusType } from '../types';
 import getCoords from '../utils/getCoords';
 
 type UseCardLayoutProps = {
-  cardElement: HTMLDivElement | null;
+  cardElement: MutableRefObject<HTMLDivElement | null>;
   parentScrollTop: number;
   onLayout: (layout: CardLayoutType) => void;
   id: string;
   index: number;
-  status: StatusesStateType['currentDraggable']['status'];
+  status: StatusType;
 };
 
 export default function useCardLayout(props: UseCardLayoutProps) {
   const { cardElement, parentScrollTop, id, index, onLayout, status } = props;
 
   useEffect(() => {
-    if (cardElement) {
-      const coords = getCoords(cardElement);
+    if (cardElement?.current) {
+      const coords = getCoords(cardElement.current);
 
       const layout = {
         id,

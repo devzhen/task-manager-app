@@ -36,6 +36,11 @@ export const STATUSES = {
   completed: 'Completed',
 } as const;
 
+export const CUSTOM_DRAG_EVENT = {
+  dragStart: 'dragStart',
+  dragEnd: 'dragEnd',
+};
+
 export const STATUSES_OBJ = {
   [STATUSES.backlog]: {
     value: STATUSES.backlog,

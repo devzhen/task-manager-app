@@ -50,7 +50,7 @@ BEGIN
     AND
     c."boardId"::text = board_id
   GROUP BY c.id, c.title, c.description, c.position, c."boardId", c."createdAt", c."statusId", s.id
-  ORDER BY c.position
+  ORDER BY c.position, c."createdAt"
   OFFSET offsetN
   LIMIT limitN;
 END;
