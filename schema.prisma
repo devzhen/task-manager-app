@@ -41,6 +41,7 @@ model Card {
   status      Status       @relation(fields: [statusId], references: [id])
   tags        TagLinker[]
   createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now())
   statusId    String       @db.Uuid
 }
 

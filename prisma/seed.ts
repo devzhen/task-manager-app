@@ -29,6 +29,18 @@ async function main() {
     .toString();
   await prisma.$queryRawUnsafe(getCardsByStatusId);
 
+  const updateCardUpdatedAtSql = fs
+    .readFileSync(path.join(process.cwd(), '/app/utils/db/functions/update_card_updated_at.sql'))
+    .toString();
+  await prisma.$queryRawUnsafe(updateCardUpdatedAtSql);
+
+  const triggerUpdateCardUpdatedAtSql = fs
+    .readFileSync(
+      path.join(process.cwd(), '/app/utils/db/functions/trigger_update_card_updated_at.sql'),
+    )
+    .toString();
+  await prisma.$queryRawUnsafe(triggerUpdateCardUpdatedAtSql);
+
   // Init boards
   await prisma.board.createMany({
     data: [

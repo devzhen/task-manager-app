@@ -4,13 +4,13 @@ import classNames from 'classnames';
 import debounce from 'debounce';
 import { useState, type ReactNode, useEffect, useRef, useCallback } from 'react';
 
-import styles from './CardsWrapper.module.css';
+import styles from './ScrollShadows.module.css';
 
-type CardsWrapperProps = {
+type ScrollShadowsProps = {
   children: ReactNode;
 };
 
-const CardsWrapper = (props: CardsWrapperProps) => {
+const ScrollShadows = (props: ScrollShadowsProps) => {
   const { children } = props;
 
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -119,4 +119,4 @@ const CardsWrapper = (props: CardsWrapperProps) => {
   );
 };
 
-export default CardsWrapper;
+export default ScrollShadows;

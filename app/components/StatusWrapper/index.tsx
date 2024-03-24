@@ -80,7 +80,7 @@ export default function StatusWrapper(props: StatusWrapperProps) {
 
   return (
     <DraggableContext.Provider value={draggableState}>
-      <div className={styles.container} id="board-statusWrapper">
+      <div className={styles.container} id="board-statuses">
         {children}
       </div>
     </DraggableContext.Provider>

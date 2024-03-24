@@ -14,6 +14,7 @@ BEGIN
     'position', c.position,
     'boardId', c."boardId",
     'createdAt', c."createdAt",
+    'updatedAt', c."updatedAt",
     'statusId', c."statusId",
     'tags', jsonb_agg(jsonb_build_object(
       'id', t.id,
@@ -50,7 +51,7 @@ BEGIN
     AND
     c."boardId"::text = board_id
   GROUP BY c.id, c.title, c.description, c.position, c."boardId", c."createdAt", c."statusId", s.id
-  ORDER BY c.position, c."createdAt"
+  ORDER BY c.position, c."updatedAt"
   OFFSET offsetN
   LIMIT limitN;
 END;

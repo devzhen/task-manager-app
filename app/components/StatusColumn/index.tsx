@@ -1,10 +1,11 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { assocPath, clone, compose, insert, isNil, pathOr, remove } from 'ramda';
 import { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import { FAKE_CARD_ID } from '@/app/constants';
+import { FAKE_CARD_ID, ROUTES } from '@/app/constants';
 import usePrevious from '@/app/hooks/usePrevious';
 import type {
   CardLayoutType,
@@ -12,6 +13,7 @@ import type {
   CardsByStatusReturnType,
   StatusData,
   StatusType,
+  UpdateCardMultipleBodyType,
 } from '@/app/types';
 
 import ButtonAddCard from '../ButtonAddCard';
@@ -38,11 +40,14 @@ type StatusColumnProps = {
   }) => Promise<CardsByStatusReturnType>;
   total: number;
   status: StatusType;
+  updateCards: (data: UpdateCardMultipleBodyType) => Promise<void>;
 };
 
 export default function StatusColumn(props: StatusColumnProps) {
   const { boardId, initialData, shouldShowAddCardButton, fetchCardsByStatus, total, status } =
     props;
+
+  const router = useRouter();
 
   // Loading state
   const [isFetchingNewData, setIsFetchingNewData] = useState(false);
@@ -231,7 +236,7 @@ export default function StatusColumn(props: StatusColumnProps) {
     });
   };
 
-  const updateCards = () => {
+  const updateStatusCards = () => {
     if (!dragState) {
       return;
     }
@@ -269,18 +274,24 @@ export default function StatusColumn(props: StatusColumnProps) {
 
     // Update data
     if (isAffected) {
+      const newCards = cards.map((item, index) => {
+        item.position = index + 1;
+        item.inserted = false;
+
+        return item;
+      });
+
       setStatusData(() => ({
         ...statusDataRef.current,
-        cards: cards.map((item, index) => {
-          item.position = index + 1;
-          item.inserted = false;
-
-          return item;
-        }),
+        cards: newCards,
       }));
 
       updateDraggableState(null);
     }
+  };
+
+  const onCardClick = (id: string) => () => {
+    router.push(ROUTES.showCard.replace('[cardId]', id).replace('[boardId]', boardId));
   };
 
   /**
@@ -295,7 +306,7 @@ export default function StatusColumn(props: StatusColumnProps) {
    */
   useLayoutEffect(() => {
     if (!isNil(dragState)) {
-      updateCards();
+      updateStatusCards();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dragState]);
@@ -331,58 +342,56 @@ export default function StatusColumn(props: StatusColumnProps) {
   const fakeCardId = `${FAKE_CARD_ID}-${status.name}`;
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-status-id={status.id} data-status-name={status.name}>
       <div className={styles.header}>
         <div style={{ backgroundColor: status.color }} />
         <span>
           {status.name} ({total})
         </span>
       </div>
-      {total !== 0 && (
-        <div
-          ref={containerRef}
-          className={styles.cardWrappers}
-          data-role="drop-container"
-          onDragOver={onDragOverHandler as VoidFunction}
-          onDragLeave={onDragLeaveHandler as VoidFunction}
-          onDrop={onDropHandler as VoidFunction}
-        >
-          {shouldShowAddCardButton && <ButtonAddCard stickyPosition boardId={boardId} />}
-          {statusData.cards.map((card, index) => {
-            return (
-              <Card
-                key={card.id}
-                attachments={card.attachments}
-                description={card.description}
-                highlighted={card.id === currentHighlighted?.id}
-                id={card.id}
-                index={index}
-                onClick={() => {}}
-                onDragStart={onDragStartHandler(card)}
-                onDragEnd={onDragEndHandler}
-                onLayout={onCardLayout}
-                parentScrollTop={scrollTop}
-                status={card.status}
-                tags={card.tags}
-                title={card.title}
-              />
-            );
-          })}
-          {isFetchingNewData && (
-            <p>
-              <FormattedMessage id="loading" />
-            </p>
-          )}
-          <FakeCard
-            highlighted={fakeCardId === currentHighlighted?.id}
-            id={fakeCardId}
-            index={statusData.cards.length}
-            onLayout={onCardLayout}
-            parentScrollTop={scrollTop}
-            status={status}
-          />
-        </div>
-      )}
+      <div
+        ref={containerRef}
+        className={styles.cardWrappers}
+        data-role="drop-container"
+        onDragOver={onDragOverHandler as VoidFunction}
+        onDragLeave={onDragLeaveHandler as VoidFunction}
+        onDrop={onDropHandler as VoidFunction}
+      >
+        {shouldShowAddCardButton && <ButtonAddCard stickyPosition boardId={boardId} />}
+        {statusData.cards.map((card, index) => {
+          return (
+            <Card
+              key={card.id}
+              attachments={card.attachments}
+              description={card.description}
+              highlighted={card.id === currentHighlighted?.id}
+              id={card.id}
+              index={index}
+              onClick={onCardClick(card.id)}
+              onDragStart={onDragStartHandler(card)}
+              onDragEnd={onDragEndHandler}
+              onLayout={onCardLayout}
+              parentScrollTop={scrollTop}
+              status={card.status}
+              tags={card.tags}
+              title={card.title}
+            />
+          );
+        })}
+        {isFetchingNewData && (
+          <p>
+            <FormattedMessage id="loading" />
+          </p>
+        )}
+        <FakeCard
+          highlighted={fakeCardId === currentHighlighted?.id}
+          id={fakeCardId}
+          index={statusData.cards.length}
+          onLayout={onCardLayout}
+          parentScrollTop={scrollTop}
+          status={status}
+        />
+      </div>
     </div>
   );
 }

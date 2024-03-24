@@ -3,8 +3,9 @@ import { notFound } from 'next/navigation';
 import fetchBoard from '@/app/api/board/fetchBoard';
 import fetchCards from '@/app/api/card/fetchCards';
 import fetchCardsByStatus from '@/app/api/card/fetchCardsByStatus';
+import updateMany from '@/app/api/card/updateMany';
 import AppIntlProvider from '@/app/components/AppIntlProvider';
-import CardsWrapper from '@/app/components/CardsWrapper';
+import ScrollShadows from '@/app/components/ScrollShadows';
 import StatusColumn from '@/app/components/StatusColumn';
 import StatusWrapper from '@/app/components/StatusWrapper';
 import { getDictionary } from '@/app/dictionaries';
@@ -33,7 +34,7 @@ export default async function BoardPage(props: BoardPageProps) {
   const { statuses } = cardsRes;
 
   return (
-    <CardsWrapper>
+    <ScrollShadows>
       <AppIntlProvider dictionary={dictionary} locale={lang}>
         <StatusWrapper>
           {board.statuses.map((status, index) => {
@@ -48,11 +49,12 @@ export default async function BoardPage(props: BoardPageProps) {
                 boardId={board.id}
                 initialData={data}
                 status={status}
+                updateCards={updateMany}
               />
             );
           })}
         </StatusWrapper>
       </AppIntlProvider>
-    </CardsWrapper>
+    </ScrollShadows>
   );
 }

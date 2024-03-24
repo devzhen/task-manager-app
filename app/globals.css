@@ -105,7 +105,7 @@ h4 {
 }
 
 .cards-wrapper {
-  width: calc(100dvw - var(--sidebar-width) - var(--content-wrapper-padding) * 2 - 14px);
+  width: calc(100dvw - var(--sidebar-width) - var(--content-wrapper-padding) * 2);
   height: 100%;
   padding: 10px;
 }

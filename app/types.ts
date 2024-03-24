@@ -78,7 +78,7 @@ export type FilteredValues = {
   [K in keyof CardTypeOmitted]?: string | number;
 };
 export type UpdateCardMultipleBodyType = {
-  ids: NonEmptyArray<string>;
+  ids: string[];
   fields: FilteredKeysArray[];
   values: FilteredValues[];
 };
