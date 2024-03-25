@@ -28,7 +28,7 @@ export const POST = async (req: NextRequest) => {
     }
 
     // Construct data
-    let data = { position: 0 } as CardInputType;
+    let data = { position: 1 } as CardInputType;
     const tags: string[] = [];
     const attachments: File[] = [];
     const attachmentsPosition: string[] = [];
@@ -57,6 +57,7 @@ export const POST = async (req: NextRequest) => {
         },
         where: {
           statusId: data.statusId,
+          boardId: data.boardId,
         },
       });
 

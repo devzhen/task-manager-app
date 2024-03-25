@@ -13,7 +13,7 @@ import type {
   CardsByStatusReturnType,
   StatusData,
   StatusType,
-  UpdateCardMultipleBodyType,
+  UpdateCardPositionBodyType,
 } from '@/app/types';
 
 import ButtonAddCard from '../ButtonAddCard';
@@ -40,12 +40,19 @@ type StatusColumnProps = {
   }) => Promise<CardsByStatusReturnType>;
   total: number;
   status: StatusType;
-  updateCards: (data: UpdateCardMultipleBodyType) => Promise<void>;
+  updateCardPosition: (data: UpdateCardPositionBodyType) => Promise<void>;
 };
 
 export default function StatusColumn(props: StatusColumnProps) {
-  const { boardId, initialData, shouldShowAddCardButton, fetchCardsByStatus, total, status } =
-    props;
+  const {
+    boardId,
+    initialData,
+    shouldShowAddCardButton,
+    fetchCardsByStatus,
+    total,
+    status,
+    updateCardPosition,
+  } = props;
 
   const router = useRouter();
 
@@ -248,6 +255,7 @@ export default function StatusColumn(props: StatusColumnProps) {
 
     let cards = clone(statusDataRef.current.cards);
     let isAffected = false;
+    let position;
 
     // Insert card
     if (status.id === insertStatusId && !isNil(insertBeforeId) && !isNil(card)) {
@@ -255,6 +263,8 @@ export default function StatusColumn(props: StatusColumnProps) {
         insertBeforeId.indexOf(FAKE_CARD_ID) !== -1
           ? cards.length
           : cards.findIndex((item) => item.id === insertBeforeId);
+
+      position = insertIndex + 1;
 
       if (insertIndex !== -1) {
         cards = insert(insertIndex, { ...card, inserted: true }, cards);
@@ -285,6 +295,16 @@ export default function StatusColumn(props: StatusColumnProps) {
         ...statusDataRef.current,
         cards: newCards,
       }));
+
+      if (!isNil(dragState.insert.card) && !isNil(dragState.remove.statusId) && !isNil(position)) {
+        updateCardPosition({
+          boardId,
+          cardId: dragState.insert.card.id,
+          oldStatusId: dragState.remove.statusId,
+          newStatusId: status.id,
+          position: position > newCards.length ? newCards.length : position,
+        });
+      }
 
       updateDraggableState(null);
     }
@@ -372,6 +392,7 @@ export default function StatusColumn(props: StatusColumnProps) {
               onDragEnd={onDragEndHandler}
               onLayout={onCardLayout}
               parentScrollTop={scrollTop}
+              position={card.position}
               status={card.status}
               tags={card.tags}
               title={card.title}

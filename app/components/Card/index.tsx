@@ -20,6 +20,7 @@ type CardProps = {
   onDragStart: (e: DragEvent) => void;
   onLayout: (layout: CardLayoutType) => void;
   parentScrollTop: number;
+  position: number;
   status: StatusType;
   tags: TagLinkerType[];
   title: string;
@@ -36,6 +37,7 @@ export default function Card(props: CardProps) {
     onDragStart,
     onLayout,
     parentScrollTop,
+    position,
     status,
     tags,
     title,
@@ -72,6 +74,7 @@ export default function Card(props: CardProps) {
       data-role="card"
       data-index={index}
       data-status={status.name}
+      data-position={position}
       draggable
       onDragStart={onDragStart as VoidFunction}
       onDragEnd={onDragEnd as VoidFunction}

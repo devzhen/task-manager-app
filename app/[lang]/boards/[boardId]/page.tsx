@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import fetchBoard from '@/app/api/board/fetchBoard';
 import fetchCards from '@/app/api/card/fetchCards';
 import fetchCardsByStatus from '@/app/api/card/fetchCardsByStatus';
-import updateMany from '@/app/api/card/updateMany';
+import updateCardPosition from '@/app/api/card/updateCardPosition';
 import AppIntlProvider from '@/app/components/AppIntlProvider';
 import ScrollShadows from '@/app/components/ScrollShadows';
 import StatusColumn from '@/app/components/StatusColumn';
@@ -49,7 +49,7 @@ export default async function BoardPage(props: BoardPageProps) {
                 boardId={board.id}
                 initialData={data}
                 status={status}
-                updateCards={updateMany}
+                updateCardPosition={updateCardPosition}
               />
             );
           })}

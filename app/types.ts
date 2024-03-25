@@ -64,10 +64,12 @@ export type AttachmentType = {
   position: number;
 };
 
-export type UpdateCardBodyType = {
-  id: string;
-  fields: FilteredKeysArray[];
-  values: (string | number)[];
+export type UpdateCardPositionBodyType = {
+  boardId: string;
+  oldStatusId: string;
+  cardId: string;
+  position: number;
+  newStatusId: string;
 };
 
 // Update cards multiple body
