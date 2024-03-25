@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { assocPath, clone, compose, insert, isNil, pathOr, remove } from 'ramda';
+import { all, any, assocPath, clone, compose, equals, insert, isNil, pathOr, remove } from 'ramda';
 import { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
@@ -81,6 +81,9 @@ export default function StatusColumn(props: StatusColumnProps) {
     updateDraggableState,
   } = useContext(DraggableContext);
 
+  // Scroll to id
+  const scrollToId = useRef<string | null>(null);
+
   /**
    * On card layout
    */
@@ -97,10 +100,8 @@ export default function StatusColumn(props: StatusColumnProps) {
       return;
     }
 
-    const hasScroll = containerRef.current.scrollHeight > containerRef.current.offsetHeight;
-
     // Fetch more cards
-    if (!hasScroll && statusData.hasMore) {
+    if (statusData.hasMore) {
       try {
         setIsFetchingNewData(true);
 
@@ -110,9 +111,11 @@ export default function StatusColumn(props: StatusColumnProps) {
           page: statusData.page + 1,
         });
 
-        const existedCards = pathOr([], ['cards'], statusData);
-        const additionalCards = pathOr([], ['cards'], res);
-        const cards = [...existedCards, ...additionalCards] as CardType[];
+        const existedCards = pathOr<CardType[]>([], ['cards'], statusData);
+        const additionalCards = pathOr<CardType[]>([], ['cards'], res);
+        const cards = [...existedCards, ...additionalCards];
+
+        scrollToId.current = additionalCards[0]?.id;
 
         const newData = compose(
           assocPath(['cards'], cards),
@@ -310,8 +313,28 @@ export default function StatusColumn(props: StatusColumnProps) {
     }
   };
 
+  /**
+   * On card click
+   */
   const onCardClick = (id: string) => () => {
     router.push(ROUTES.showCard.replace('[cardId]', id).replace('[boardId]', boardId));
+  };
+
+  /**
+   * On scroll handler
+   */
+  const onScrollHandler = () => {
+    if (!containerRef.current) {
+      return;
+    }
+
+    // If scrolled to the bottom
+    if (
+      containerRef.current.scrollTop ===
+      containerRef.current.scrollHeight - containerRef.current.offsetHeight
+    ) {
+      fetchMore();
+    }
   };
 
   /**
@@ -347,12 +370,33 @@ export default function StatusColumn(props: StatusColumnProps) {
       return;
     }
 
-    if (!cardsLengthPrev && statusData.cards.length) {
+    // For big screens - fetch more cards
+    const hasScroll = containerRef.current.scrollHeight > containerRef.current.offsetHeight;
+
+    const firstBatchCondition = all(equals(true))([
+      isNil(cardsLengthPrev),
+      !isNil(statusData.cards.length),
+      equals(hasScroll, false),
+    ]);
+
+    const nextBatchCondition = all(equals(true))([
+      !isNil(cardsLengthPrev) && cardsLengthPrev < statusData.cards.length,
+      equals(hasScroll, false),
+    ]);
+
+    const fetchCondition = any(equals(true))([firstBatchCondition, nextBatchCondition]);
+
+    if (fetchCondition) {
       fetchMore();
     }
 
-    if (cardsLengthPrev && cardsLengthPrev < statusData.cards.length) {
-      fetchMore();
+    // Scroll to a first newly added element
+    if (!fetchCondition && scrollToId.current) {
+      const element = containerRef.current.querySelector(`[data-id="${scrollToId.current}"]`);
+
+      element?.scrollIntoView();
+
+      scrollToId.current = null;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cardsLengthPrev, statusData.cards.length]);
@@ -376,6 +420,7 @@ export default function StatusColumn(props: StatusColumnProps) {
         onDragOver={onDragOverHandler as VoidFunction}
         onDragLeave={onDragLeaveHandler as VoidFunction}
         onDrop={onDropHandler as VoidFunction}
+        onScroll={onScrollHandler}
       >
         {shouldShowAddCardButton && <ButtonAddCard stickyPosition boardId={boardId} />}
         {statusData.cards.map((card, index) => {
@@ -400,7 +445,7 @@ export default function StatusColumn(props: StatusColumnProps) {
           );
         })}
         {isFetchingNewData && (
-          <p>
+          <p className={styles.loadingText}>
             <FormattedMessage id="loading" />
           </p>
         )}

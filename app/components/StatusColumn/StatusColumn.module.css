@@ -34,3 +34,8 @@
 .cardWrappers::-webkit-scrollbar {
   display: none;
 }
+
+.loadingText {
+  font-size: 14px;
+  margin: 0 0 4px 7px;
+}

@@ -16,12 +16,18 @@ BEGIN
     'createdAt', c."createdAt",
     'updatedAt', c."updatedAt",
     'statusId', c."statusId",
-    'tags', jsonb_agg(jsonb_build_object(
-      'id', t.id,
-      'name', t.name,
-      'color', t.color,
-      'fontColor', t."fontColor"
-    )),
+    'tags', CASE 
+       	WHEN COUNT(t.id) > 0 
+       	THEN 
+            jsonb_agg(jsonb_build_object(
+               'id', t.id,
+	      		'name', t.name,
+	      		'color', t.color,
+	      		'fontColor', t."fontColor"
+            ))
+        ELSE 
+            '[]'::jsonb 
+    END,
     'status', jsonb_build_object(
       'id', s.id,
       'name', s.name,
@@ -43,7 +49,7 @@ BEGIN
     )
   )
   FROM "Card" c
-  LEFT JOIN "TagLinker" tL ON c.id = tL."cardId"
+  LEFT JOIN "TagLinker" tL ON c.id = tL."cardId" AND tl."boardId"::text = board_id
   LEFT JOIN "Tag" t ON tL."tagId" = t."id"
   LEFT JOIN "Status" s ON c."statusId" = s.id
   WHERE 
