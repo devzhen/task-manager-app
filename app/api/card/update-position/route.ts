@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { isNil, remove } from 'ramda';
+import { T, always, cond, isNil, remove } from 'ramda';
 import { validate } from 'uuid';
 
 import type { UpdateCardPositionBodyType } from '@/app/types';
@@ -59,31 +59,21 @@ export const PUT = async (req: NextRequest) => {
         }),
         tx.card.findMany({
           where: {
-            statusId: body.oldStatusId,
-            boardId: body.boardId,
+            AND: {
+              statusId: body.oldStatusId,
+              boardId: body.boardId,
+            },
           },
-          orderBy: [
-            {
-              updatedAt: 'asc',
-            },
-            {
-              position: 'asc',
-            },
-          ],
+          orderBy: [{ position: 'asc' }],
         }),
         tx.card.findMany({
           where: {
-            statusId: body.newStatusId,
-            boardId: body.boardId,
+            AND: {
+              statusId: body.newStatusId,
+              boardId: body.boardId,
+            },
           },
-          orderBy: [
-            {
-              updatedAt: 'asc',
-            },
-            {
-              position: 'asc',
-            },
-          ],
+          orderBy: [{ position: 'asc' }],
         }),
       ]);
 
@@ -91,12 +81,17 @@ export const PUT = async (req: NextRequest) => {
         throw new Error('The status ids are not correct, any record was found');
       }
 
+      const position = cond([
+        [() => body.position > newStatusCards.length && newStatusCards.length === 0, always(1)],
+        [T, always(body.position)],
+      ])();
+
       const res = {
         [oldStatus?.name as string]: [],
         [newStatus?.name as string]: [
           {
             id: body.cardId,
-            position: body.position > newStatusCards.length ? newStatusCards.length : body.position,
+            position,
             statusName: newStatus.name,
             statusId: newStatus.id,
             title: '__DRAGGED__',
@@ -105,24 +100,22 @@ export const PUT = async (req: NextRequest) => {
       };
 
       // Splice into 2 array - before the new position and after the new position
-      const newStatusCardsBefore = newStatusCards
-        .filter((item) => item.id !== body.cardId)
-        .slice(0, body.position - 1);
-      const newStatusCardsAfter = newStatusCards
-        .filter((item) => item.id !== body.cardId)
-        .slice(body.position - 1);
+      const newStatusCardsBefore = newStatusCards.slice(0, position - 1);
+      const newStatusCardsAfter = newStatusCards.slice(position - 1);
 
       // Remove from an old status
       const index = oldStatusCards.findIndex((item) => item.id === body.cardId);
       const oldStatusCardsSpliced = index !== -1 ? remove(index, 1, oldStatusCards) : [];
 
-      for (
-        let i = 0, k = 0, t = 0;
-        i < newStatusCardsBefore.length,
-          k < newStatusCardsAfter.length,
-          t < oldStatusCardsSpliced.length;
-        i++, k++, t++
-      ) {
+      const maxLength = Math.max(
+        newStatusCardsBefore.length,
+        newStatusCardsAfter.length,
+        oldStatusCardsSpliced.length,
+      );
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      for (let i = 0, k = 0, t = 0; i < maxLength, k < maxLength, t < maxLength; i++, k++, t++) {
         const cardBefore = newStatusCardsBefore[i];
         if (cardBefore) {
           res[newStatus.name].push({
@@ -138,7 +131,7 @@ export const PUT = async (req: NextRequest) => {
         if (cardAfter) {
           res[newStatus.name].push({
             id: cardAfter.id,
-            position: k + 1 + body.position,
+            position: k + 1 + position,
             statusName: newStatus.name,
             statusId: newStatus.id,
             title: cardAfter.title,

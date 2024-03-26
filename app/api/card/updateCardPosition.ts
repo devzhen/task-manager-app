@@ -21,8 +21,6 @@ const updateCardPosition = async (data: UpdateCardPositionBodyType) => {
     if (json && 'error' in json && 'message' in json) {
       throw new Error(json.message);
     }
-    revalidateTag(NEXT_REVALIDATE_TAGS.board);
-    revalidateTag(NEXT_REVALIDATE_TAGS.boards);
     revalidateTag(NEXT_REVALIDATE_TAGS.cards);
     revalidateTag(NEXT_REVALIDATE_TAGS.card);
     revalidateTag(NEXT_REVALIDATE_TAGS.boardMeta);
