@@ -257,8 +257,8 @@ export default function StatusColumn(props: StatusColumnProps) {
     } = dragState;
 
     let cards = clone(statusDataRef.current.cards);
-    let isAffected = false;
-    let position;
+    let isInserted = false;
+    let isDeleted = false;
 
     // Insert card
     if (status.id === insertStatusId && !isNil(insertBeforeId) && !isNil(card)) {
@@ -267,11 +267,9 @@ export default function StatusColumn(props: StatusColumnProps) {
           ? cards.length
           : cards.findIndex((item) => item.id === insertBeforeId);
 
-      position = insertIndex + 1;
-
       if (insertIndex !== -1) {
         cards = insert(insertIndex, { ...card, inserted: true }, cards);
-        isAffected = true;
+        isInserted = true;
       }
     }
 
@@ -281,14 +279,13 @@ export default function StatusColumn(props: StatusColumnProps) {
 
       if (removeIndex !== -1) {
         cards = remove(removeIndex, 1, cards);
-        isAffected = true;
+        isDeleted = true;
       }
     }
 
     // Update data
-    if (isAffected) {
-      const newCards = cards.map((item, index) => {
-        item.position = index + 1;
+    if (isInserted || isDeleted) {
+      const newCards = cards.map((item) => {
         item.inserted = false;
 
         return item;
@@ -299,17 +296,24 @@ export default function StatusColumn(props: StatusColumnProps) {
         cards: newCards,
       }));
 
-      if (!isNil(dragState.insert.card) && !isNil(dragState.remove.statusId) && !isNil(position)) {
+      updateDraggableState(null);
+
+      // Update on the backend
+      if (!isNil(dragState.insert.card)) {
+        const insertBeforeCardId = dragState.insert.beforeId as string;
+
+        // If card was only deleted from status without insertion
+        if (isInserted === false && isDeleted === true) {
+          return;
+        }
+
         updateCardPosition({
-          boardId,
           cardId: dragState.insert.card.id,
-          oldStatusId: dragState.remove.statusId,
           newStatusId: status.id,
-          position: position > newCards.length ? newCards.length : position,
+          insertBeforeCardId:
+            insertBeforeCardId.indexOf(FAKE_CARD_ID) === -1 ? insertBeforeCardId : null,
         });
       }
-
-      updateDraggableState(null);
     }
   };
 
@@ -437,7 +441,6 @@ export default function StatusColumn(props: StatusColumnProps) {
               onDragEnd={onDragEndHandler}
               onLayout={onCardLayout}
               parentScrollTop={scrollTop}
-              position={card.position}
               status={card.status}
               tags={card.tags}
               title={card.title}

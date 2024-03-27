@@ -1,21 +1,18 @@
-CREATE OR REPLACE FUNCTION get_cards_by_status_id(
-  board_id TEXT,
-  status_id TEXT,
-  limitN bigint,
-  offsetN bigint
-) RETURNS SETOF JSONB AS 
-$$
+CREATE OR REPLACE FUNCTION public.get_cards_by_status_id(board_id text, status_id text, limitn bigint, offsetn bigint)
+ RETURNS SETOF jsonb
+ LANGUAGE plpgsql
+AS $function$
 BEGIN
   RETURN QUERY 
   SELECT jsonb_build_object(
     'id', c.id,
     'title', c.title,
     'description', c.description,
-    'position', c.position,
     'boardId', c."boardId",
     'createdAt', c."createdAt",
     'updatedAt', c."updatedAt",
     'statusId', c."statusId",
+    'moveDate', h."moveDate",
     'tags', CASE 
        	WHEN COUNT(t.id) > 0 
        	THEN 
@@ -52,14 +49,14 @@ BEGIN
   LEFT JOIN "TagLinker" tL ON c.id = tL."cardId" AND tl."boardId"::text = board_id
   LEFT JOIN "Tag" t ON tL."tagId" = t."id"
   LEFT JOIN "Status" s ON c."statusId" = s.id
+  JOIN "CardStatusHistory" h ON c.id = h."cardId"
   WHERE 
     c."statusId"::text = status_id
     AND
     c."boardId"::text = board_id
-  GROUP BY c.id, c.title, c.description, c.position, c."boardId", c."createdAt", c."statusId", s.id
-  ORDER BY c.position, c."updatedAt"
+  GROUP BY c.id, c.title, c.description, c."boardId", c."createdAt", c."statusId", s.id, h."moveDate"
+  ORDER BY h."moveDate" DESC
   OFFSET offsetN
   LIMIT limitN;
 END;
-$$ 
-LANGUAGE plpgsql;
+$function$

@@ -41,6 +41,18 @@ async function main() {
     .toString();
   await prisma.$queryRawUnsafe(triggerUpdateCardUpdatedAtSql);
 
+  const insertIntoCardStatusHistorySql = fs
+    .readFileSync(
+      path.join(process.cwd(), '/app/utils/db/functions/insert_into_card_status_history.sql'),
+    )
+    .toString();
+  await prisma.$queryRawUnsafe(insertIntoCardStatusHistorySql);
+
+  const cardInsertTriggerSql = fs
+    .readFileSync(path.join(process.cwd(), '/app/utils/db/functions/card_insert_trigger.sql'))
+    .toString();
+  await prisma.$queryRawUnsafe(cardInsertTriggerSql);
+
   // Init boards
   await prisma.board.createMany({
     data: [
@@ -117,63 +129,77 @@ async function main() {
     const grouped = R.indexBy(R.prop('name'), statuses) as Record<string, Status>;
 
     if (board.name === 'Home board') {
-      await prisma.card.createMany({
-        data: [
-          {
-            title: 'Investigate Framer-Motion for animations.',
-            boardId: board.id,
-            position: 1,
-            statusId: grouped[STATUSES.backlog].id,
-          },
-          {
-            title: 'Implement CRUD operations',
-            boardId: board.id,
-            position: 2,
-            statusId: grouped[STATUSES.backlog].id,
-          },
-          {
-            title: 'Implement the ability for users to edit tasks',
-            boardId: board.id,
-            position: 1,
-            statusId: grouped[STATUSES.inProgress].id,
-          },
-          {
-            title: 'Implement the ability for users to view a specific subset of tasks',
-            boardId: board.id,
-            position: 2,
-            statusId: grouped[STATUSES.inProgress].id,
-          },
-          {
-            title: 'Use the useEffect hook to update the number of pending tasks',
-            boardId: board.id,
-            position: 3,
-            statusId: grouped[STATUSES.inProgress].id,
-          },
-          {
-            title: 'Implement the ability for users to delete tasks using the mouse or keyboard',
-            boardId: board.id,
-            position: 1,
-            statusId: grouped[STATUSES.inReview].id,
-          },
-          {
-            title: 'Implement the ability for users to add tasks using the mouse or keyboard',
-            boardId: board.id,
-            position: 2,
-            statusId: grouped[STATUSES.inReview].id,
-          },
-          {
-            title: 'Create a basic App component structure and styling',
-            boardId: board.id,
-            position: 1,
-            statusId: grouped[STATUSES.completed].id,
-          },
-          {
-            title: 'Implement a layout according to the design',
-            boardId: board.id,
-            position: 3,
-            statusId: grouped[STATUSES.completed].id,
-          },
-        ],
+      await prisma.card.create({
+        data: {
+          // title: 'Investigate Framer-Motion for animations.',
+          title: '1',
+          boardId: board.id,
+          statusId: grouped[STATUSES.backlog].id,
+        },
+      });
+      await prisma.card.create({
+        data: {
+          // title: 'Implement CRUD operations',
+          title: '2',
+          boardId: board.id,
+          statusId: grouped[STATUSES.backlog].id,
+        },
+      });
+      await prisma.card.create({
+        data: {
+          // title: 'Implement the ability for users to edit tasks',
+          title: '3',
+          boardId: board.id,
+          statusId: grouped[STATUSES.inProgress].id,
+        },
+      });
+      await prisma.card.create({
+        data: {
+          // title: 'Implement the ability for users to view a specific subset of tasks',
+          title: '4',
+          boardId: board.id,
+          statusId: grouped[STATUSES.inProgress].id,
+        },
+      });
+      await prisma.card.create({
+        data: {
+          // title: 'Use the useEffect hook to update the number of pending tasks',
+          title: '5',
+          boardId: board.id,
+          statusId: grouped[STATUSES.inProgress].id,
+        },
+      });
+      await prisma.card.create({
+        data: {
+          // title: 'Implement the ability for users to delete tasks using the mouse or keyboard',
+          title: '6',
+          boardId: board.id,
+          statusId: grouped[STATUSES.inReview].id,
+        },
+      });
+      await prisma.card.create({
+        data: {
+          // title: 'Implement the ability for users to add tasks using the mouse or keyboard',
+          title: '7',
+          boardId: board.id,
+          statusId: grouped[STATUSES.inReview].id,
+        },
+      });
+      await prisma.card.create({
+        data: {
+          // title: 'Create a basic App component structure and styling',
+          title: '8',
+          boardId: board.id,
+          statusId: grouped[STATUSES.completed].id,
+        },
+      });
+      await prisma.card.create({
+        data: {
+          // title: 'Implement a layout according to the design',
+          title: '9',
+          boardId: board.id,
+          statusId: grouped[STATUSES.completed].id,
+        },
       });
     }
   }

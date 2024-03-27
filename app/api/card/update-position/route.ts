@@ -1,10 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { T, always, cond, isNil, remove } from 'ramda';
+import { compose, defaultTo, isNil, last } from 'ramda';
 import { validate } from 'uuid';
 
-import type { UpdateCardPositionBodyType } from '@/app/types';
+import type { CardStatusHistoryType, UpdateCardPositionBodyType } from '@/app/types';
 
 export const PUT = async (req: NextRequest) => {
   const prisma = new PrismaClient();
@@ -12,171 +12,109 @@ export const PUT = async (req: NextRequest) => {
   try {
     const body = (await req.json()) as UpdateCardPositionBodyType;
 
-    const requiredFields = ['boardId', 'oldStatusId', 'cardId', 'position', 'newStatusId'];
+    const requiredFields = ['newStatusId', 'cardId'];
     for (const field of requiredFields) {
       const value = body[field as keyof UpdateCardPositionBodyType];
 
       if (isNil(value)) {
-        return NextResponse.json(
-          { error: `The required body param '${field}' was not provided` },
-          { status: 422 },
-        );
-      }
-
-      if (field !== 'position' && !validate(value as string)) {
-        return NextResponse.json(
-          { error: `The body param '${field}' is not valid id - ${value}` },
-          { status: 422 },
-        );
-      }
-
-      if (field === 'position' && typeof value !== 'number') {
-        return NextResponse.json(
-          { error: `The body param '${field}' is not valid number - '${value}'` },
-          { status: 422 },
-        );
-      }
-
-      if (field === 'position' && (value as number) < 1) {
-        return NextResponse.json(
-          { error: `The body param '${field}' is incorrect - '${value}'` },
-          { status: 422 },
-        );
+        throw new Error(`The required body param '${field}' was not provided`);
       }
     }
 
+    if (!validate(body.cardId) || !validate(body.newStatusId)) {
+      throw new Error(`The body params 'cardId' or 'newStatusId' is not valid uuid`);
+    }
+
+    // If body.insertBeforeCardId === null - append to the end of a list
     const result = await prisma.$transaction(async (tx) => {
-      const [oldStatus, newStatus, oldStatusCards, newStatusCards] = await Promise.all([
-        tx.status.findUnique({
-          where: {
-            id: body.oldStatusId,
-          },
-        }),
-        tx.status.findUnique({
-          where: {
-            id: body.newStatusId,
-          },
-        }),
-        tx.card.findMany({
-          where: {
-            AND: {
-              statusId: body.oldStatusId,
-              boardId: body.boardId,
-            },
-          },
-          orderBy: [{ position: 'asc' }],
-        }),
-        tx.card.findMany({
-          where: {
-            AND: {
-              statusId: body.newStatusId,
-              boardId: body.boardId,
-            },
-          },
-          orderBy: [{ position: 'asc' }],
-        }),
+      const [newStatus, cardsHistory] = await Promise.all([
+        tx.status.findUnique({ where: { id: body.newStatusId } }),
+        body.insertBeforeCardId === null
+          ? tx.cardStatusHistory.findMany({
+              where: { statusId: body.newStatusId },
+              orderBy: {
+                moveDate: 'desc',
+              },
+            })
+          : tx.cardStatusHistory.findMany({
+              where: { statusId: body.newStatusId, cardId: body.insertBeforeCardId },
+            }),
       ]);
 
-      if (isNil(oldStatus) || isNil(newStatus)) {
-        throw new Error('The status ids are not correct, any record was found');
+      const insertBeforeCardHistory = compose(
+        last,
+        defaultTo([]),
+      )(cardsHistory) as CardStatusHistoryType;
+
+      if (isNil(newStatus)) {
+        throw new Error(`The status with the id - '${body.newStatusId}' wasn't found`);
       }
 
-      const position = cond([
-        [() => body.position > newStatusCards.length && newStatusCards.length === 0, always(1)],
-        [T, always(body.position)],
-      ])();
-
-      const res = {
-        [oldStatus?.name as string]: [],
-        [newStatus?.name as string]: [
-          {
-            id: body.cardId,
-            position,
-            statusName: newStatus.name,
-            statusId: newStatus.id,
-            title: '__DRAGGED__',
-          },
-        ],
-      };
-
-      // Splice into 2 array - before the new position and after the new position
-      const newStatusCardsBefore = newStatusCards.slice(0, position - 1);
-      const newStatusCardsAfter = newStatusCards.slice(position - 1);
-
-      // Remove from an old status
-      const index = oldStatusCards.findIndex((item) => item.id === body.cardId);
-      const oldStatusCardsSpliced = index !== -1 ? remove(index, 1, oldStatusCards) : [];
-
-      const maxLength = Math.max(
-        newStatusCardsBefore.length,
-        newStatusCardsAfter.length,
-        oldStatusCardsSpliced.length,
-      );
-
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      for (let i = 0, k = 0, t = 0; i < maxLength, k < maxLength, t < maxLength; i++, k++, t++) {
-        const cardBefore = newStatusCardsBefore[i];
-        if (cardBefore) {
-          res[newStatus.name].push({
-            id: cardBefore.id,
-            position: i + 1,
-            statusName: newStatus.name,
-            statusId: newStatus.id,
-            title: cardBefore.title,
-          });
-        }
-
-        const cardAfter = newStatusCardsAfter[k];
-        if (cardAfter) {
-          res[newStatus.name].push({
-            id: cardAfter.id,
-            position: k + 1 + position,
-            statusName: newStatus.name,
-            statusId: newStatus.id,
-            title: cardAfter.title,
-          });
-        }
-
-        const oldCard = oldStatusCardsSpliced[t];
-        if (oldCard && newStatus.id !== oldStatus.id) {
-          res[oldStatus.name].push({
-            id: oldCard.id,
-            position: t + 1,
-            statusName: oldStatus.name,
-            statusId: oldStatus.id,
-            title: oldCard.title,
-          });
-        }
+      if (body.insertBeforeCardId !== null && isNil(insertBeforeCardHistory)) {
+        throw new Error(
+          `The (insert before) card with the id - '${body.insertBeforeCardId}' wasn't found`,
+        );
       }
 
-      const finalArr =
-        oldStatus.id === newStatus.id
-          ? res[newStatus.name]
-          : [...res[newStatus.name], ...res[oldStatus.name]];
+      const date = !isNil(insertBeforeCardHistory?.moveDate)
+        ? new Date(insertBeforeCardHistory?.moveDate)
+        : new Date();
+      const dateString = date.toISOString().slice(0, 19).replace('T', ' ');
 
-      const updateSql = `
-UPDATE "Card" AS Card SET
-  position = Temp.position,
-  "statusId" = Temp."statusId"
-FROM (VALUES
-    ${(() => {
-      let sql = ``;
-      for (let i = 0; i < finalArr.length; i++) {
-        const card = finalArr[i];
-        const end = i === finalArr.length - 1 ? '' : ',';
+      // Update card histories placed above
+      const updateOtherCardHistoriesSql = `
+UPDATE "CardStatusHistory"
+SET 
+  "moveDate" = "moveDate" + INTERVAL '2 second'
+WHERE id IN (
+  SELECT 
+    id
+  FROM 
+    "CardStatusHistory"
+  WHERE 
+    "moveDate" > '${dateString}' 
+  AND "statusId" = '${body.newStatusId}'
+  ${(() => {
+    if (isNil(body.insertBeforeCardId)) {
+      return '';
+    }
 
-        sql = `${sql}('${card.id}', ${card.position}, uuid('${card.statusId}'))${end}\n`;
-      }
+    return `AND "cardId" != '${body.insertBeforeCardId}'`;
+  })()}
+  AND "cardId" != '${body.cardId}'
+);
+`;
+      date.setSeconds(date.getSeconds() + 1);
+      const dateString2 = date.toISOString().replace('T', ' ').replace('Z', '');
 
-      return sql;
-    })()}
-) AS Temp(id, position, "statusId")
-WHERE Card.id::text = Temp.id;`;
+      // Update s current card history
+      const updateCardHistorySql = `
+UPDATE 
+  "CardStatusHistory"
+SET 
+  "moveDate" = '${dateString2}', 
+  "statusId" = '${body.newStatusId}'
+WHERE 
+  "cardId" = '${body.cardId}';
+`;
 
-      await tx.$executeRawUnsafe(updateSql);
+      // Update s card
+      const updateCardSql = `
+UPDATE 
+  "Card"
+SET 
+  "statusId" = '${body.newStatusId}'
+WHERE 
+  "id" = '${body.cardId}';
+`;
 
-      return res;
+      await Promise.all([
+        tx.$executeRawUnsafe(updateOtherCardHistoriesSql),
+        tx.$executeRawUnsafe(updateCardHistorySql),
+        tx.$executeRawUnsafe(updateCardSql),
+      ]);
+
+      return {};
     });
 
     return NextResponse.json(result);

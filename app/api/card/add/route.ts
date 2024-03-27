@@ -1,4 +1,6 @@
 import { PrismaClient } from '@prisma/client';
+import type { HttpError } from 'http-errors';
+import createError from 'http-errors';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { T, assoc, cond, equals } from 'ramda';
@@ -20,15 +22,12 @@ export const POST = async (req: NextRequest) => {
     const requiredFields = ['boardId', 'statusId', 'title'];
     for (const field of requiredFields) {
       if (!body.get(field)) {
-        return NextResponse.json(
-          { error: `The required body param '${field}' was not provided` },
-          { status: 422 },
-        );
+        throw createError(422, `The required body param '${field}' was not provided`);
       }
     }
 
     // Construct data
-    let data = { position: 1 } as CardInputType;
+    let data = {} as CardInputType;
     const tags: string[] = [];
     const attachments: File[] = [];
     const attachmentsPosition: string[] = [];
@@ -48,19 +47,6 @@ export const POST = async (req: NextRequest) => {
 
     // Transaction
     const createdCard = await prisma.$transaction(async (tx) => {
-      // Update cards position
-      await tx.card.updateMany({
-        data: {
-          position: {
-            increment: 1,
-          },
-        },
-        where: {
-          statusId: data.statusId,
-          boardId: data.boardId,
-        },
-      });
-
       // Create card
       const card = await tx.card.create({
         data,
@@ -110,7 +96,10 @@ export const POST = async (req: NextRequest) => {
 
     return NextResponse.json(createdCard);
   } catch (error) {
-    return NextResponse.json({ error, message: (error as Error).message }, { status: 500 });
+    return NextResponse.json(
+      { error, message: (error as HttpError).message },
+      { status: (error as HttpError).statusCode || 500 },
+    );
   } finally {
     await prisma.$disconnect();
   }

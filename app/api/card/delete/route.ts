@@ -1,6 +1,9 @@
 import { PrismaClient } from '@prisma/client';
+import type { HttpError } from 'http-errors';
+import createError from 'http-errors';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import { validate } from 'uuid';
 
 export const DELETE = async (req: NextRequest) => {
   const prisma = new PrismaClient();
@@ -8,10 +11,10 @@ export const DELETE = async (req: NextRequest) => {
   try {
     const body = await req.json();
 
-    if (!body.cardId) {
-      return NextResponse.json(
-        { error: `The required body param 'cardId' was not provided` },
-        { status: 422 },
+    if (!body.cardId || !validate(body.cardId)) {
+      throw createError(
+        422,
+        `The required body param 'cardId' was not provided or not a valid uuid`,
       );
     }
 
@@ -22,10 +25,7 @@ export const DELETE = async (req: NextRequest) => {
     });
 
     if (!card) {
-      return NextResponse.json(
-        { error: `The card with the id - '${body.cardId}' was not found` },
-        { status: 422 },
-      );
+      throw createError(422, `The card with the id - '${body.cardId}' was not found`);
     }
 
     await prisma.$transaction(async (tx) => {
@@ -36,6 +36,11 @@ export const DELETE = async (req: NextRequest) => {
           },
         }),
         tx.tagLinker.deleteMany({
+          where: {
+            cardId: body.cardId,
+          },
+        }),
+        tx.cardStatusHistory.deleteMany({
           where: {
             cardId: body.cardId,
           },
@@ -51,7 +56,10 @@ export const DELETE = async (req: NextRequest) => {
 
     return NextResponse.json(card);
   } catch (error) {
-    return NextResponse.json({ error, message: (error as Error).message }, { status: 500 });
+    return NextResponse.json(
+      { error: (error as HttpError).message },
+      { status: (error as HttpError).statusCode || 500 },
+    );
   } finally {
     await prisma.$disconnect();
   }

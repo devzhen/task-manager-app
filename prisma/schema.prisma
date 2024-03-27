@@ -31,18 +31,18 @@ model Board {
 }
 
 model Card {
-  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  title       String
-  description String?
-  boardId     String       @db.Uuid
-  position    Int
-  attachments Attachment[]
-  board       Board        @relation(fields: [boardId], references: [id])
-  status      Status       @relation(fields: [statusId], references: [id])
-  tags        TagLinker[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @default(now())
-  statusId    String       @db.Uuid
+  id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title             String
+  description       String?
+  boardId           String             @db.Uuid
+  attachments       Attachment[]
+  board             Board              @relation(fields: [boardId], references: [id])
+  status            Status             @relation(fields: [statusId], references: [id])
+  tags              TagLinker[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @default(now())
+  statusId          String             @db.Uuid
+  CardStatusHistory CardStatusHistory?
 }
 
 model Status {
@@ -54,6 +54,15 @@ model Status {
   boardId   String   @db.Uuid
   boards    Board    @relation(fields: [boardId], references: [id])
   cards     Card[]
+}
+
+model CardStatusHistory {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  cardId    String   @unique @db.Uuid
+  cardTitle String
+  statusId  String   @db.Uuid
+  moveDate  DateTime
+  card      Card     @relation(fields: [cardId], references: [id])
 }
 
 model Tag {

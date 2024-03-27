@@ -46,6 +46,14 @@ export type CardType = {
   inserted?: boolean;
 };
 
+export type CardStatusHistoryType = {
+  id: string;
+  cardId: string;
+  cardTitle: string;
+  statusId: string;
+  moveDate: string;
+};
+
 export type CardLayoutType = {
   id: string;
   top: number;
@@ -65,11 +73,9 @@ export type AttachmentType = {
 };
 
 export type UpdateCardPositionBodyType = {
-  boardId: string;
-  oldStatusId: string;
-  cardId: string;
-  position: number;
   newStatusId: string;
+  cardId: string;
+  insertBeforeCardId: string | null;
 };
 
 // Update cards multiple body
