@@ -75,16 +75,16 @@ async function main() {
           color: STATUSES_OBJ[STATUSES.backlog].color,
         },
         {
-          name: STATUSES.inReview,
-          boardId: board.id,
-          position: 2,
-          color: STATUSES_OBJ[STATUSES.inReview].color,
-        },
-        {
           name: STATUSES.inProgress,
           boardId: board.id,
-          position: 3,
+          position: 2,
           color: STATUSES_OBJ[STATUSES.inProgress].color,
+        },
+        {
+          name: STATUSES.inReview,
+          boardId: board.id,
+          position: 3,
+          color: STATUSES_OBJ[STATUSES.inReview].color,
         },
         {
           name: STATUSES.completed,

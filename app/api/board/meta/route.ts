@@ -1,4 +1,6 @@
 import { PrismaClient } from '@prisma/client';
+import type { HttpError } from 'http-errors';
+import createError from 'http-errors';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { assoc, compose, omit, path } from 'ramda';
@@ -10,10 +12,7 @@ export const GET = async (request: NextRequest) => {
 
   try {
     if (!boardId) {
-      return NextResponse.json(
-        { error: `The required query param 'boardId' was not provided` },
-        { status: 422 },
-      );
+      throw createError(422, `The required query param 'boardId' was not provided`);
     }
 
     const meta = await prisma.$transaction(async (tx) => {
@@ -61,7 +60,10 @@ export const GET = async (request: NextRequest) => {
 
     return NextResponse.json(meta);
   } catch (error) {
-    return NextResponse.json({ error }, { status: 500 });
+    return NextResponse.json(
+      { error: (error as HttpError).message },
+      { status: (error as HttpError).statusCode || 500 },
+    );
   } finally {
     await prisma.$disconnect;
   }

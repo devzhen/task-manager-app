@@ -1,4 +1,6 @@
 import { PrismaClient } from '@prisma/client';
+import type { HttpError } from 'http-errors';
+import createError from 'http-errors';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -10,10 +12,7 @@ export const GET = async (req: NextRequest) => {
 
   try {
     if (!board) {
-      return NextResponse.json(
-        { error: `The required query param 'board' was not provided` },
-        { status: 422 },
-      );
+      throw createError(422, `The required query param 'board' was not provided`);
     }
 
     const currentBoard = await prisma.board.findUnique({
@@ -22,10 +21,7 @@ export const GET = async (req: NextRequest) => {
       },
     });
     if (!currentBoard) {
-      return NextResponse.json(
-        { error: `The board with the id - '${board}' was not found` },
-        { status: 404 },
-      );
+      throw createError(422, `The board with the id - '${board}' was not found`);
     }
 
     const tags = await prisma.tag.findMany({
@@ -36,7 +32,10 @@ export const GET = async (req: NextRequest) => {
 
     return NextResponse.json(tags);
   } catch (error) {
-    return NextResponse.json({ error, message: (error as Error).message }, { status: 500 });
+    return NextResponse.json(
+      { error: (error as HttpError).message },
+      { status: (error as HttpError).statusCode || 500 },
+    );
   } finally {
     await prisma.$disconnect();
   }

@@ -1,4 +1,6 @@
 import { PrismaClient } from '@prisma/client';
+import type { HttpError } from 'http-errors';
+import createError from 'http-errors';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -10,10 +12,7 @@ export const GET = async (req: NextRequest) => {
 
   try {
     if (!cardId) {
-      return NextResponse.json(
-        { error: `The required query param 'card' was not provided` },
-        { status: 422 },
-      );
+      throw createError(422, `The required query param 'card' was not provided`);
     }
 
     // Get a card
@@ -33,15 +32,15 @@ export const GET = async (req: NextRequest) => {
     });
 
     if (!card) {
-      return NextResponse.json(
-        { error: `The card with the id - '${card}' was not found` },
-        { status: 422 },
-      );
+      throw createError(422, `The card with the id - '${card}' was not found`);
     }
 
     return NextResponse.json(card);
   } catch (error) {
-    return NextResponse.json({ error, message: (error as Error).message }, { status: 500 });
+    return NextResponse.json(
+      { error: (error as HttpError).message },
+      { status: (error as HttpError).statusCode || 500 },
+    );
   } finally {
     await prisma.$disconnect();
   }

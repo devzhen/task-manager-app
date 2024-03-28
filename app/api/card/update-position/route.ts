@@ -1,4 +1,6 @@
 import { PrismaClient } from '@prisma/client';
+import type { HttpError } from 'http-errors';
+import createError from 'http-errors';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { compose, defaultTo, isNil, last } from 'ramda';
@@ -17,12 +19,12 @@ export const PUT = async (req: NextRequest) => {
       const value = body[field as keyof UpdateCardPositionBodyType];
 
       if (isNil(value)) {
-        throw new Error(`The required body param '${field}' was not provided`);
+        throw createError(422, `The required body param '${field}' was not provided`);
       }
     }
 
     if (!validate(body.cardId) || !validate(body.newStatusId)) {
-      throw new Error(`The body params 'cardId' or 'newStatusId' is not valid uuid`);
+      throw createError(422, `The body params 'cardId' or 'newStatusId' is not valid uuid`);
     }
 
     // If body.insertBeforeCardId === null - append to the end of a list
@@ -47,11 +49,12 @@ export const PUT = async (req: NextRequest) => {
       )(cardsHistory) as CardStatusHistoryType;
 
       if (isNil(newStatus)) {
-        throw new Error(`The status with the id - '${body.newStatusId}' wasn't found`);
+        throw createError(422, `The status with the id - '${body.newStatusId}' wasn't found`);
       }
 
       if (body.insertBeforeCardId !== null && isNil(insertBeforeCardHistory)) {
-        throw new Error(
+        throw createError(
+          422,
           `The (insert before) card with the id - '${body.insertBeforeCardId}' wasn't found`,
         );
       }
@@ -119,7 +122,10 @@ WHERE
 
     return NextResponse.json(result);
   } catch (error) {
-    return NextResponse.json({ error, message: (error as Error).message }, { status: 500 });
+    return NextResponse.json(
+      { error: (error as HttpError).message },
+      { status: (error as HttpError).statusCode || 500 },
+    );
   } finally {
     await prisma.$disconnect();
   }

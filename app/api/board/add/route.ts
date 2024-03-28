@@ -1,4 +1,6 @@
 import { PrismaClient } from '@prisma/client';
+import type { HttpError } from 'http-errors';
+import createError from 'http-errors';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -11,17 +13,11 @@ export const POST = async (req: NextRequest) => {
     const { name, statuses, tags } = (await req.json()) as AddBoardFormInputs;
 
     if (!name) {
-      return NextResponse.json(
-        { error: `The required body param 'name' was not provided` },
-        { status: 422 },
-      );
+      throw createError(422, `The required body param 'name' was not provided`);
     }
 
     if (!statuses || statuses.length === 0) {
-      return NextResponse.json(
-        { error: `The required body param 'statuses' was not provided` },
-        { status: 422 },
-      );
+      throw createError(422, `The required body param 'statuses' was not provided`);
     }
 
     // Transaction
@@ -73,7 +69,10 @@ export const POST = async (req: NextRequest) => {
 
     return NextResponse.json(createdBoard);
   } catch (error) {
-    return NextResponse.json({ error, message: (error as Error).message }, { status: 500 });
+    return NextResponse.json(
+      { error: (error as HttpError).message },
+      { status: (error as HttpError).statusCode || 500 },
+    );
   } finally {
     await prisma.$disconnect();
   }

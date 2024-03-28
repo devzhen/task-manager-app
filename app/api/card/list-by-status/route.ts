@@ -1,4 +1,6 @@
 import { PrismaClient } from '@prisma/client';
+import createError from 'http-errors';
+import type { HttpError } from 'http-errors';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { assocPath, compose, path as ramdaPath } from 'ramda';
@@ -31,16 +33,10 @@ export const GET = async (req: NextRequest) => {
 
   try {
     if (!boardId) {
-      return NextResponse.json(
-        { error: `The required query param 'boardId' was not provided` },
-        { status: 422 },
-      );
+      throw createError(422, `The required query param 'boardId' was not provided`);
     }
     if (!statusId) {
-      return NextResponse.json(
-        { error: `The required query param 'statusId' was not provided` },
-        { status: 422 },
-      );
+      throw createError(422, `The required query param 'statusId' was not provided`);
     }
 
     const currentBoard = await prisma.board.findUnique({
@@ -53,16 +49,13 @@ export const GET = async (req: NextRequest) => {
     });
 
     if (!currentBoard) {
-      return NextResponse.json(
-        { error: `The board with the id - '${boardId}' was not found` },
-        { status: 422 },
-      );
+      throw createError(422, `The board with the id - '${boardId}' was not found`);
     }
 
     if (!currentBoard.statuses.map((item) => item.id).includes(statusId)) {
-      return NextResponse.json(
-        { error: `The current status - '${statusId}' was not found in the board - ${statusId}.` },
-        { status: 422 },
+      throw createError(
+        422,
+        `The current status - '${statusId}' was not found in the board - ${statusId}.`,
       );
     }
 
@@ -92,7 +85,10 @@ export const GET = async (req: NextRequest) => {
       )(result),
     );
   } catch (error) {
-    return NextResponse.json({ error, message: (error as Error).message }, { status: 500 });
+    return NextResponse.json(
+      { error: (error as HttpError).message },
+      { status: (error as HttpError).statusCode || 500 },
+    );
   } finally {
     await prisma.$disconnect();
   }

@@ -1,4 +1,6 @@
 import { PrismaClient } from '@prisma/client';
+import type { HttpError } from 'http-errors';
+import createError from 'http-errors';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -16,16 +18,13 @@ export const PUT = async (req: NextRequest) => {
     const { deletedStatuses, deletedTags, boardId, name } = body;
 
     if (!boardId) {
-      return NextResponse.json(
-        { error: `The required body param 'boardId' was not provided` },
-        { status: 422 },
-      );
+      throw createError(422, `The required body param 'boardId' was not provided`);
     }
 
     const statusNames = body.statuses.map((item) => item.name);
     const duplicates = statusNames.filter((item, index) => statusNames.indexOf(item) !== index);
     if (duplicates.length > 0) {
-      return NextResponse.json({ error: `The statuses are not unique` }, { status: 422 });
+      throw createError(422, `The statuses are not unique`);
     }
 
     const statusObj = reduceByIsNewProperty(body.statuses, 'isNew');
@@ -104,7 +103,10 @@ export const PUT = async (req: NextRequest) => {
 
     return NextResponse.json(updatedData);
   } catch (error) {
-    return NextResponse.json({ error, message: (error as Error).message }, { status: 500 });
+    return NextResponse.json(
+      { error: (error as HttpError).message },
+      { status: (error as HttpError).statusCode || 500 },
+    );
   } finally {
     await prisma.$disconnect();
   }

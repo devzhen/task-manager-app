@@ -1,6 +1,8 @@
 import { PrismaClient } from '@prisma/client';
-import type { NextRequest } from 'next/server';
+import createError from 'http-errors';
+import type { HttpError } from 'http-errors';
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 import { assocPath, compose, path as ramdaPath } from 'ramda';
 import { validate } from 'uuid';
 
@@ -14,10 +16,7 @@ export const GET = async (req: NextRequest) => {
 
   try {
     if (!board || !validate(board)) {
-      return NextResponse.json(
-        { error: `The required query param 'board' was not provided` },
-        { status: 422 },
-      );
+      throw createError(422, `The required query param 'board' was not provided`);
     }
 
     const currentBoard = await prisma.board.findUnique({
@@ -30,10 +29,7 @@ export const GET = async (req: NextRequest) => {
     });
 
     if (!currentBoard) {
-      return NextResponse.json(
-        { error: `The board with the id - '${board}' was not found` },
-        { status: 404 },
-      );
+      throw createError(422, `The board with the id - '${board}' was not found`);
     }
 
     const statusQuery = currentBoard.statuses.map((item) => {
@@ -81,7 +77,10 @@ export const GET = async (req: NextRequest) => {
       )(result),
     );
   } catch (error) {
-    return NextResponse.json({ error, message: (error as Error).message }, { status: 500 });
+    return NextResponse.json(
+      { error: (error as HttpError).message },
+      { status: (error as HttpError).statusCode || 500 },
+    );
   } finally {
     await prisma.$disconnect();
   }

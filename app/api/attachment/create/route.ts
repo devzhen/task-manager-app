@@ -1,5 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { put, del } from '@vercel/blob';
+import type { HttpError } from 'http-errors';
+import createError from 'http-errors';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -13,33 +15,20 @@ export async function POST(request: Request) {
     const file = formData.get('file') as File;
 
     if (!cardId) {
-      return NextResponse.json(
-        { error: `The required body param 'cardId' was not provided` },
-        {
-          status: 422,
-        },
-      );
+      throw createError(422, `The required body param 'cardId' was not provided`);
     }
 
-    const currentBoard = await prisma.card.findUnique({
+    const currentCard = await prisma.card.findUnique({
       where: {
         id: cardId,
       },
     });
-    if (!currentBoard) {
-      return NextResponse.json(
-        { error: `The card with the id - '${cardId}' was not found` },
-        { status: 422 },
-      );
+    if (!currentCard) {
+      throw createError(422, `The card with the id - '${cardId}' was not found`);
     }
 
     if (!file) {
-      return NextResponse.json(
-        { error: `The required body param 'file' was not provided` },
-        {
-          status: 422,
-        },
-      );
+      throw createError(422, `The required body param 'file' was not provided`);
     }
 
     const blob = await put(file.name, file, {
@@ -62,7 +51,10 @@ export async function POST(request: Request) {
       del(fileUrl);
     }
 
-    return NextResponse.json({ error, message: (error as Error).message }, { status: 500 });
+    return NextResponse.json(
+      { error: (error as HttpError).message },
+      { status: (error as HttpError).statusCode || 500 },
+    );
   } finally {
     await prisma.$disconnect();
   }

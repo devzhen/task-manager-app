@@ -1,4 +1,6 @@
 import { PrismaClient } from '@prisma/client';
+import type { HttpError } from 'http-errors';
+import createError from 'http-errors';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { T as ramdaTrue, assoc, cond, equals, isEmpty } from 'ramda';
@@ -20,10 +22,7 @@ export const PUT = async (req: NextRequest) => {
     const requiredFields = ['boardId', 'statusId', 'title'];
     for (const field of requiredFields) {
       if (!body.get(field)) {
-        return NextResponse.json(
-          { error: `The required body param '${field}' was not provided` },
-          { status: 422 },
-        );
+        throw createError(422, `The required body param '${field}' was not provided`);
       }
     }
 
@@ -60,7 +59,7 @@ export const PUT = async (req: NextRequest) => {
       },
     });
     if (!currentCard) {
-      return NextResponse.json({ error: `The card is not existed` }, { status: 422 });
+      throw createError(422, `The card does not exist`);
     }
 
     // Transaction
@@ -144,7 +143,10 @@ export const PUT = async (req: NextRequest) => {
 
     return NextResponse.json(updatedCard);
   } catch (error) {
-    return NextResponse.json({ error, message: (error as Error).message }, { status: 500 });
+    return NextResponse.json(
+      { error: (error as HttpError).message },
+      { status: (error as HttpError).statusCode || 500 },
+    );
   } finally {
     await prisma.$disconnect();
   }

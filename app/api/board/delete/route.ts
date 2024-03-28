@@ -1,4 +1,6 @@
 import { PrismaClient } from '@prisma/client';
+import type { HttpError } from 'http-errors';
+import createError from 'http-errors';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -9,10 +11,7 @@ export const DELETE = async (req: NextRequest) => {
     const { id } = (await req.json()) as { id: string };
 
     if (!id) {
-      return NextResponse.json(
-        { error: `The required body param 'id' was not provided` },
-        { status: 422 },
-      );
+      throw createError(422, `The required body param 'id' was not provided`);
     }
 
     // Transaction
@@ -56,7 +55,10 @@ export const DELETE = async (req: NextRequest) => {
 
     return NextResponse.json(deletedBoard);
   } catch (error) {
-    return NextResponse.json({ error, message: (error as Error).message }, { status: 500 });
+    return NextResponse.json(
+      { error: (error as HttpError).message },
+      { status: (error as HttpError).statusCode || 500 },
+    );
   } finally {
     await prisma.$disconnect();
   }
