@@ -6,14 +6,10 @@ import '../globals.css';
 
 import type { ReactNode } from 'react';
 
-import fetchBoards from '../api/board/fetchBoards';
 import AppIntlProvider from '../components/AppIntlProvider';
-import ContentWrapper from '../components/ContentWrapper';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import SideBar from '../components/SideBar';
 import { getDictionary } from '../dictionaries';
-import type { BoardType } from '../types';
 
 export const metadata: Metadata = {
   title: 'Task Manager App',
@@ -41,22 +37,14 @@ export default async function RootLayout(props: RootLayoutProps) {
 
   const dictionary = await getDictionary(lang);
 
-  let boards: BoardType[] = await fetchBoards();
-  if (boards && 'error' in boards) {
-    boards = [];
-  }
-
   return (
     <html lang="en">
       <body className={font.className}>
         <div className="container">
           <Header />
-          <ContentWrapper>
-            <AppIntlProvider dictionary={dictionary} locale={lang}>
-              <SideBar boards={boards} />
-            </AppIntlProvider>
+          <AppIntlProvider dictionary={dictionary} locale={lang}>
             {children}
-          </ContentWrapper>
+          </AppIntlProvider>
           <Footer />
         </div>
       </body>

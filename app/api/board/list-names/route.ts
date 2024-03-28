@@ -19,7 +19,7 @@ export const GET = async () => {
 
     return NextResponse.json(boards);
   } catch (error) {
-    return NextResponse.json({ error }, { status: 500 });
+    return NextResponse.json({ error, status: 500 });
   } finally {
     await prisma.$disconnect;
   }

@@ -103,10 +103,10 @@ export const PUT = async (req: NextRequest) => {
 
     return NextResponse.json(updatedData);
   } catch (error) {
-    return NextResponse.json(
-      { error: (error as HttpError).message },
-      { status: (error as HttpError).statusCode || 500 },
-    );
+    return NextResponse.json({
+      error: (error as HttpError).message,
+      status: (error as HttpError).statusCode || 500,
+    });
   } finally {
     await prisma.$disconnect();
   }

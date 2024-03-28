@@ -51,10 +51,10 @@ export async function POST(request: Request) {
       del(fileUrl);
     }
 
-    return NextResponse.json(
-      { error: (error as HttpError).message },
-      { status: (error as HttpError).statusCode || 500 },
-    );
+    return NextResponse.json({
+      error: (error as HttpError).message,
+      status: (error as HttpError).statusCode || 500,
+    });
   } finally {
     await prisma.$disconnect();
   }

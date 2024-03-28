@@ -96,10 +96,11 @@ export const POST = async (req: NextRequest) => {
 
     return NextResponse.json(createdCard);
   } catch (error) {
-    return NextResponse.json(
-      { error, message: (error as HttpError).message },
-      { status: (error as HttpError).statusCode || 500 },
-    );
+    return NextResponse.json({
+      error,
+      message: (error as HttpError).message,
+      status: (error as HttpError).statusCode || 500,
+    });
   } finally {
     await prisma.$disconnect();
   }

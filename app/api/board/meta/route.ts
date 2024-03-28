@@ -60,10 +60,10 @@ export const GET = async (request: NextRequest) => {
 
     return NextResponse.json(meta);
   } catch (error) {
-    return NextResponse.json(
-      { error: (error as HttpError).message },
-      { status: (error as HttpError).statusCode || 500 },
-    );
+    return NextResponse.json({
+      error: (error as HttpError).message,
+      status: (error as HttpError).statusCode || 500,
+    });
   } finally {
     await prisma.$disconnect;
   }

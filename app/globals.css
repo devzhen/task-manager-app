@@ -33,6 +33,8 @@ body {
 button {
   outline: none;
   border: none;
+  background: none; 
+  cursor: pointer;
 }
 
 span,
@@ -41,6 +43,20 @@ h1,
 h2,
 h3,
 h4 {
+  color: var(--textColor);
+}
+
+input {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border: none;
+  background-color: inherit;
+  outline: none;
+  z-index: 1;
+  caret-color: var(--textColor);
   color: var(--textColor);
 }
 

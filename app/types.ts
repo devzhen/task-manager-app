@@ -2,6 +2,11 @@ import type json from '../dictionaries/en';
 
 export type DictionaryType = typeof json;
 
+export type LoginInputs = {
+  email: string;
+  password: string;
+};
+
 export type BoardType = {
   id: string;
   name: string;
