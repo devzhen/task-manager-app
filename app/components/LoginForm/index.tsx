@@ -1,42 +1,52 @@
 'use client';
 
 import { ErrorMessage } from '@hookform/error-message';
-import { useFormState } from 'react-dom';
+import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { LoginInputs } from '@/app/types';
-
-import AuthSubmitButton from '../AuthSubmitButton';
 
 import styles from './LoginForm.module.css';
 import resolver from './schema';
 
 type LoginFormProps = {
-  login: (state: LoginInputs) => Promise<LoginInputs>;
+  login: (data: LoginInputs) => Promise<Record<string, string | number | boolean>>;
 };
 
 export default function LoginForm(props: LoginFormProps) {
   const { login } = props;
 
-  const { register, formState } = useForm<LoginInputs>({
+  const { formatMessage } = useIntl();
+
+  const { register, formState, handleSubmit, resetField, setError } = useForm<LoginInputs>({
     resolver,
     mode: 'all',
     defaultValues: {
       email: 'admin@test.com',
       password: 'testtest',
+      error: '',
     },
   });
 
-  const [state, formAction] = useFormState<LoginInputs>(
-    login,
-    formState.defaultValues as LoginInputs,
-  );
+  const onSubmitHandler: SubmitHandler<LoginInputs> = async (data) => {
+    resetField('error');
 
-  console.log({ state });
+    const result = await login(data);
+
+    if (result && 'statusCode' in result && result.statusCode === 403) {
+      setError('error', { message: formatMessage({ id: 'auth.incorrectPassword' }) });
+    }
+
+    if (result && 'statusCode' in result && result.statusCode === 404) {
+      setError('error', {
+        message: formatMessage({ id: 'auth.incorrectEmail' }, { email: data.email }),
+      });
+    }
+  };
 
   return (
-    <form className={styles.form} method="POST" action={formAction}>
+    <form className={styles.form} onSubmit={handleSubmit(onSubmitHandler)}>
       <h3>
         <FormattedMessage id="auth.login" />
       </h3>
@@ -58,7 +68,15 @@ export default function LoginForm(props: LoginFormProps) {
         name="password"
         render={({ message }) => <span className={styles.error}>{message}</span>}
       />
-      <AuthSubmitButton disabled={!formState.isValid} />
+      <ErrorMessage
+        errors={formState.errors}
+        name="error"
+        render={({ message }) => <span className={styles.submitError}>{message}</span>}
+      />
+      <button type="submit" disabled={!formState.isValid || formState.isSubmitting}>
+        {formState.isSubmitting && <div className="loader" />}
+        {!formState.isSubmitting && <FormattedMessage id="auth.login" />}
+      </button>
     </form>
   );
 }

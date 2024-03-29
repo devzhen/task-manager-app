@@ -6,6 +6,7 @@ import '../globals.css';
 
 import type { ReactNode } from 'react';
 
+import logOut from '../api/auth/logout';
 import AppIntlProvider from '../components/AppIntlProvider';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
@@ -41,7 +42,7 @@ export default async function RootLayout(props: RootLayoutProps) {
     <html lang="en">
       <body className={font.className}>
         <div className="container">
-          <Header />
+          <Header logout={logOut} />
           <AppIntlProvider dictionary={dictionary} locale={lang}>
             {children}
           </AppIntlProvider>

@@ -8,7 +8,7 @@
   border: 1px solid #696e73;
   color: var(--textColor);
   padding: 28px;
-  box-shadow: -1px 0px 20px 11px rgba(0,0,0,0.75);
+  box-shadow: -1px 0px 20px 11px rgba(0, 0, 0, 0.75);
 }
 
 .form::before {
@@ -66,9 +66,16 @@
   cursor: not-allowed;
 }
 
-.error {
+.error,
+.submitError {
   margin-top: 2px;
   margin-bottom: 2px;
   color: #d85045;
   font-size: 12px;
+}
+
+.submitError {
+  margin-top: 20px;
+  font-size: 14px;
+  text-align: center;
 }

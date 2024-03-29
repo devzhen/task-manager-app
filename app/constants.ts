@@ -15,16 +15,36 @@ export const LOCALE = {
 
 export const DEFAULT_LOCALE = LOCALE.enUS;
 
+export const PROTECTED_API_ROUTES = ['/board', '/card', '/tag', 'attachment'];
+
 export const ROUTES = {
   addBoard: '/boards/add',
   editBoard: '/boards/edit/[boardId]',
   showBoard: '/boards/[boardId]',
   addCard: '/cards/[boardId]/add',
   showCard: '/cards/[boardId]/show/[cardId]',
+  login: '/auth/login',
+  WITH_AUTHENTICATION: ['/boards', '/cards'],
+  WITHOUT_AUTHENTICATION: ['/auth'],
 };
 
 export const PAGINATION = {
   perPage: 10,
+};
+
+export const USER_ROLE = {
+  admin: 'admin',
+  member: 'member',
+};
+
+export const VALIDATION = {
+  auth: {
+    minPasswordLength: 8,
+  },
+  card: {
+    titleMinLength: 3,
+    attachmentMaxSize: 4500000,
+  },
 };
 
 export const BOARD_NAME_MIN_LENGTH = 3;
@@ -88,6 +108,3 @@ export const TAGS = {
     fontColor: '#ebb20cff',
   },
 };
-
-export const TASK_TITLE_MIN_LENGTH = 3;
-export const TASK_ATTACHMENT_MAX_SIZE = 4500000;

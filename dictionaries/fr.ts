@@ -2,6 +2,8 @@ const messages = {
   'auth.login': '[Fr]: Login',
   'auth.email': '[Fr]: Email',
   'auth.password': '[Fr]: Password',
+  'auth.incorrectPassword': '[Fr]: The password is incorrect',
+  'auth.incorrectEmail': `[Fr]: The user with the email ''{email}'' was not found`,
   'attachments.message': `[Fr]: Drag 'n' drop some files here, or click to select files`,
   'attachments.restriction':
     '[Fr]: Only PNG and JPG image formats are permitted, and file sizes must not exceed 4.5 MB.',

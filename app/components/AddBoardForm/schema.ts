@@ -3,7 +3,7 @@ import type { Resolver } from 'react-hook-form';
 import * as yup from 'yup';
 import '@/app/validators';
 
-import { TASK_TITLE_MIN_LENGTH } from '@/app/constants';
+import { VALIDATION } from '@/app/constants';
 import type { BoardType } from '@/app/types';
 
 import type { AddBoardFormInputs } from './types';
@@ -21,7 +21,10 @@ export const createSchema = (board: BoardType | undefined, boardNames: string[])
         boardId: yup.string().nullable(),
         name: yup
           .string()
-          .min(TASK_TITLE_MIN_LENGTH, `The minimum length is ${TASK_TITLE_MIN_LENGTH}`)
+          .min(
+            VALIDATION.card.titleMinLength,
+            `The minimum length is ${VALIDATION.card.titleMinLength}`,
+          )
           .required('A board name is required')
           .restrictedValues(names, 'The current name already exists'),
         statuses: yup
@@ -30,7 +33,7 @@ export const createSchema = (board: BoardType | undefined, boardNames: string[])
             yup.object({
               name: yup
                 .string()
-                .min(TASK_TITLE_MIN_LENGTH, `must be >= ${TASK_TITLE_MIN_LENGTH}`)
+                .min(VALIDATION.card.titleMinLength, `must be >= ${VALIDATION.card.titleMinLength}`)
                 .required(),
               color: yup.string().required('required'),
             }),
@@ -44,7 +47,7 @@ export const createSchema = (board: BoardType | undefined, boardNames: string[])
             yup.object({
               name: yup
                 .string()
-                .min(TASK_TITLE_MIN_LENGTH, `must be >= ${TASK_TITLE_MIN_LENGTH}`)
+                .min(VALIDATION.card.titleMinLength, `must be >= ${VALIDATION.card.titleMinLength}`)
                 .required(),
               color: yup.string().required('required'),
               fontColor: yup.string().required('required'),

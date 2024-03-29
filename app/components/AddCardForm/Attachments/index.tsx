@@ -12,7 +12,7 @@ import { v4 as uuid } from 'uuid';
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 
-import { TASK_ATTACHMENT_MAX_SIZE } from '@/app/constants';
+import { VALIDATION } from '@/app/constants';
 import type { FormAttachment } from '@/app/types';
 
 import ModalInfo from '../../ModalInfo';
@@ -152,7 +152,7 @@ export default function Attachments() {
       'image/jpeg': [],
       'image/png': [],
     },
-    maxSize: TASK_ATTACHMENT_MAX_SIZE,
+    maxSize: VALIDATION.card.attachmentMaxSize,
   });
 
   useEffect(() => {

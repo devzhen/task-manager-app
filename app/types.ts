@@ -5,6 +5,7 @@ export type DictionaryType = typeof json;
 export type LoginInputs = {
   email: string;
   password: string;
+  error?: string;
 };
 
 export type BoardType = {

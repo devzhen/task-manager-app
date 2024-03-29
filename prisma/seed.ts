@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import * as R from 'ramda';
 
-import { STATUSES, STATUSES_OBJ, TAGS } from '../app/constants';
+import { STATUSES, STATUSES_OBJ, TAGS, USER_ROLE } from '../app/constants';
 
 const prisma = new PrismaClient({ log: ['query', 'info', 'warn', 'error'] });
 
@@ -52,6 +52,22 @@ async function main() {
     .readFileSync(path.join(process.cwd(), '/app/utils/db/functions/card_insert_trigger.sql'))
     .toString();
   await prisma.$queryRawUnsafe(cardInsertTriggerSql);
+
+  // Init Users
+  await prisma.user.createMany({
+    data: [
+      {
+        email: 'admin@test.com',
+        password: '$2b$10$d.y8LpLx9jQyiiHEMnWaPOio.0hXRari69rNEalcqW4Zqy2IX9kjO',
+        role: USER_ROLE.admin,
+      },
+      {
+        email: 'user@test.com',
+        password: '$2b$10$d.y8LpLx9jQyiiHEMnWaPOio.0hXRari69rNEalcqW4Zqy2IX9kjO',
+        role: USER_ROLE.admin,
+      },
+    ],
+  });
 
   // Init boards
   await prisma.board.createMany({
