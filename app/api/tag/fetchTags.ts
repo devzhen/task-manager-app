@@ -1,3 +1,5 @@
+import { cookies } from 'next/headers';
+
 import { API_HOST } from '@/app/constants';
 import type { TagLinkerType } from '@/app/types';
 
@@ -9,7 +11,11 @@ const fetchTags = async (boardId: string): Promise<TagLinkerType[]> => {
 
   try {
     const url = new URL(`${API_HOST}/api/tag/list?board=${boardId}`);
-    const response = await fetch(url.toString());
+    const response = await fetch(url.toString(), {
+      headers: {
+        Cookie: cookies().toString(),
+      },
+    });
     tags = await response.json();
 
     if ('error' in tags) {

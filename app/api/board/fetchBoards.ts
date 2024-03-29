@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidateTag } from 'next/cache';
+import { cookies } from 'next/headers';
 
 import { API_HOST, NEXT_REVALIDATE_TAGS } from '@/app/constants';
 import type { BoardType } from '@/app/types';
@@ -22,7 +23,12 @@ const fetchBoards = async (options: FetchBoardsArguments = {}): Promise<BoardTyp
 
   try {
     const url = new URL(`${API_HOST}/api/board/list`);
-    const response = await fetch(url.toString(), { next: { tags: [NEXT_REVALIDATE_TAGS.boards] } });
+    const response = await fetch(url.toString(), {
+      next: { tags: [NEXT_REVALIDATE_TAGS.boards] },
+      headers: {
+        Cookie: cookies().toString(),
+      },
+    });
     const json = await response.json();
 
     if (json && 'error' in json && 'message' in json) {

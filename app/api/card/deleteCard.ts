@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidateTag } from 'next/cache';
+import { cookies } from 'next/headers';
 
 import { API_HOST, NEXT_REVALIDATE_TAGS } from '@/app/constants';
 
@@ -16,6 +17,9 @@ const deleteCard = async ({ boardId, cardId }: { boardId: string; cardId: string
         cardId,
         boardId,
       }),
+      headers: {
+        Cookie: cookies().toString(),
+      },
     });
 
     const json = await res.json();

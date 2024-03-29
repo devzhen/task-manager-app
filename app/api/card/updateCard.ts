@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidateTag } from 'next/cache';
+import { cookies } from 'next/headers';
 
 import { API_HOST, NEXT_REVALIDATE_TAGS } from '@/app/constants';
 
@@ -13,6 +14,9 @@ const addCard = async (formData: FormData) => {
     const res = await fetch(url.toString(), {
       method: 'PUT',
       body: formData,
+      headers: {
+        Cookie: cookies().toString(),
+      },
     });
 
     const json = await res.json();

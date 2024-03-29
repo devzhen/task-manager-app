@@ -21,12 +21,16 @@
   text-decoration: none;
 }
 
+.board:active {
+  background-color: #2a2d43bf;
+}
+
 .boardActive {
   background-color: #545668;
 }
 
-.board:active {
-  opacity: 0.5;
+.boardActive:active {
+  background-color: #545668bf;
 }
 
 .board span {

@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { ROUTES } from '@/app/constants';
@@ -9,13 +9,25 @@ import usePrevious from '@/app/hooks/usePrevious';
 
 import styles from './ButtonAddBoard.module.css';
 
-export default function ButtonAddBoard() {
+export default forwardRef(function ButtonAddBoard(props, ref) {
   const pathname = usePathname();
   const pathnamePrev = usePrevious(pathname);
 
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(false);
+
+  useImperativeHandle(
+    ref,
+    () => {
+      return {
+        setButtonLoading: (loading: boolean) => {
+          setIsLoading(loading);
+        },
+      };
+    },
+    [],
+  );
 
   useEffect(() => {
     if (pathnamePrev && pathnamePrev !== pathname && isLoading) {
@@ -45,4 +57,4 @@ export default function ButtonAddBoard() {
       {isLoading && <div className="animationBlock animationBlueBlock" />}
     </button>
   );
-}
+});

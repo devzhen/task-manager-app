@@ -1,12 +1,19 @@
 'use server';
 
+import { cookies } from 'next/headers';
+
 import { API_HOST, NEXT_REVALIDATE_TAGS } from '@/app/constants';
 
 // Fetch available boards
 const fetchBoardNames = async (): Promise<{ id: string; name: string }[]> => {
   try {
     const url = new URL(`${API_HOST}/api/board/list-names`);
-    const response = await fetch(url.toString(), { next: { tags: [NEXT_REVALIDATE_TAGS.boards] } });
+    const response = await fetch(url.toString(), {
+      next: { tags: [NEXT_REVALIDATE_TAGS.boards] },
+      headers: {
+        Cookie: cookies().toString(),
+      },
+    });
     const json = await response.json();
 
     if (json && 'error' in json && 'message' in json) {

@@ -1,19 +1,17 @@
 .header {
   display: flex;
-  justify-content: center;
-  align-items: flex-end;
+  justify-content: space-between;
+  align-items: center;
   width: 100%;
+  padding: 0 20px;
 }
 
 .header span {
   font-size: 30px;
-}
-
-.header span:nth-child(1) {
   color: var(--textColor);
 }
 
-.header span:nth-child(2) {
+.background {
   background-image: linear-gradient(45deg, #ad4e8e, #ba72ba, #9b91ed);
   background-size: 100%;
   -webkit-background-clip: text;

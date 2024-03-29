@@ -8,6 +8,13 @@ export type LoginInputs = {
   error?: string;
 };
 
+export type UserType = {
+  id: string;
+  email: string;
+  password: string;
+  role: string;
+};
+
 export type BoardType = {
   id: string;
   name: string;

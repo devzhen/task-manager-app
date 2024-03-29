@@ -2,10 +2,9 @@
 
 import classNames from 'classnames';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import { pathOr } from 'ramda';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import Modal from 'react-modal';
 
@@ -34,6 +33,8 @@ export default function SideBar(props: SideBarProps) {
 
   const pathname = usePathname();
   const pathnamePrev = usePrevious(pathname);
+
+  const buttonAddRef = useRef({ setButtonLoading: (loading: boolean) => loading });
 
   const [isEditBtnLoading, setIsEditBtnLoading] = useState(false);
 
@@ -129,12 +130,19 @@ export default function SideBar(props: SideBarProps) {
     <div className={styles.container}>
       {boards.map((item) => {
         return (
-          <Link
-            href={ROUTES.showBoard.replace('[boardId]', item.id)}
+          <div
             key={item.id}
             className={classNames(styles.board, {
               [styles.boardActive]: params.boardId === item.id,
             })}
+            role="presentation"
+            onClick={() => {
+              if (isEditBtnLoading) {
+                setIsEditBtnLoading(false);
+              }
+              buttonAddRef.current?.setButtonLoading(false);
+              router.push(ROUTES.showBoard.replace('[boardId]', item.id));
+            }}
           >
             <span>{item.name}</span>
             <div className={styles.boardActions}>
@@ -154,10 +162,10 @@ export default function SideBar(props: SideBarProps) {
                 </button>
               )}
             </div>
-          </Link>
+          </div>
         );
       })}
-      <ButtonAddBoard />
+      <ButtonAddBoard ref={buttonAddRef} />
       {modalDeleteState.isOpen && (
         <ModalDelete
           closeModal={setModalDeleteVisibility(false)}

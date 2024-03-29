@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidateTag } from 'next/cache';
+import { cookies } from 'next/headers';
 
 import { API_HOST, NEXT_REVALIDATE_TAGS } from '@/app/constants';
 import type { UpdateCardPositionBodyType } from '@/app/types';
@@ -15,6 +16,9 @@ const updateCardPosition = async (data: UpdateCardPositionBodyType) => {
     const res = await fetch(url.toString(), {
       method: 'PUT',
       body: JSON.stringify(data),
+      headers: {
+        Cookie: cookies().toString(),
+      },
     });
 
     const json = await res.json();

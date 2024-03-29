@@ -1,0 +1,31 @@
+.container {
+  position: relative;
+}
+
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: 30px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #7b8998;
+  border-radius: 10px;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.dropdown button {
+  min-width: 160px;
+  min-height: 40px;
+  background-color: #2a2d43;
+}
+
+.dropdown button:active {
+  background-color: #2a2d43bf;
+}
+
+.dropdown button:nth-child(even) {
+  border-top-color: #696e73;
+  border-top-style: solid;
+  border-top-width: 1px;
+}

@@ -10,15 +10,24 @@ type ModalDeleteProps = {
   onDelete: () => void;
   title: string;
   description: string;
+  deleteBtnText?: string;
+  cancelBtnText?: string;
 };
 
 export default function ModalDelete(props: ModalDeleteProps) {
-  const { closeModal, title, description, onDelete } = props;
+  const {
+    closeModal,
+    title,
+    description,
+    onDelete,
+    deleteBtnText = 'delete',
+    cancelBtnText = 'cancel',
+  } = props;
 
   const [isLoading, setIsLoading] = useState(false);
 
   return (
-    <Modal isOpen contentLabel="Example Modal">
+    <Modal isOpen>
       <div className={styles.header}>
         <span>{title}</span>
         <Image
@@ -42,13 +51,13 @@ export default function ModalDelete(props: ModalDeleteProps) {
         >
           {!isLoading && (
             <span>
-              <FormattedMessage id="delete" />
+              <FormattedMessage id={deleteBtnText} />
             </span>
           )}
           {isLoading && <div className="loader" />}
         </button>
         <button onClick={closeModal}>
-          <FormattedMessage id="cancel" />
+          <FormattedMessage id={cancelBtnText} />
         </button>
       </div>
     </Modal>

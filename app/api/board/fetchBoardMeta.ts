@@ -1,5 +1,7 @@
 'use server';
 
+import { cookies } from 'next/headers';
+
 import { API_HOST, NEXT_REVALIDATE_TAGS } from '@/app/constants';
 import type { BoardMetaType } from '@/app/types';
 
@@ -9,6 +11,9 @@ const fetchBoardMeta = async (boardId: string): Promise<BoardMetaType> => {
     const url = new URL(`${API_HOST}/api/board/meta?boardId=${boardId}`);
     const response = await fetch(url.toString(), {
       next: { tags: [NEXT_REVALIDATE_TAGS.boardMeta] },
+      headers: {
+        Cookie: cookies().toString(),
+      },
     });
     const json = await response.json();
 

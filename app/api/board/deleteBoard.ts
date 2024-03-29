@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidateTag } from 'next/cache';
+import { cookies } from 'next/headers';
 
 import { API_HOST, NEXT_REVALIDATE_TAGS } from '@/app/constants';
 
@@ -13,6 +14,9 @@ const deleteBoard = async (id: string) => {
     const res = await fetch(url.toString(), {
       method: 'DELETE',
       body: JSON.stringify({ id }),
+      headers: {
+        Cookie: cookies().toString(),
+      },
     });
 
     const json = await res.json();

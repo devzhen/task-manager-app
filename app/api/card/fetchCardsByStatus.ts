@@ -1,5 +1,7 @@
 'use server';
 
+import { cookies } from 'next/headers';
+
 import { API_HOST, NEXT_REVALIDATE_TAGS, PAGINATION } from '@/app/constants';
 import type { ApiResponseType, CardsByStatusReturnType } from '@/app/types';
 
@@ -27,7 +29,12 @@ const fetchCardsByStatus = async ({
     }
     const url = new URL(`${API_HOST}/api/card/list-by-status/?${searchParams.toString()}`);
 
-    const res = await fetch(url.toString(), { next: { tags: [NEXT_REVALIDATE_TAGS.cards] } });
+    const res = await fetch(url.toString(), {
+      next: { tags: [NEXT_REVALIDATE_TAGS.cards] },
+      headers: {
+        Cookie: cookies().toString(),
+      },
+    });
 
     const json: ApiResponseType<CardsByStatusReturnType> = await res.json();
 

@@ -38,9 +38,6 @@ export async function POST(req: NextRequest) {
         email: user.email,
       },
       process.env.JWT_TOKEN_SECRET as string,
-      {
-        expiresIn: '1d',
-      },
     );
 
     return NextResponse.json({

@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidateTag } from 'next/cache';
+import { cookies } from 'next/headers';
 
 import type { AddBoardFormInputs } from '@/app/components/AddBoardForm/types';
 import { API_HOST, NEXT_REVALIDATE_TAGS } from '@/app/constants';
@@ -14,6 +15,9 @@ const addBoard = async (data: AddBoardFormInputs) => {
     const res = await fetch(url.toString(), {
       method: 'POST',
       body: JSON.stringify(data),
+      headers: {
+        Cookie: cookies().toString(),
+      },
     });
 
     const json = await res.json();
