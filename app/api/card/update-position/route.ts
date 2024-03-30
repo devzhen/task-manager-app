@@ -7,11 +7,18 @@ import { validate } from 'uuid';
 
 import type { CardStatusHistoryType, UpdateCardPositionBodyType } from '@/app/types';
 import constructResponseError from '@/app/utils/constructResponseError';
+import getUserFromCookieToken from '@/app/utils/getUserFromCookieToken';
 
 export const PUT = async (req: NextRequest) => {
   const prisma = new PrismaClient();
 
   try {
+    const user = getUserFromCookieToken();
+
+    if (!user) {
+      throw createError(401, `Authentication Failed`);
+    }
+
     const body = (await req.json()) as UpdateCardPositionBodyType;
 
     const requiredFields = ['newStatusId', 'cardId'];

@@ -4,6 +4,7 @@ import createError from 'http-errors';
 import { NextResponse } from 'next/server';
 
 import constructResponseError from '@/app/utils/constructResponseError';
+import getUserFromCookieToken from '@/app/utils/getUserFromCookieToken';
 
 export async function POST(request: Request) {
   let fileUrl = '';
@@ -11,6 +12,12 @@ export async function POST(request: Request) {
   const prisma = new PrismaClient();
 
   try {
+    const user = getUserFromCookieToken();
+
+    if (!user) {
+      throw createError(401, `Authentication Failed`);
+    }
+
     const formData = await request.formData();
     const cardId = formData.get('cardId') as string;
     const file = formData.get('file') as File;

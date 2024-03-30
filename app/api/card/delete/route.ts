@@ -5,11 +5,18 @@ import { NextResponse } from 'next/server';
 import { validate } from 'uuid';
 
 import constructResponseError from '@/app/utils/constructResponseError';
+import getUserFromCookieToken from '@/app/utils/getUserFromCookieToken';
 
 export const DELETE = async (req: NextRequest) => {
   const prisma = new PrismaClient();
 
   try {
+    const user = getUserFromCookieToken();
+
+    if (!user) {
+      throw createError(401, `Authentication Failed`);
+    }
+
     const body = await req.json();
 
     if (!body.cardId || !validate(body.cardId)) {

@@ -1,40 +1,22 @@
 import { PrismaClient } from '@prisma/client';
-import jwt from 'jsonwebtoken';
-import type { NextRequest } from 'next/server';
-import { isNil, pathOr } from 'ramda';
 import { validate } from 'uuid';
 
-import type { UserType } from '@/app/types';
 import constructResponseError from '@/app/utils/constructResponseError';
+import getUserFromCookieToken from '@/app/utils/getUserFromCookieToken';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const prisma = new PrismaClient();
 
   try {
-    const response: { user: UserType | null } = { user: null };
-    let userId = null;
+    const user = getUserFromCookieToken();
 
-    const token = req.cookies.get('token')?.value;
-    if (isNil(token)) {
-      return Response.json(response);
+    if (!user || !user.id || !validate(user.id)) {
+      return Response.json({ user: null });
     }
 
-    jwt.verify(token, process.env.JWT_TOKEN_SECRET as string, (err, decoded) => {
-      if (err) {
-        return Response.json(response);
-      }
+    const userEntity = await prisma.user.findUnique({ where: { id: user.id } });
 
-      userId = pathOr(null, ['id'], decoded);
-    });
-
-    if (!userId || !validate(userId)) {
-      return Response.json(response);
-    }
-
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    response.user = user;
-
-    return Response.json(response);
+    return Response.json(userEntity);
   } catch (error) {
     return constructResponseError(error);
   } finally {

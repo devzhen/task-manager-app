@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 import { T, assoc, cond, equals } from 'ramda';
 
 import constructResponseError from '@/app/utils/constructResponseError';
+import getUserFromCookieToken from '@/app/utils/getUserFromCookieToken';
 
 type CardInputType = {
   title: string;
@@ -18,6 +19,12 @@ export const POST = async (req: NextRequest) => {
   const prisma = new PrismaClient();
 
   try {
+    const user = getUserFromCookieToken();
+
+    if (!user) {
+      throw createError(401, `Authentication Failed`);
+    }
+
     const body = await req.formData();
 
     const requiredFields = ['boardId', 'statusId', 'title'];

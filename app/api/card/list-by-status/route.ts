@@ -7,6 +7,7 @@ import { assocPath, compose, path as ramdaPath } from 'ramda';
 import { PAGINATION } from '@/app/constants';
 import type { CardType } from '@/app/types';
 import constructResponseError from '@/app/utils/constructResponseError';
+import getUserFromCookieToken from '@/app/utils/getUserFromCookieToken';
 
 type QueryResult = {
   queryResult: {
@@ -32,6 +33,12 @@ export const GET = async (req: NextRequest) => {
   const prisma = new PrismaClient();
 
   try {
+    const user = getUserFromCookieToken();
+
+    if (!user) {
+      throw createError(401, `Authentication Failed`);
+    }
+
     if (!boardId) {
       throw createError(422, `The required query param 'boardId' was not provided`);
     }

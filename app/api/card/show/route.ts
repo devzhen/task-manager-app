@@ -4,6 +4,8 @@ import createError from 'http-errors';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
+import getUserFromCookieToken from '@/app/utils/getUserFromCookieToken';
+
 export const GET = async (req: NextRequest) => {
   const searchParams = req.nextUrl.searchParams;
   const cardId = searchParams.get('card');
@@ -11,6 +13,12 @@ export const GET = async (req: NextRequest) => {
   const prisma = new PrismaClient();
 
   try {
+    const user = getUserFromCookieToken();
+
+    if (!user) {
+      throw createError(401, `Authentication Failed`);
+    }
+
     if (!cardId) {
       throw createError(422, `The required query param 'card' was not provided`);
     }
