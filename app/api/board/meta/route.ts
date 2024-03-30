@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 import { assoc, compose, omit, path } from 'ramda';
 
 import constructResponseError from '@/app/utils/constructResponseError';
+import getUserFromCookieToken from '@/app/utils/getUserFromCookieToken';
 
 export const GET = async (request: NextRequest) => {
   const prisma = new PrismaClient();
@@ -12,6 +13,12 @@ export const GET = async (request: NextRequest) => {
   const boardId = request.nextUrl.searchParams.get('boardId');
 
   try {
+    const user = getUserFromCookieToken();
+
+    if (!user) {
+      throw createError(401, `Authentication Failed`);
+    }
+
     if (!boardId) {
       throw createError(422, `The required query param 'boardId' was not provided`);
     }

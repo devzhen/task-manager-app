@@ -5,11 +5,23 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import type { AddBoardFormInputs } from '@/app/components/AddBoardForm/types';
+import { USER_ROLE } from '@/app/constants';
+import getUserFromCookieToken from '@/app/utils/getUserFromCookieToken';
 
 export const POST = async (req: NextRequest) => {
   const prisma = new PrismaClient();
 
   try {
+    const user = getUserFromCookieToken();
+
+    if (!user) {
+      throw createError(401, `Authentication Failed`);
+    }
+
+    if (user.role !== USER_ROLE.admin) {
+      throw createError(403, `This user is not permitted to add boards`);
+    }
+
     const { name, statuses, tags } = (await req.json()) as AddBoardFormInputs;
 
     if (!name) {
@@ -22,8 +34,20 @@ export const POST = async (req: NextRequest) => {
 
     // Transaction
     const createdBoard = await prisma.$transaction(async (tx) => {
-      // Create board
-      const board = await tx.board.create({ data: { name } });
+      const [board, admins] = await Promise.all([
+        tx.board.create({ data: { name } }),
+        await tx.user.findMany({ where: { role: USER_ROLE.admin } }),
+      ]);
+
+      // Create user board entity
+      for (const admin of admins) {
+        await tx.userBoard.create({
+          data: {
+            userId: admin.id,
+            boardId: board.id,
+          },
+        });
+      }
 
       // Create tags
       const tagData = [];

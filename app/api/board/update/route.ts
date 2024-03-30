@@ -46,7 +46,7 @@ export const PUT = async (req: NextRequest) => {
         },
       });
       if (!userBoard) {
-        throw createError(403, `The board for this user was not found`);
+        throw createError(403, `This user is not permitted to update boards`);
       }
 
       // Delete statuses

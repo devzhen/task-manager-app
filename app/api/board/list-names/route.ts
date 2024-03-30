@@ -3,6 +3,7 @@ import type { HttpError } from 'http-errors';
 import createError from 'http-errors';
 import { NextResponse } from 'next/server';
 
+import { USER_ROLE } from '@/app/constants';
 import getUserFromCookieToken from '@/app/utils/getUserFromCookieToken';
 
 export const GET = async () => {
@@ -13,6 +14,18 @@ export const GET = async () => {
 
     if (!user) {
       throw createError(401, `Authentication Failed`);
+    }
+
+    if (user.role === USER_ROLE.admin) {
+      const boards = await prisma.board.findMany({
+        select: {
+          id: true,
+          name: true,
+        },
+        orderBy: [{ orderId: 'asc' }],
+      });
+
+      return NextResponse.json(boards);
     }
 
     const userBoards = await prisma.userBoard.findMany({

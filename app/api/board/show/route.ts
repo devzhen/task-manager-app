@@ -43,7 +43,7 @@ export const GET = async (request: NextRequest) => {
     });
 
     if (!userBoard) {
-      throw createError(403, `The board for this user was not found`);
+      throw createError(403, `This user is not permitted to this board`);
     }
 
     return NextResponse.json(userBoard.board);
