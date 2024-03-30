@@ -30,7 +30,7 @@ export const GET = async (request: NextRequest) => {
       },
       select: {
         board: {
-          select: {
+          include: {
             statuses: {
               orderBy: {
                 position: 'asc',

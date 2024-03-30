@@ -4,9 +4,9 @@ import { cookies } from 'next/headers';
 
 import { API_HOST } from '@/app/constants';
 
-const getUser = async () => {
+const fetchUsers = async () => {
   try {
-    const url = new URL(`${API_HOST}/api/user/show`);
+    const url = new URL(`${API_HOST}/api/user/list`);
     const res = await fetch(url.toString(), {
       headers: {
         Cookie: cookies().toString(),
@@ -15,13 +15,13 @@ const getUser = async () => {
 
     const json = await res.json();
 
-    return json?.user;
+    return json;
   } catch (err) {
     // eslint-disable-next-line no-console
-    console.log('getUser error - ', err);
+    console.log('fetchUsers error - ', err);
 
     throw err;
   }
 };
 
-export default getUser;
+export default fetchUsers;

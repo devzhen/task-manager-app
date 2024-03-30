@@ -39,6 +39,11 @@ const messages = {
   'card.notExist': 'This card does not exist.',
   'card.delete': 'Delete Task',
   'card.deleteQuestion': 'Are you sure you want to delete this task?',
+  'user.addNew': 'Add a User',
+  'validation.required': 'Required',
+  'validation.email': 'Email is not valid',
+  'validation.emailUnique': 'The email must be unique',
+  admin: 'Admin',
   attachments: 'Attachments',
   cancel: 'Cancel',
   confirmation: 'Confirmation',
@@ -49,12 +54,15 @@ const messages = {
   fontColor: 'Font Color',
   loading: 'Loading ...',
   name: 'Name',
+  member: 'Member',
+  role: 'Role',
   settings: 'Settings',
   status: 'Status',
   statuses: 'Statuses',
   submit: 'Submit',
   tags: 'Tags',
   title: 'Title',
+  users: 'Users',
 };
 
 export default messages;

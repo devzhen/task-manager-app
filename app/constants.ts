@@ -24,6 +24,7 @@ export const ROUTES = {
   addCard: '/cards/[boardId]/add',
   showCard: '/cards/[boardId]/show/[cardId]',
   login: '/auth/login',
+  users: '/users',
   WITH_AUTHENTICATION: ['/boards', '/cards'],
   WITHOUT_AUTHENTICATION: ['/auth'],
 };

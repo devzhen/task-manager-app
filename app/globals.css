@@ -131,63 +131,66 @@ input {
   margin-bottom: 20px;
 }
 
-#card-status .card-select__control,
-#card-tags .card-select__control {
-  min-height: 40px;
-  margin-top: 10px;
-  background-color: #2a2d43;
-  border: 1px solid #696e73;
-  border-radius: 8px;
+.card-select__control {
+  min-height: 40px !important;
+  margin-top: 10px !important;
+  background-color: #2a2d43 !important;
+  border: 1px solid #696e73 !important;
+  border-radius: 8px !important;
 }
 
-#card-status .card-select__single-value,
-#card-tags .card-select__single-value {
-  color: var(--textColor);
+#user-role .card-select__control {
+  height: 40px;
+  font-size: 13px;
 }
 
-#card-status .card-select__control--is-focused,
-#card-tags .card-select__control--is-focused {
-  border-color: #696e73;
-  box-shadow: none;
+.card-select__single-value {
+  color: var(--textColor) !important;
 }
 
-#card-status .card-select__value-container,
-#card-tags .card-select__value-container {
-  padding: 8px;
+.card-select__control--is-focused {
+  border-color: #696e73 !important;
+  box-shadow: none !important;
 }
 
-#card-status .card-select__placeholder,
-#card-tags .card-select__placeholder {
-  display: none;
+.card-select__value-container {
+  min-height: 40px !important;
 }
 
-#card-status .card-select__menu,
-#card-tags .card-select__menu {
-  background-color: #2a2d43;
-  border: 1px solid #696e73;
-  border-radius: 8px;
-  overflow: hidden;
+.card-select__indicators {
+  min-height: 40px !important;
 }
 
-#card-status .card-select__menu-list,
-#card-tags .card-select__menu-list {
-  padding: 0;
+.card-select__placeholder {
+  display: none !important;
 }
 
-#card-status .card-select__option,
-#card-tags .card-select__option {
-  color: var(--textColor);
-  cursor: pointer;
+.card-select__menu {
+  background-color: #2a2d43 !important;
+  border: 1px solid #696e73 !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
 }
 
-#card-status .card-select__option--is-focused,
-#card-tags .card-select__option--is-focused {
-  background: none;
+.card-select__menu-list {
+  padding: 0 !important;
 }
 
-#card-status .card-select__option--is-selected,
-#card-tags .card-select__option--is-selected {
-  background-color: #545668;
+.card-select__option {
+  color: var(--textColor) !important;
+  cursor: pointer !important;
+}
+
+#user-role .card-select__option {
+  font-size: 13px;
+}
+
+.card-select__option--is-focused {
+  background: none !important;
+}
+
+.card-select__option--is-selected {
+  background-color: #545668 !important;
 }
 
 .formItemSkeleton {

@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
-import { validate } from 'uuid';
+import createError from 'http-errors';
 
+import { USER_ROLE } from '@/app/constants';
 import constructResponseError from '@/app/utils/constructResponseError';
 import getUserFromCookieToken from '@/app/utils/getUserFromCookieToken';
 import Users from '@/prisma/users';
@@ -12,13 +13,17 @@ export async function GET() {
   try {
     const user = getUserFromCookieToken();
 
-    if (!user || !user.id || !validate(user.id)) {
-      return Response.json(null);
+    if (!user) {
+      throw createError(401, `Authentication Failed`);
     }
 
-    const userEntity = users.findOneWithoutPassword(user.id);
+    if (user.role !== USER_ROLE.admin) {
+      throw createError(403, `This user is not permitted to see the list of users`);
+    }
 
-    return Response.json(userEntity);
+    const res = await users.findManyWithoutPassword({ exceptId: user.id });
+
+    return Response.json(res);
   } catch (error) {
     return constructResponseError(error);
   } finally {
