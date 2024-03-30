@@ -1,12 +1,11 @@
 import { PrismaClient } from '@prisma/client';
-import type { HttpError } from 'http-errors';
 import jwt from 'jsonwebtoken';
 import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
 import { isNil, pathOr } from 'ramda';
 import { validate } from 'uuid';
 
 import type { UserType } from '@/app/types';
+import constructResponseError from '@/app/utils/constructResponseError';
 
 export async function GET(req: NextRequest) {
   const prisma = new PrismaClient();
@@ -37,13 +36,7 @@ export async function GET(req: NextRequest) {
 
     return Response.json(response);
   } catch (error) {
-    return NextResponse.json(
-      {
-        error: (error as HttpError).message,
-        statusCode: (error as HttpError).statusCode || 500,
-      },
-      { status: (error as HttpError).statusCode || 500 },
-    );
+    return constructResponseError(error);
   } finally {
     await prisma.$disconnect();
   }

@@ -6,6 +6,8 @@ import * as R from 'ramda';
 
 import { STATUSES, STATUSES_OBJ, TAGS, USER_ROLE } from '../app/constants';
 
+const ADMIN_EMAIL = 'admin@test.com';
+
 const prisma = new PrismaClient({ log: ['query', 'info', 'warn', 'error'] });
 
 async function main() {
@@ -57,14 +59,14 @@ async function main() {
   await prisma.user.createMany({
     data: [
       {
-        email: 'admin@test.com',
+        email: ADMIN_EMAIL,
         password: '$2b$10$d.y8LpLx9jQyiiHEMnWaPOio.0hXRari69rNEalcqW4Zqy2IX9kjO',
         role: USER_ROLE.admin,
       },
       {
         email: 'user@test.com',
         password: '$2b$10$d.y8LpLx9jQyiiHEMnWaPOio.0hXRari69rNEalcqW4Zqy2IX9kjO',
-        role: USER_ROLE.admin,
+        role: USER_ROLE.member,
       },
     ],
   });
@@ -80,7 +82,18 @@ async function main() {
 
   // Init cards
   const boards = await prisma.board.findMany();
+  const admins = await prisma.user.findMany({ where: { role: USER_ROLE.admin } });
   for (const board of boards) {
+    // Init board users
+    for (const admin of admins) {
+      await prisma.userBoard.create({
+        data: {
+          userId: admin.id,
+          boardId: board.id,
+        },
+      });
+    }
+
     // Init statuses
     await prisma.status.createMany({
       data: [

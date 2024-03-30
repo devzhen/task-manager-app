@@ -1,9 +1,10 @@
 import { PrismaClient } from '@prisma/client';
-import type { HttpError } from 'http-errors';
 import createError from 'http-errors';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { T as ramdaTrue, assoc, cond, equals, isEmpty } from 'ramda';
+
+import constructResponseError from '@/app/utils/constructResponseError';
 
 type CardInputType = {
   id: string;
@@ -143,10 +144,7 @@ export const PUT = async (req: NextRequest) => {
 
     return NextResponse.json(updatedCard);
   } catch (error) {
-    return NextResponse.json({
-      error: (error as HttpError).message,
-      status: (error as HttpError).statusCode || 500,
-    });
+    return constructResponseError(error);
   } finally {
     await prisma.$disconnect();
   }

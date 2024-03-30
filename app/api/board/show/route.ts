@@ -1,9 +1,11 @@
 import { PrismaClient } from '@prisma/client';
-import type { HttpError } from 'http-errors';
 import createError from 'http-errors';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { validate } from 'uuid';
+
+import constructResponseError from '@/app/utils/constructResponseError';
+import getUserFromCookieToken from '@/app/utils/getUserFromCookieToken';
 
 export const GET = async (request: NextRequest) => {
   const boardId = request.nextUrl.searchParams.get('boardId');
@@ -11,30 +13,42 @@ export const GET = async (request: NextRequest) => {
   const prisma = new PrismaClient();
 
   try {
+    const user = getUserFromCookieToken();
+
+    if (!user) {
+      throw createError(401, `Authentication Failed`);
+    }
+
     if (!boardId || !validate(boardId)) {
       throw createError(422, `The required query param 'boardId' was not provided`);
     }
 
-    const board = await prisma.board.findUnique({
+    const userBoard = await prisma.userBoard.findFirst({
       where: {
-        id: boardId,
+        boardId: boardId,
+        userId: user.id,
       },
-      include: {
-        statuses: {
-          orderBy: {
-            position: 'asc',
+      select: {
+        board: {
+          select: {
+            statuses: {
+              orderBy: {
+                position: 'asc',
+              },
+            },
+            tags: true,
           },
         },
-        tags: true,
       },
     });
 
-    return NextResponse.json(board);
+    if (!userBoard) {
+      throw createError(403, `The board for this user was not found`);
+    }
+
+    return NextResponse.json(userBoard.board);
   } catch (error) {
-    return NextResponse.json({
-      error: (error as HttpError).message,
-      status: (error as HttpError).statusCode || 500,
-    });
+    return constructResponseError(error);
   } finally {
     await prisma.$disconnect();
   }

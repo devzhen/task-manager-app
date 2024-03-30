@@ -1,18 +1,25 @@
 import { PrismaClient } from '@prisma/client';
-import type { HttpError } from 'http-errors';
 import createError from 'http-errors';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import type { AddBoardFormInputs } from '@/app/components/AddBoardForm/types';
+import constructResponseError from '@/app/utils/constructResponseError';
 import createUpdateMultipleStatusesQuery from '@/app/utils/db/createUpdateMultipleStatusesQuery';
 import createUpdateMultipleTagsQuery from '@/app/utils/db/createUpdateMultipleTagsQuery';
 import reduceByIsNewProperty from '@/app/utils/db/reduceByIsNewProperty';
+import getUserFromCookieToken from '@/app/utils/getUserFromCookieToken';
 
 export const PUT = async (req: NextRequest) => {
   const prisma = new PrismaClient(/* { log: ['query', 'error', 'warn', 'info'] } */);
 
   try {
+    const user = getUserFromCookieToken();
+
+    if (!user) {
+      throw createError(401, `Authentication Failed`);
+    }
+
     const body = (await req.json()) as AddBoardFormInputs;
 
     const { deletedStatuses, deletedTags, boardId, name } = body;
@@ -31,6 +38,17 @@ export const PUT = async (req: NextRequest) => {
     const tagObj = reduceByIsNewProperty(body.tags, 'isNew');
 
     const updatedData = await prisma.$transaction(async (tx) => {
+      // Find user board
+      const userBoard = await tx.userBoard.findFirst({
+        where: {
+          boardId: boardId,
+          userId: user.id,
+        },
+      });
+      if (!userBoard) {
+        throw createError(403, `The board for this user was not found`);
+      }
+
       // Delete statuses
       await tx.status.deleteMany({
         where: {
@@ -103,10 +121,7 @@ export const PUT = async (req: NextRequest) => {
 
     return NextResponse.json(updatedData);
   } catch (error) {
-    return NextResponse.json({
-      error: (error as HttpError).message,
-      status: (error as HttpError).statusCode || 500,
-    });
+    return constructResponseError(error);
   } finally {
     await prisma.$disconnect();
   }

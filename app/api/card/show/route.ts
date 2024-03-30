@@ -37,10 +37,13 @@ export const GET = async (req: NextRequest) => {
 
     return NextResponse.json(card);
   } catch (error) {
-    return NextResponse.json({
-      error: (error as HttpError).message,
-      status: (error as HttpError).statusCode || 500,
-    });
+    return NextResponse.json(
+      {
+        error: (error as HttpError).message,
+        status: (error as HttpError).statusCode || 500,
+      },
+      { status: (error as HttpError).statusCode || 500 },
+    );
   } finally {
     await prisma.$disconnect();
   }

@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -9,10 +10,11 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email    String @unique
-  password String
-  role     String
+  id        String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email     String      @unique
+  password  String
+  role      String
+  UserBoard UserBoard[]
 }
 
 model Attachment {
@@ -35,6 +37,16 @@ model Board {
   statuses  Status[]
   tags      Tag[]
   TagLinker TagLinker[]
+  UserBoard UserBoard[]
+}
+
+model UserBoard {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt DateTime @default(now())
+  board     Board    @relation(fields: [boardId], references: [id])
+  boardId   String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @db.Uuid
 }
 
 model Card {

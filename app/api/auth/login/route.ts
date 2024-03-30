@@ -1,12 +1,12 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
-import type { HttpError } from 'http-errors';
 import createError from 'http-errors';
 import jwt from 'jsonwebtoken';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import type { LoginInputs } from '@/app/types';
+import constructResponseError from '@/app/utils/constructResponseError';
 
 export async function POST(req: NextRequest) {
   const prisma = new PrismaClient();
@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
       {
         id: user.id,
         email: user.email,
+        role: user.role,
       },
       process.env.JWT_TOKEN_SECRET as string,
     );
@@ -46,10 +47,7 @@ export async function POST(req: NextRequest) {
       token,
     });
   } catch (error) {
-    return NextResponse.json({
-      error: (error as HttpError).message,
-      statusCode: (error as HttpError).statusCode || 500,
-    });
+    return constructResponseError(error);
   } finally {
     await prisma.$disconnect();
   }

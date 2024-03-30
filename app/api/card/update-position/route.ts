@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client';
-import type { HttpError } from 'http-errors';
 import createError from 'http-errors';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -7,6 +6,7 @@ import { compose, defaultTo, isNil, last } from 'ramda';
 import { validate } from 'uuid';
 
 import type { CardStatusHistoryType, UpdateCardPositionBodyType } from '@/app/types';
+import constructResponseError from '@/app/utils/constructResponseError';
 
 export const PUT = async (req: NextRequest) => {
   const prisma = new PrismaClient();
@@ -122,10 +122,7 @@ WHERE
 
     return NextResponse.json(result);
   } catch (error) {
-    return NextResponse.json({
-      error: (error as HttpError).message,
-      status: (error as HttpError).statusCode || 500,
-    });
+    return constructResponseError(error);
   } finally {
     await prisma.$disconnect();
   }

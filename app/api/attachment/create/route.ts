@@ -1,8 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import { put, del } from '@vercel/blob';
-import type { HttpError } from 'http-errors';
 import createError from 'http-errors';
 import { NextResponse } from 'next/server';
+
+import constructResponseError from '@/app/utils/constructResponseError';
 
 export async function POST(request: Request) {
   let fileUrl = '';
@@ -51,10 +52,7 @@ export async function POST(request: Request) {
       del(fileUrl);
     }
 
-    return NextResponse.json({
-      error: (error as HttpError).message,
-      status: (error as HttpError).statusCode || 500,
-    });
+    return constructResponseError(error);
   } finally {
     await prisma.$disconnect();
   }

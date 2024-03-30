@@ -1,12 +1,12 @@
 import { PrismaClient } from '@prisma/client';
 import createError from 'http-errors';
-import type { HttpError } from 'http-errors';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { assocPath, compose, path as ramdaPath } from 'ramda';
 
 import { PAGINATION } from '@/app/constants';
 import type { CardType } from '@/app/types';
+import constructResponseError from '@/app/utils/constructResponseError';
 
 type QueryResult = {
   queryResult: {
@@ -85,10 +85,7 @@ export const GET = async (req: NextRequest) => {
       )(result),
     );
   } catch (error) {
-    return NextResponse.json({
-      error: (error as HttpError).message,
-      status: (error as HttpError).statusCode || 500,
-    });
+    return constructResponseError(error);
   } finally {
     await prisma.$disconnect();
   }

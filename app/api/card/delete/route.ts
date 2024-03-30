@@ -1,9 +1,10 @@
 import { PrismaClient } from '@prisma/client';
-import type { HttpError } from 'http-errors';
 import createError from 'http-errors';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { validate } from 'uuid';
+
+import constructResponseError from '@/app/utils/constructResponseError';
 
 export const DELETE = async (req: NextRequest) => {
   const prisma = new PrismaClient();
@@ -56,10 +57,7 @@ export const DELETE = async (req: NextRequest) => {
 
     return NextResponse.json(card);
   } catch (error) {
-    return NextResponse.json({
-      error: (error as HttpError).message,
-      status: (error as HttpError).statusCode || 500,
-    });
+    return constructResponseError(error);
   } finally {
     await prisma.$disconnect();
   }
